@@ -1,0 +1,85 @@
+﻿  core.cpp
+  CPG.cpp
+CPG.cpp(106): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(108): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(307): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(341): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(341): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+CPG.cpp(346): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(353): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(370): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(373): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(373): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+CPG.cpp(374): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(387): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(389): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(569): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(570): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(570): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+CPG.cpp(571): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+CPG.cpp(572): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+CPG.cpp(577): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+CPG.cpp(590): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(590): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+CPG.cpp(597): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(601): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(615): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(633): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(637): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(640): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(652): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(667): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(667): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+CPG.cpp(669): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+CPG.cpp(676): warning C4244: 'argument': conversion from 'double' to 'unsigned int', possible loss of data
+CPG.cpp(676): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+CPG.cpp(678): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  matsuNode.cpp
+matsuNode.cpp(97): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+matsuNode.cpp(364): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+matsuNode.cpp(514): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  MatsuokaEngine.cpp
+MatsuokaEngine.cpp(33): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+MatsuokaEngine.cpp(53): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+MatsuokaEngine.cpp(561): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+MatsuokaEngine.cpp(567): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+MatsuokaEngine.cpp(582): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+MatsuokaEngine.cpp(588): warning C4244: 'return': conversion from 'unsigned int' to 'float', possible loss of data
+MatsuokaEngine.cpp(697): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+MatsuokaEngine.cpp(769): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  QuantisedEventQueue.cpp
+QuantisedEventQueue.cpp(79): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+QuantisedEventQueue.cpp(228): warning C4244: 'return': conversion from 'float' to 'unsigned int', possible loss of data
+QuantisedEventQueue.cpp(244): warning C4244: '=': conversion from 'float' to 'unsigned int', possible loss of data
+  QuantiseGrid_hard.cpp
+QuantiseGrid_hard.cpp(7): warning C4244: '=': conversion from 'float' to 'unsigned int', possible loss of data
+QuantiseGrid_hard.cpp(10): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
+QuantiseGrid_hard.cpp(51): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
+QuantiseGrid_hard.cpp(71): warning C4244: '=': conversion from 'float' to 'unsigned int', possible loss of data
+  QuantiseGrid_soft.cpp
+QuantiseGrid_soft.cpp(40): warning C4244: '=': conversion from 'float' to 'unsigned int', possible loss of data
+QuantiseGrid_soft.cpp(43): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
+QuantiseGrid_soft.cpp(60): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+QuantiseGrid_soft.cpp(72): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+QuantiseGrid_soft.cpp(79): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+QuantiseGrid_soft.cpp(84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+QuantiseGrid_soft.cpp(92): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
+QuantiseGrid_soft.cpp(93): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+QuantiseGrid_soft.cpp(105): warning C4244: '=': conversion from 'float' to 'uint64_t', possible loss of data
+QuantiseGrid_soft.cpp(112): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+QuantiseGrid_soft.cpp(127): warning C4244: '=': conversion from 'float' to 'unsigned int', possible loss of data
+QuantiseGrid_soft.cpp(133): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+QuantiseGrid_soft.cpp(134): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+QuantiseGrid_soft.cpp(179): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+QuantiseGrid_soft.cpp(197): warning C4244: 'initializing': conversion from 'uint64_t' to 'int', possible loss of data
+QuantiseGrid_soft.cpp(198): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+QuantiseGrid_soft.cpp(199): warning C4244: 'initializing': conversion from 'double' to 'uint64_t', possible loss of data
+QuantiseGrid_soft.cpp(204): warning C4244: '+=': conversion from 'double' to 'uint64_t', possible loss of data
+QuantiseGrid_soft.cpp(206): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+QuantiseGrid_soft.cpp(208): warning C4244: '-=': conversion from 'double' to 'uint64_t', possible loss of data
+QuantiseGrid_soft.cpp(211): warning C4244: 'argument': conversion from 'uint64_t' to 'float', possible loss of data
+  ScalingCurve.cpp
+ScalingCurve.cpp(92): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  XORRand.cpp
+  matsu_signal_calcs.c
+  MatsuokaEngine_src.vcxproj -> D:\Development\oF\of_v0.9.3_vs_release\apps\MatsuokaParent\x64\Release\MatsuokaEngine_src.lib

@@ -1,0 +1,21 @@
+/**
+\mainpage Rough documentation for Neurythmic code
+
+This is intended to be give rough overview of the code.
+Not everything is equally well documented. There is a lot of code
+and I have focused on the commenting the bits that seemed most
+significant.
+
+The classes page is probably the most useful.
+I have added brief descriptions for classes that seemed more significant to me.
+
+
+
+Descriptions are all marked either:
+
+Engine: for classes in the engine, (MatsuokaEngine_src folder)
+
+Multimedia: for classes in the multimedia layer (MatsuokaTouchscreen_src folder)
+
+
+*/
