@@ -44,12 +44,10 @@ void matsuoka_rkStep(double in, double t1recip, double t2recip,
     k4 = matsuoka_calc_deriv(in, t1recip, t2recip, c1, c2, b, g,
         matsuoka_eulerStep(*internals, k3, step));
 
-	double oneSixthStep = ONE_SIXTH * step;
-
-    internals->x1 = internals->x1 + (k1.x1 + 2 * (k2.x1 + k3.x1) + k4.x1)* oneSixthStep;
-    internals->x2 = internals->x2 + (k1.x2 + 2 * (k2.x2 + k3.x2) + k4.x2)* oneSixthStep;
-    internals->v1 = internals->v1 + (k1.v1 + 2 * (k2.v1 + k3.v1) + k4.v1)* oneSixthStep;
-    internals->v2 = internals->v2 + (k1.v2 + 2 * (k2.v2 + k3.v2) + k4.v2)* oneSixthStep;
+    internals->x1 = internals->x1 + (k1.x1 + 2 * (k2.x1 + k3.x1) + k4.x1)* ONE_SIXTH * step;
+    internals->x2 = internals->x2 + (k1.x2 + 2 * (k2.x2 + k3.x2) + k4.x2)* ONE_SIXTH * step;
+    internals->v1 = internals->v1 + (k1.v1 + 2 * (k2.v1 + k3.v1) + k4.v1)* ONE_SIXTH * step;
+    internals->v2 = internals->v2 + (k1.v2 + 2 * (k2.v2 + k3.v2) + k4.v2)* ONE_SIXTH * step;
 
 }
 
