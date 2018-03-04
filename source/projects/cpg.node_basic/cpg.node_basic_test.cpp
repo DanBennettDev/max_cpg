@@ -8,35 +8,73 @@
 // Unit tests are written using the Catch framework as described at
 // https://github.com/philsquared/Catch/blob/master/docs/tutorial.md
 
-TEST_CASE( "produces valid impulse response" ) {
+TEST_CASE( "calculates a vector when provided valid values" ) {
 	ext_main(nullptr);	// every unit test must call ext_main() once to configure the class
 
 	// create an instance of our object
-	test_wrapper<phasor> an_instance;
-	phasor& my_object = an_instance;
+	test_wrapper<node_basic> an_instance;
+	node_basic& my_object = an_instance;
 
 	// create an impulse buffer to process
 	const int		buffersize = 256;
-	sample_vector	impulse(buffersize);
+	sample_vector	impulse(buffersize * 10000);
 	
 	std::fill_n(impulse.begin(), buffersize, 0.0);
 	impulse[0] = 1.0;
 	
 	// output from our object's processing
-	sample_vector	output;
+	//sample_vector	output;
 	
 	// run the calculations
 	for (auto x : impulse) {
-		auto y = my_object();
-		output.push_back(y);
+		auto y = my_object(0, 1, 4, 1, 1, 4.07, 4.07);
+		//output.push_back(y);
 	}
 	
-	// get a reference impulse response to compare against
-	auto reference = lib::filters::generate_impulse_response({1.0,-1.0}, {1.0,-0.9997}, buffersize);
-	
+	int i = 0;
 	// check it
 //	REQUIRE( output == reference );
 	REQUIRE ( true );
+}
+
+
+TEST_CASE("calculates a vector when provided invalid values")
+{
+	ext_main(nullptr);	// every unit test must call ext_main() once to configure the class
+
+						// create an instance of our object
+	test_wrapper<node_basic> an_instance;
+	node_basic& my_object = an_instance;
+
+	// create an impulse buffer to process
+	const int		buffersize = 256;
+	sample_vector	impulse(buffersize);
+
+	std::fill_n(impulse.begin(), buffersize, 0.0);
+	impulse[0] = 1.0;
+
+	// output from our object's processing
+	sample_vector	output;
+
+	// run the calculations
+	for (auto x : impulse) {
+		auto y = my_object(0, 0, 0, 0, 0, 0, 0);
+	}
+	for (auto x : impulse) {
+		auto y = my_object(-1, -1, -1, -1, -1, -1, -1);
+	}
+	for (auto x : impulse) {
+		auto y = my_object(0, 1, 0, 1, 1, 1, 1);
+	}
+	for (auto x : impulse) {
+		auto y = my_object(0, 1, 1, 1, 1, 0.6, 1);
+	}
+	for (auto x : impulse) {
+		auto y = my_object(0, 1, 1, 1, 1, 1, 0.6);
+	}
+	// check it
+	//	REQUIRE( output == reference );
+	REQUIRE(true);
 }
 
 
@@ -49,7 +87,7 @@ SCENARIO( "responds appropriately to messages and attrs" ) {
 	std::generate(input.begin(), input.end(), lib::generator::cosine<sample>(buffersize, 10));
 	
 	GIVEN( "An instance of phasor~" ) {
-		phasor	my_object;
+		node_basic	my_object;
 		
 //		REQUIRE( my_object.bypass == false );	// default attr value
 		/*

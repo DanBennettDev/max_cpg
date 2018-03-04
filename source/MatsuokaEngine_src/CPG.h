@@ -177,10 +177,9 @@ public:
     unsigned getNextNodeID();
 
     // protected - may be useful to limit which nodes can take external input 
-    void setExternalInput(unsigned nodeID, double *input, double weight = 0.0);
+    void setExternalInput(unsigned nodeID, double input, double weight = 1.0);
 
-    // protected - may be useful to limit which nodes can take external input 
-    void setExternalInput(unsigned nodeID, double weight);
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

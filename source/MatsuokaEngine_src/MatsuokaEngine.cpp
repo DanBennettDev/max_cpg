@@ -491,9 +491,9 @@ void MatsuokaEngine::setNodeSynchMode(unsigned nodeID, synchMode mode)
 
 
 
-void MatsuokaEngine::setNodeExternalInput(unsigned nodeID, double weight, double* input)
+void MatsuokaEngine::setNodeExternalInput(unsigned nodeID, double weight, double input)
 {
-    void (CPG::*fptr)(unsigned, double*, double)
+    void (CPG::*fptr)(unsigned, double, double)
         = &CPG::setExternalInput;
     std::function<void()> fn = std::bind(fptr, &_cpg, nodeID, input, weight);
 

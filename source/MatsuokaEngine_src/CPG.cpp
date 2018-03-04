@@ -497,17 +497,12 @@ bool CPG::removeNode(unsigned nodeID)
     return found;
 }
 
-void CPG::setExternalInput(unsigned nodeID, double *input, double weight)
+void CPG::setExternalInput(unsigned nodeID, double input, double weight)
 {
     if (!exists(nodeID)) { throw std::invalid_argument("invalid node ID"); }
-    _nodes[nodeID].setExternalInput(input);
-    _nodes[nodeID].setExternalInputWeight(weight);
+    _nodes[nodeID].setExternalInput(input * weight);
 }
 
-void CPG::setExternalInput(unsigned nodeID, double weight)
-{
-    _nodes[nodeID].setExternalInputWeight(weight);
-}
 
 // TODO - split into components.
 void CPG::setParam(unsigned nodeID, MatsuNode::matsuParam param, double val)

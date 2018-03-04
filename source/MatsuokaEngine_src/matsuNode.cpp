@@ -76,9 +76,8 @@ double MatsuNode::getInput() const
         sum += in * inpt.weight;
     }
 
-    if(_ext_input!=nullptr){
-        sum += (*_ext_input * _ext_input_weight);
-    }
+    sum += _ext_input;
+
     if (_selfNoiseAmount > 0.0) {
         sum += XORRand::nextSigVal() * _selfNoiseAmount;
     }
@@ -373,27 +372,16 @@ unsigned MatsuNode::getDelayLineLength() const
 void MatsuNode::clearInputs()
 {
     _inputs.clear();
-    _ext_input = nullptr;
-    _ext_input_weight = 0.0;
+    _ext_input = 0.0;
     _haveInputsChanged = true;
 }
 
-void MatsuNode::setExternalInput(double const *input)
+void MatsuNode::setExternalInput(double const input)
 {
     _ext_input = input;
     _haveInputsChanged = true;
 }
 
-void MatsuNode::setExternalInputWeight(double weight)
-{
-    _ext_input_weight = weight;
-    _haveInputsChanged = true;
-}
-
-double MatsuNode::getExternalInputWeight() const
-{
-    return _ext_input_weight;
-}
 
 
 double MatsuNode::calcFreqCompensation(int cycleCount, int sampleRate)
@@ -482,7 +470,11 @@ void MatsuNode::setParam(matsuParam param, double val)
 
 void    MatsuNode::set_t(double val) 
 {
-	validateT(val);
+	if (val<T_MIN) {
+		val = T_MIN;
+	} else if (val > T_MAX) {
+		val = T_MAX;
+	}
 	matsuParams.t1 = val;
 	matsuParams.t2 = val;
 	_haveParamsChanged = true;
@@ -490,49 +482,77 @@ void    MatsuNode::set_t(double val)
 
 void    MatsuNode::set_t1(double val)
 {
-	validateT(val);
+	if (val<T_MIN ) {
+		val = T_MIN;
+	} else if (val > T_MAX) {
+		val = T_MAX;
+	}
 	matsuParams.t1 = val;
 	_haveParamsChanged = true;
 }
 
 void    MatsuNode::set_t2(double val)
 {
-	validateT(val);
+	if (val<T_MIN) {
+		val = T_MIN;
+	} else if (val > T_MAX) {
+		val = T_MAX;
+	}
 	matsuParams.t2 = val;
 	_haveParamsChanged = true;
 }
 
 void    MatsuNode::set_b(double val)
 {
-	validateB(val);
+	if (val<B_MIN) {
+		val = B_MIN;
+	} else if (val > B_MAX) {
+		val = B_MAX;
+	}
 	matsuParams.b = val;
 	_haveParamsChanged = true;
 }
 
 void    MatsuNode::set_g(double val)
 {
-	validateG(val);
+	if (val<G_MIN) {
+		val = G_MIN;
+	} else if (val > G_MAX) {
+		val = G_MAX;
+	}
 	matsuParams.g = val;
 	_haveParamsChanged = true;
 }
 
 void    MatsuNode::set_c1(double val)
 {
-	validateC(val);
+	if (val<C_MIN) {
+		val = C_MIN;
+	} else if (val > C_MAX) {
+		val = C_MAX;
+	}
 	matsuParams.c1 = val;
 	_haveParamsChanged = true;
 }
 
 void    MatsuNode::set_c2(double val)
 {
-	validateC(val);
+	if (val<C_MIN) {
+		val = C_MIN;
+	} else if (val > C_MAX) {
+		val = C_MAX;
+	}
 	matsuParams.c2 = val;
 	_haveParamsChanged = true;
 }
 
 void    MatsuNode::set_c(double val)
 {
-	validateC(val);
+	if (val<C_MIN) {
+		val = C_MIN;
+	} else if (val > C_MAX) {
+		val = C_MAX;
+	}
 	matsuParams.c1 = val;
 	matsuParams.c2 = val;
 	_haveParamsChanged = true;
@@ -545,7 +565,11 @@ void    MatsuNode::set_t2_over_t1(double val)
 	double t2;
 	_haveParamsChanged = true;
 	t2 = matsuParams.t1 * val;
-	validateT(t2);
+	if (t2<T_MIN) {
+		t2 = T_MIN;
+	} else if (t2 > T_MAX) {
+		t2 = T_MAX;
+	}
 	matsuParams.t2 = t2;
 }
 
@@ -779,8 +803,7 @@ void MatsuNode::create(unsigned id, double t1, double t2, double c1,
 
     _nodeOutputDelay = 0;
     _freqCompensation = DEFAULTFREQCOMPENSAITON;
-    _ext_input = nullptr;
-    _ext_input_weight = 0.0;
+    _ext_input =  0.0;
     _parentNodeID = -1;
     _hasCrossedZero = 0;
     _signalState = signalState::nonSignificant;

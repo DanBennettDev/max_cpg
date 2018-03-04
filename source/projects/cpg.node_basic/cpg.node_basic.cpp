@@ -52,10 +52,7 @@ public:
 		dummyNode = MatsuNode();
 		cout << "initialised matsunode" << endl;
 
-		node.setExternalInput(&inVal);
-		node.setExternalInputWeight(1.0);
-
-		cout << "connected external input" << endl;
+		node.setExternalInput(inVal);
 
 
 		if (args.size() > 0) {
@@ -82,11 +79,12 @@ public:
 		int settleTime = samplerate();
 		node.setFrequency(freq, samplerate());
 		dummyNode.setFrequency(freq, samplerate());
+
 		while (settleTime-- > 0) {
 			dummyNode.doCalcStep(true, true);
 			node.doCalcStep(true, true);
 		}
-		freqComp = dummyNode.calcFreqCompensation(16, samplerate());
+		freqComp = dummyNode.calcFreqCompensation(4, samplerate());
 
 		m_initialized = true;
 	}
@@ -134,15 +132,16 @@ public:
 
 
 	sample operator()(sample in, sample t1, sample t2, sample c1, sample c2, sample b, sample g) {
-		//node.set_t1(t1);
-		//node.set_t2(t2);
-		//node.set_c1(c1);
-		//node.set_c2(c2);
-		//node.set_b(b);
-		//node.set_g(g);
-		//inVal = in;
 
-		node.doCalcStep(true, false);
+		node.set_t1(t1);
+		node.set_t2(t2);
+		node.set_c1(c1);
+		node.set_c2(c2);
+		node.set_b(b);
+		node.set_g(g);
+		node.setExternalInput(in);
+
+		node.doCalcStep(true, true);
 		return node.getOutput();
 	}
 };

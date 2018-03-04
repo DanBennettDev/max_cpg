@@ -217,7 +217,7 @@ public:
 
     /// QUEUED ACTION -allows input of external signals to nodes in the network. Sets connection.
     /// weight and pointer to the input value. Update the input value with signal
-    void setNodeExternalInput(unsigned nodeID, double weight, double* input);
+    void setNodeExternalInput(unsigned nodeID, double weight, double input);
 
     /// resets the flag that indicates that node parameters have been changed
     void resetNodeChangeFlag_Params(unsigned nodeID);

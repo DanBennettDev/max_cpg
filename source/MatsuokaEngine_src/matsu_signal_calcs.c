@@ -18,7 +18,7 @@ double matsuoka_calc_nextVal_RK(double in, double t1, double t2,
     double t1recip = 1.0 / t1;
     double t2recip = 1.0 / t2;
 
-    STABILISE(&g, &c1, &c2, b, t1, t2);
+    STABILISE(&g, &c1, &c2, b, t1, t2recip);
 
     int i = (int)STEP_DIVISION;
     while (i--) {
@@ -44,10 +44,12 @@ void matsuoka_rkStep(double in, double t1recip, double t2recip,
     k4 = matsuoka_calc_deriv(in, t1recip, t2recip, c1, c2, b, g,
         matsuoka_eulerStep(*internals, k3, step));
 
-    internals->x1 = internals->x1 + (k1.x1 + 2 * (k2.x1 + k3.x1) + k4.x1)*(1.0 / 6.0)*step;
-    internals->x2 = internals->x2 + (k1.x2 + 2 * (k2.x2 + k3.x2) + k4.x2)*(1.0 / 6.0)*step;
-    internals->v1 = internals->v1 + (k1.v1 + 2 * (k2.v1 + k3.v1) + k4.v1)*(1.0 / 6.0)*step;
-    internals->v2 = internals->v2 + (k1.v2 + 2 * (k2.v2 + k3.v2) + k4.v2)*(1.0 / 6.0)*step;
+	double oneSixthStep = ONE_SIXTH * step;
+
+    internals->x1 = internals->x1 + (k1.x1 + 2 * (k2.x1 + k3.x1) + k4.x1)* oneSixthStep;
+    internals->x2 = internals->x2 + (k1.x2 + 2 * (k2.x2 + k3.x2) + k4.x2)* oneSixthStep;
+    internals->v1 = internals->v1 + (k1.v1 + 2 * (k2.v1 + k3.v1) + k4.v1)* oneSixthStep;
+    internals->v2 = internals->v2 + (k1.v2 + 2 * (k2.v2 + k3.v2) + k4.v2)* oneSixthStep;
 
 }
 
@@ -82,8 +84,8 @@ matsuoka_internals matsuoka_eulerStep(matsuoka_internals init, matsuoka_internal
 
 // enforces parameters within stable range (see K. Matsuoka, Biological cybernetics, 1985.)
 void matsuoka_enforceStability(double *g, double *c1, double *c2,
-    double b, double t1, double t2) {
-    double gMin = 1.0 + (t1 / t2);
+    double b, double t1, double t2Recip) {
+    double gMin = 1.0 + (t1 * t2Recip);
     *g = *g < gMin ? gMin : *g;
 
     double cMin = *g / (1.0 + b);

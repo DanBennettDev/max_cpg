@@ -232,13 +232,7 @@ public:
 
 
     /// Sets pointer to external signal input
-    void setExternalInput(double const *input);
-
-    /// Sets weight for external signal input
-    void setExternalInputWeight(double weight);  
-
-    /// returns weight for external signal input
-    double getExternalInputWeight() const;
+    void setExternalInput(double const input);
 
 	/// runs node for required No of Cycles and returns the freq compensation amount
 	double calcFreqCompensation(int cycleCount, int sampleRate);
@@ -356,8 +350,7 @@ private:
     //          will probably mean substantial work
     std::vector<MatsuNode const *> _children;
 
-    const double *_ext_input;
-    double _ext_input_weight;
+    double _ext_input;
     double _selfNoiseAmount;
 
     int _parentNodeID;
