@@ -48,11 +48,10 @@ void MatsuNode::doCalcStep(bool basicsOnly, bool withInput)
         prevState = matsuParams.state;
 #endif
 	double input = withInput ? getInput() : 0;
-    matsuParams.out.pushSample(matsuoka_calc_nextVal_RK(input,
+    matsuParams.out.pushSample(mCalcs.nextVal(input,
         matsuParams.t1, matsuParams.t2,
         matsuParams.c1, matsuParams.c2,
-        matsuParams.b, matsuParams.g,
-        &matsuParams.state));
+        matsuParams.b, matsuParams.g));
 
 	if (!basicsOnly) {
 		updateSignalState();
@@ -127,16 +126,16 @@ double MatsuNode::getInternal(matsuInternal param) const
     switch(param)
     {
     case matsuInternal::X1: 
-        return matsuParams.state.x1;
+        return mCalcs.x1();
         break;
     case matsuInternal::X2: 
-        return matsuParams.state.x2;
+        return mCalcs.x2();
         break;
     case matsuInternal::V1: 
-        return matsuParams.state.v1;
+        return mCalcs.v1();
         break;
     case matsuInternal::V2: 
-        return matsuParams.state.v2;
+        return mCalcs.v2();
         break;
     default: 
         throw std::invalid_argument("invalid parameter");
@@ -168,12 +167,12 @@ void MatsuNode::reset()
 
 void MatsuNode::reset(double x1, double x2, double v1, double v2)
 {
-    matsuParams.state.x1 = x1;
-    matsuParams.state.x2 = x2;
-    matsuParams.state.v1 = v1;
-    matsuParams.state.v2 = v2;
+	mCalcs.x1(x1);
+    mCalcs.x2(x2);
+    mCalcs.v1(v1);
+    mCalcs.v2(v2);
     matsuParams.out.pushSample(
-        POSPART(matsuParams.state.x1) - POSPART(matsuParams.state.x2));
+        POSPART(mCalcs.x1()) - POSPART(mCalcs.x2()));
 }
 
 
@@ -793,12 +792,12 @@ void MatsuNode::create(unsigned id, double t1, double t2, double c1,
     matsuParams.c2 = c2;
     matsuParams.b = b;
     matsuParams.g = g;
-    matsuParams.state.x1 = X1_INIT;
-    matsuParams.state.x2 = X2_INIT;
-    matsuParams.state.v1 = V1_INIT;
-    matsuParams.state.v2 = V2_INIT;
+    mCalcs.x1(X1_INIT);
+    mCalcs.x2(X2_INIT);
+    mCalcs.v1(V1_INIT);
+    mCalcs.v2(V2_INIT);
     matsuParams.out.pushSample(
-        POSPART(matsuParams.state.x1) - POSPART(matsuParams.state.x2));
+        POSPART(mCalcs.x1()) - POSPART(mCalcs.x2()));
     _selfNoiseAmount = 0.0;
 
     _nodeOutputDelay = 0;

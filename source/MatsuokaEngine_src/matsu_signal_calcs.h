@@ -75,7 +75,6 @@ extern "C" {
 #define G_MIN     1.0
 #define G_MAX     1000.0
 
-#define ONE_SIXTH 0.166666666666666666666667
 
 
 typedef struct _matsuoka_internals {

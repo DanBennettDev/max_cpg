@@ -5,7 +5,7 @@
 #include <memory>
 #include <cmath>
 #include <vector>
-#include "matsu_signal_calcs.h"
+#include "Matsu_calcs.h"
 #include "core.h"
 #include "delayline.h"
 #include "XORRand.h"
@@ -304,7 +304,6 @@ private:
 
     /// equation parameters and variables for the matsuoka oscillator. See [MatsuParam](@ref matsuParam) and [MatsuInternal](@ref matsuInternal)  
     struct params {
-        matsuoka_internals state;
         DelayLine<double> out;
         double t1;
         double t2;
@@ -317,6 +316,8 @@ private:
             :out(INIT_DELAY_LENGTH)
         {}
     } matsuParams;
+
+	MatsuCalcs mCalcs;
 
     #ifdef _DEBUG_LOG
         matsuoka_internals prevState;

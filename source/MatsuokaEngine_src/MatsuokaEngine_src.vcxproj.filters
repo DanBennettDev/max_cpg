@@ -18,9 +18,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="matsu_signal_calcs.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="matsuNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,15 +45,15 @@
     <ClCompile Include="ScalingCurve.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Matsu_calcs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CPG.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="matsu_signal_calcs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="matsuNode.h">
@@ -81,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ScalingCurve.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Matsu_calcs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
