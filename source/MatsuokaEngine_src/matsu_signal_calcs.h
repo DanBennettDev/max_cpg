@@ -104,7 +104,7 @@ extern "C" {
 
 	void matsuoka_rkStep(double in, double t1recip, double t2recip,
 		double c1, double c2, double b, double g,
-		matsuoka_internals *state, double step);
+		matsuoka_internals *state);
 
 	void matsuoka_fixNAN(matsuoka_internals *state);
 

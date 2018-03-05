@@ -14,7 +14,6 @@ double matsuoka_calc_nextVal_RK(double in, double t1, double t2,
 	double c1, double c2, double b, double g,
 	matsuoka_internals *internals)
 {
-	double step = 1.0 / STEP_DIVISION;
 	double t1recip = 1.0 / t1;
 	double t2recip = 1.0 / t2;
 
@@ -22,7 +21,7 @@ double matsuoka_calc_nextVal_RK(double in, double t1, double t2,
 
 	int i = (int)STEP_DIVISION;
 	while (i--) {
-		matsuoka_rkStep(in, t1recip, t2recip, c1, c2, b, g, internals, step);
+		matsuoka_rkStep(in, t1recip, t2recip, c1, c2, b, g, internals);
 	}
 	matsuoka_fixNAN(internals);
 	return POSPART(internals->x1) - POSPART(internals->x2);
@@ -32,20 +31,23 @@ double matsuoka_calc_nextVal_RK(double in, double t1, double t2,
 // single step in Runge Kutta calculation
 void matsuoka_rkStep(double in, double t1recip, double t2recip,
 	double c1, double c2, double b, double g,
-	matsuoka_internals *internals, double step)
+	matsuoka_internals *internals)
 {
 	matsuoka_internals k1, k2, k3, k4;
+
+	double step = 1.0 / STEP_DIVISION;
+	double halfStep = 0.5 / STEP_DIVISION;
+
+	double oneSixthStep = (1.0 / 6.0) / STEP_DIVISION;
 
 	k1 = matsuoka_calc_deriv(in, t1recip, t2recip, c1, c2, b, g,
 		*internals);
 	k2 = matsuoka_calc_deriv(in, t1recip, t2recip, c1, c2, b, g,
-		matsuoka_eulerStep(*internals, k1, step*0.5));
+		matsuoka_eulerStep(*internals, k1, halfStep));
 	k3 = matsuoka_calc_deriv(in, t1recip, t2recip, c1, c2, b, g,
-		matsuoka_eulerStep(*internals, k2, step*0.5));
+		matsuoka_eulerStep(*internals, k2, halfStep));
 	k4 = matsuoka_calc_deriv(in, t1recip, t2recip, c1, c2, b, g,
 		matsuoka_eulerStep(*internals, k3, step));
-
-	double oneSixthStep = (1.0 / 6.0) * step;
 
 	internals->x1 = internals->x1 + (k1.x1 + 2 * (k2.x1 + k3.x1) + k4.x1)* oneSixthStep;
 	internals->x2 = internals->x2 + (k1.x2 + 2 * (k2.x2 + k3.x2) + k4.x2)* oneSixthStep;
