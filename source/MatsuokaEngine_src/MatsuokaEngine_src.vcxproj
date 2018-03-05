@@ -143,7 +143,7 @@
     <ClCompile Include="CPG.cpp" />
     <ClCompile Include="matsuNode.cpp" />
     <ClCompile Include="MatsuokaEngine.cpp" />
-    <ClCompile Include="Matsu_calcs.cpp" />
+    <ClCompile Include="matsu_signal_calcs.c" />
     <ClCompile Include="QuantisedEventQueue.cpp" />
     <ClCompile Include="QuantiseGrid_hard.cpp" />
     <ClCompile Include="QuantiseGrid_soft.cpp" />
@@ -154,7 +154,7 @@
     <ClInclude Include="core.h" />
     <ClInclude Include="CPG.h" />
     <ClInclude Include="delayLine.h" />
-    <ClInclude Include="Matsu_calcs.h" />
+    <ClInclude Include="matsu_signal_calcs.h" />
     <ClInclude Include="ScalingCurve.h" />
     <ClInclude Include="QuantisedEventQueue.h" />
     <ClInclude Include="QuantiseGrid_hard.h" />

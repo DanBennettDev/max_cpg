@@ -45,7 +45,7 @@
     <ClCompile Include="ScalingCurve.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Matsu_calcs.cpp">
+    <ClCompile Include="matsu_signal_calcs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,7 +80,7 @@
     <ClInclude Include="ScalingCurve.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Matsu_calcs.h">
+    <ClInclude Include="matsu_signal_calcs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

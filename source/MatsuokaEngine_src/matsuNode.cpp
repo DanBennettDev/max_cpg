@@ -3,55 +3,56 @@
 using std::vector;
 
 MatsuNode::MatsuNode()
-    :MatsuNode(0)
+	:MatsuNode(0)
 {
-    return;
+	return;
 }
 
 MatsuNode::MatsuNode(unsigned id)
 {
-    create(id, T1_INIT, T2_INIT, C_INIT, C_INIT, B_INIT, G_INIT);
+	create(id, T1_INIT, T2_INIT, C_INIT, C_INIT, B_INIT, G_INIT);
 }
 
 
-MatsuNode::MatsuNode(unsigned id, double t1, double t2, double c, 
-                        double b, double g)
+MatsuNode::MatsuNode(unsigned id, double t1, double t2, double c,
+	double b, double g)
 {
-    create(id, t1, t2, c, c, b, g);
+	create(id, t1, t2, c, c, b, g);
 }
 
 
-MatsuNode::MatsuNode(unsigned id, double t1, double t2, double c1, 
-                        double c2, double b, double g) 
+MatsuNode::MatsuNode(unsigned id, double t1, double t2, double c1,
+	double c2, double b, double g)
 {
-    create(id, t1, t2, c1, c2, b, g);
+	create(id, t1, t2, c1, c2, b, g);
 }
 
 unsigned MatsuNode::getIdentifier() const
 {
-    return _identifier;
+	return _identifier;
 }
 
 
 void MatsuNode::setIdentifier(unsigned id)
 {
-    if(id >= MAX_NODES){
-        throw std::invalid_argument("ID > MAX no of permitted nodes");
-    }
-    _identifier = id;
+	if (id >= MAX_NODES) {
+		throw std::invalid_argument("ID > MAX no of permitted nodes");
+	}
+	_identifier = id;
 }
 
 
 void MatsuNode::doCalcStep(bool basicsOnly, bool withInput)
 {
 #ifdef _DEBUG_LOG
-        prevState = matsuParams.state;
+	prevState = matsuParams.state;
 #endif
 	double input = withInput ? getInput() : 0;
-    matsuParams.out.pushSample(mCalcs.nextVal(input,
-        matsuParams.t1, matsuParams.t2,
-        matsuParams.c1, matsuParams.c2,
-        matsuParams.b, matsuParams.g));
+	matsuParams.out.pushSample(matsuoka_calc_nextVal_RK(input,
+		matsuParams.t1, matsuParams.t2,
+		matsuParams.c1, matsuParams.c2,
+		matsuParams.b, matsuParams.g,
+		&matsuParams.state));
 
 	if (!basicsOnly) {
 		updateSignalState();
@@ -61,42 +62,42 @@ void MatsuNode::doCalcStep(bool basicsOnly, bool withInput)
 }
 
 
-void MatsuNode::doAuxiliaryStepActions() 
+void MatsuNode::doAuxiliaryStepActions()
 {
-    ;// to be overriden by classes extending MatsuNode
+	;// to be overriden by classes extending MatsuNode
 }
 
-double MatsuNode::getInput() const 
+double MatsuNode::getInput() const
 {
-    double sum = 0.0, in;  
+	double sum = 0.0, in;
 
-    for(auto &inpt : _inputs){
-        in = inpt.node->getOutput(inpt.delay);
-        sum += in * inpt.weight;
-    }
+	for (auto &inpt : _inputs) {
+		in = inpt.node->getOutput(inpt.delay);
+		sum += in * inpt.weight;
+	}
 
-    sum += _ext_input;
+	sum += _ext_input;
 
-    if (_selfNoiseAmount > 0.0) {
-        sum += XORRand::nextSigVal() * _selfNoiseAmount;
-    }
+	if (_selfNoiseAmount > 0.0) {
+		sum += XORRand::nextSigVal() * _selfNoiseAmount;
+	}
 
-    return sum;
+	return sum;
 }
 
 
 double MatsuNode::getOutput() const
 {
-    return matsuParams.out.getDelayed(_nodeOutputDelay);
+	return matsuParams.out.getDelayed(_nodeOutputDelay);
 }
 
 
 double MatsuNode::getOutput(unsigned samplesDelay) const
 {
-    if (samplesDelay > matsuParams.out.size()) { 
-        samplesDelay = matsuParams.out.size();
-    }
-    return matsuParams.out.getDelayed(samplesDelay);
+	if (samplesDelay > matsuParams.out.size()) {
+		samplesDelay = (unsigned)matsuParams.out.size();
+	}
+	return matsuParams.out.getDelayed(samplesDelay);
 }
 
 
@@ -105,78 +106,78 @@ double MatsuNode::getOutput(unsigned samplesDelay) const
 
 double MatsuNode::getLastMaxima() const
 {
-    return _lastMaxima;
+	return _lastMaxima;
 }
 
 double MatsuNode::getLastMinima() const
 {
-    return _lastMinima;
+	return _lastMinima;
 }
 
 
 
 
-MatsuNode::signalState MatsuNode::getSignalState() const {
-    return _signalState;
+MatsuNode::signalState MatsuNode::getSignalState() const
+{
+	return _signalState;
 }
 
 
 double MatsuNode::getInternal(matsuInternal param) const
 {
-    switch(param)
-    {
-    case matsuInternal::X1: 
-        return mCalcs.x1();
-        break;
-    case matsuInternal::X2: 
-        return mCalcs.x2();
-        break;
-    case matsuInternal::V1: 
-        return mCalcs.v1();
-        break;
-    case matsuInternal::V2: 
-        return mCalcs.v2();
-        break;
-    default: 
-        throw std::invalid_argument("invalid parameter");
-        break;
-    }
+	switch (param) {
+	case matsuInternal::X1:
+		return matsuParams.state.x1;
+		break;
+	case matsuInternal::X2:
+		return matsuParams.state.x2;
+		break;
+	case matsuInternal::V1:
+		return matsuParams.state.v1;
+		break;
+	case matsuInternal::V2:
+		return matsuParams.state.v2;
+		break;
+	default:
+		throw std::invalid_argument("invalid parameter");
+		break;
+	}
 }
 
-void MatsuNode::setFreqCompensation(double comp) 
+void MatsuNode::setFreqCompensation(double comp)
 {
-    _freqCompensation = comp;
+	_freqCompensation = comp;
 }
 
-double MatsuNode::getFreqCompensation() const 
+double MatsuNode::getFreqCompensation() const
 {
-    return _freqCompensation;
+	return _freqCompensation;
 }
 
 
 
-void MatsuNode::resetFreqCompensation() 
+void MatsuNode::resetFreqCompensation()
 {
-    _freqCompensation = DEFAULTFREQCOMPENSAITON;
+	_freqCompensation = DEFAULTFREQCOMPENSAITON;
 }
 
 void MatsuNode::reset()
 {
-    reset(X1_INIT, X2_INIT, V1_INIT, V2_INIT);
+	reset(X1_INIT, X2_INIT, V1_INIT, V2_INIT);
 }
 
 void MatsuNode::reset(double x1, double x2, double v1, double v2)
 {
-	mCalcs.x1(x1);
-    mCalcs.x2(x2);
-    mCalcs.v1(v1);
-    mCalcs.v2(v2);
-    matsuParams.out.pushSample(
-        POSPART(mCalcs.x1()) - POSPART(mCalcs.x2()));
+	matsuParams.state.x1 = x1;
+	matsuParams.state.x2 = x2;
+	matsuParams.state.v1 = v1;
+	matsuParams.state.v2 = v2;
+	matsuParams.out.pushSample(
+		POSPART(matsuParams.state.x1) - POSPART(matsuParams.state.x2));
 }
 
 
-void MatsuNode::resetChangeFlag_Params(){ _haveParamsChanged = false; }
+void MatsuNode::resetChangeFlag_Params() { _haveParamsChanged = false; }
 
 void MatsuNode::resetChangeFlag_Inputs() { _haveInputsChanged = false; }
 
@@ -195,73 +196,73 @@ bool MatsuNode::hasChanged_Inputs() const { return _haveInputsChanged; }
 // compensation must be recalculated if b,g change
 void MatsuNode::setFrequency(double freq, unsigned sampleRate)
 {
-    if (freq < 0.0) { 
-        throw std::invalid_argument("freq cannot be negative"); 
-    };
+	if (freq < 0.0) {
+		throw std::invalid_argument("freq cannot be negative");
+	};
 
-    double mult = matsuParams.t2 / matsuParams.t1;
-    
-    double t1 = (_freqCompensation*sampleRate / (freq * TWOPI)) *
-        sqrt( (matsuParams.b + (matsuParams.b * mult) - (matsuParams.g * mult)) /
-            (matsuParams.g * mult));
+	double mult = matsuParams.t2 / matsuParams.t1;
 
-    double t2 = t1 * mult;
-    validateT(t1);
-    validateT(t2);
-    matsuParams.t1 = t1;
-    matsuParams.t2 = t2;   
-    _haveParamsChanged = true;
+	double t1 = (_freqCompensation*sampleRate / (freq * TWOPI)) *
+		sqrt((matsuParams.b + (matsuParams.b * mult) - (matsuParams.g * mult)) /
+		(matsuParams.g * mult));
+
+	double t2 = t1 * mult;
+	validateT(t1);
+	validateT(t2);
+	matsuParams.t1 = t1;
+	matsuParams.t2 = t2;
+	_haveParamsChanged = true;
 }
 
 double MatsuNode::getFrequency(unsigned sampleRate) const
 {
-    double comp = _freqCompensation*sampleRate;
-    double mult = matsuParams.t2 / matsuParams.t1;
+	double comp = _freqCompensation * sampleRate;
+	double mult = matsuParams.t2 / matsuParams.t1;
 
-    //return (comp / matsuParams.t2)*
-    //            sqrt(((matsuParams.t1 + matsuParams.t2) * matsuParams.b
-    //                - matsuParams.t1*matsuParams.g) /
-    //                (matsuParams.t1 *matsuParams.g));
+	//return (comp / matsuParams.t2)*
+	//            sqrt(((matsuParams.t1 + matsuParams.t2) * matsuParams.b
+	//                - matsuParams.t1*matsuParams.g) /
+	//                (matsuParams.t1 *matsuParams.g));
 
 
-    return (_freqCompensation*sampleRate / (matsuParams.t1 * TWOPI)) *
-        sqrt((matsuParams.b + (matsuParams.b * mult) - (matsuParams.g * mult)) /
-        (matsuParams.g * mult));
+	return (_freqCompensation*sampleRate / (matsuParams.t1 * TWOPI)) *
+		sqrt((matsuParams.b + (matsuParams.b * mult) - (matsuParams.g * mult)) /
+		(matsuParams.g * mult));
 }
 
 
 // returns true if input is added, false if already exists
 bool MatsuNode::setInputWeight(MatsuNode const &node, double weight)
 {
-    // check if node already exists as input
-    for(auto &inpt : _inputs){
-        if (inpt.node == &node) {
-            inpt.weight = weight;
-            _haveInputsChanged = true;
-            return false;
-        } 
-        if (inpt.node->getIdentifier() == node.getIdentifier()) {
-            throw std::invalid_argument("same node id already exists for different input");
-        }
-    }
-    // if not, add input
-    input in;
-    in.node = &node;
-    in.weight = weight;
-    in.delay = 0;
-    _inputs.push_back(in);
-    _haveInputsChanged = true;
-    return true;
+	// check if node already exists as input
+	for (auto &inpt : _inputs) {
+		if (inpt.node == &node) {
+			inpt.weight = weight;
+			_haveInputsChanged = true;
+			return false;
+		}
+		if (inpt.node->getIdentifier() == node.getIdentifier()) {
+			throw std::invalid_argument("same node id already exists for different input");
+		}
+	}
+	// if not, add input
+	input in;
+	in.node = &node;
+	in.weight = weight;
+	in.delay = 0;
+	_inputs.push_back(in);
+	_haveInputsChanged = true;
+	return true;
 }
 
 void MatsuNode::setInputDelay(MatsuNode const &node, unsigned delay)
 {
-    if (delay > node.getDelayLineLength()) { delay = node.getDelayLineLength(); }
-    for (auto &inpt : _inputs) {
-        if (node.getIdentifier() == inpt.node->getIdentifier()) {
-            inpt.delay = delay;
-        }
-    }
+	if (delay > node.getDelayLineLength()) { delay = node.getDelayLineLength(); }
+	for (auto &inpt : _inputs) {
+		if (node.getIdentifier() == inpt.node->getIdentifier()) {
+			inpt.delay = delay;
+		}
+	}
 }
 
 
@@ -269,45 +270,45 @@ void MatsuNode::setInputDelay(MatsuNode const &node, unsigned delay)
 
 void MatsuNode::setSelfNoiseAmount(double amount)
 {
-    if (amount < 0) { amount = 0; }
-    _selfNoiseAmount = amount;
+	if (amount < 0) { amount = 0; }
+	_selfNoiseAmount = amount;
 }
 
 
 
-bool MatsuNode::removeInput(unsigned identifier) 
+bool MatsuNode::removeInput(unsigned identifier)
 {
-    
-    for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
-        if (iter->node->_identifier == identifier) {
-            _inputs.erase(iter);
-            _haveInputsChanged = true;
-            return true;    // input removed
-        } 
-    }
-    return false;   // node was not an input, no change
+
+	for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
+		if (iter->node->_identifier == identifier) {
+			_inputs.erase(iter);
+			_haveInputsChanged = true;
+			return true;    // input removed
+		}
+	}
+	return false;   // node was not an input, no change
 }
 
-bool MatsuNode::isInput(unsigned identifier) const 
+bool MatsuNode::isInput(unsigned identifier) const
 {
-    for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
-        if (iter->node->getIdentifier() == identifier) {
-            return true;
-        }
-    }
-    return false;
+	for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
+		if (iter->node->getIdentifier() == identifier) {
+			return true;
+		}
+	}
+	return false;
 }
 
 
 vector<unsigned> MatsuNode::getInputIds() const
 {
-    vector<unsigned> out;
-    out.reserve(_inputs.size());
-    for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
-        out.push_back(iter->node->_identifier);
-    }
-    std::sort(out.begin(), out.end());
-    return out;
+	vector<unsigned> out;
+	out.reserve(_inputs.size());
+	for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
+		out.push_back(iter->node->_identifier);
+	}
+	std::sort(out.begin(), out.end());
+	return out;
 }
 
 
@@ -315,53 +316,53 @@ vector<unsigned> MatsuNode::getInputIds() const
 // ToDo - should I handle not found differently?
 double MatsuNode::getInputWeight(unsigned identifier) const
 {
-    // check if node exists as input
-    for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
-        if (iter->node->_identifier == identifier) {
-            return iter->weight;
-        }
-    }
-    return 0.0;
+	// check if node exists as input
+	for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
+		if (iter->node->_identifier == identifier) {
+			return iter->weight;
+		}
+	}
+	return 0.0;
 }
 
 double MatsuNode::getInputDelay(unsigned identifier) const
 {
-    // check if node exists as input
-    for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
-        if (iter->node->_identifier == identifier) {
-            return iter->delay;
-        }
-    }
-    return 0.0;
+	// check if node exists as input
+	for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
+		if (iter->node->_identifier == identifier) {
+			return iter->delay;
+		}
+	}
+	return 0.0;
 }
 
 
 
 
-const MatsuNode* MatsuNode::getInputNode(unsigned identifier) const 
+const MatsuNode* MatsuNode::getInputNode(unsigned identifier) const
 {
-    // check if node already exists as input
-    for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
-        if (iter->node->_identifier == identifier) {
-            return iter->node;
-        }
-    }
-    throw std::invalid_argument("invalid parameter");
+	// check if node already exists as input
+	for (auto iter = _inputs.begin(); iter != _inputs.end(); iter++) {
+		if (iter->node->_identifier == identifier) {
+			return iter->node;
+		}
+	}
+	throw std::invalid_argument("invalid parameter");
 }
 
 double MatsuNode::getSelfNoiseAmount() const
 {
-    return _selfNoiseAmount;
+	return _selfNoiseAmount;
 }
 
 unsigned MatsuNode::getOutputDelay() const
 {
-    return _nodeOutputDelay;
+	return _nodeOutputDelay;
 }
 
 unsigned MatsuNode::getDelayLineLength() const
 {
-    return matsuParams.out.size();
+	return (unsigned)matsuParams.out.size();
 }
 
 
@@ -370,15 +371,15 @@ unsigned MatsuNode::getDelayLineLength() const
 
 void MatsuNode::clearInputs()
 {
-    _inputs.clear();
-    _ext_input = 0.0;
-    _haveInputsChanged = true;
+	_inputs.clear();
+	_ext_input = 0.0;
+	_haveInputsChanged = true;
 }
 
 void MatsuNode::setExternalInput(double const input)
 {
-    _ext_input = input;
-    _haveInputsChanged = true;
+	_ext_input = input;
+	_haveInputsChanged = true;
 }
 
 
@@ -402,7 +403,7 @@ double MatsuNode::calcFreqCompensation(int cycleCount, int sampleRate)
 			} else {
 				isCounting = true;
 			}
-		} 
+		}
 		counter = isCounting ? counter + 1 : counter;
 	}
 
@@ -417,57 +418,57 @@ double MatsuNode::calcFreqCompensation(int cycleCount, int sampleRate)
 // throws exception if any parameters invalid
 void MatsuNode::setParam(matsuParam param, double val)
 {
-    double t2;
-    _haveParamsChanged = true;
+	double t2;
+	_haveParamsChanged = true;
 
-    switch (param) {
-    case matsuParam::T:
-        validateT(val);
-        matsuParams.t1 = val;
-        matsuParams.t2 = val;
-        break;
-    case matsuParam::T1:
-        validateT(val);
-        matsuParams.t1 = val;
-        break;
-    case matsuParam::T2:
-        validateT(val);
-        matsuParams.t2 = val;
-        break;
-    case matsuParam::T2OverT1:
-        t2 = matsuParams.t1 * val;
-        validateT(t2);
-        matsuParams.t2 = t2;
-        break;
-    case matsuParam::C:
-        validateC(val);
-        matsuParams.c1 = val;
-        matsuParams.c2 = val;
-        break;
-    case matsuParam::C1:
-        validateC(val);
-        matsuParams.c1 = val;
-        break;
-    case matsuParam::C2:
-        validateC(val);
-        matsuParams.c2 = val;
-        break;
-    case matsuParam::B:
-        validateB(val);
-        matsuParams.b = val;
-        break;
-    case matsuParam::G:
-        validateG(val);
-        matsuParams.g = val;
-        break;
-    default:
-        throw std::invalid_argument("invalid parameter");
-        break;
-    }
+	switch (param) {
+	case matsuParam::T:
+		validateT(val);
+		matsuParams.t1 = val;
+		matsuParams.t2 = val;
+		break;
+	case matsuParam::T1:
+		validateT(val);
+		matsuParams.t1 = val;
+		break;
+	case matsuParam::T2:
+		validateT(val);
+		matsuParams.t2 = val;
+		break;
+	case matsuParam::T2OverT1:
+		t2 = matsuParams.t1 * val;
+		validateT(t2);
+		matsuParams.t2 = t2;
+		break;
+	case matsuParam::C:
+		validateC(val);
+		matsuParams.c1 = val;
+		matsuParams.c2 = val;
+		break;
+	case matsuParam::C1:
+		validateC(val);
+		matsuParams.c1 = val;
+		break;
+	case matsuParam::C2:
+		validateC(val);
+		matsuParams.c2 = val;
+		break;
+	case matsuParam::B:
+		validateB(val);
+		matsuParams.b = val;
+		break;
+	case matsuParam::G:
+		validateG(val);
+		matsuParams.g = val;
+		break;
+	default:
+		throw std::invalid_argument("invalid parameter");
+		break;
+	}
 }
 
 
-void    MatsuNode::set_t(double val) 
+void    MatsuNode::set_t(double val)
 {
 	if (val<T_MIN) {
 		val = T_MIN;
@@ -481,7 +482,7 @@ void    MatsuNode::set_t(double val)
 
 void    MatsuNode::set_t1(double val)
 {
-	if (val<T_MIN ) {
+	if (val<T_MIN) {
 		val = T_MIN;
 	} else if (val > T_MAX) {
 		val = T_MAX;
@@ -574,75 +575,74 @@ void    MatsuNode::set_t2_over_t1(double val)
 
 
 
-void MatsuNode::setParams(double t1, double t2, double c1, double c2, 
-                                double b, double g) 
+void MatsuNode::setParams(double t1, double t2, double c1, double c2,
+	double b, double g)
 {
-    validateParams(t1, t2, c1, c2, b, g);
-    _haveInputsChanged = true;
-    matsuParams.t1 = t1;    matsuParams.t2 = t2;
-    matsuParams.c1 = c1;    matsuParams.c2 = c2;
-    matsuParams.b = b;      matsuParams.g = g;
+	validateParams(t1, t2, c1, c2, b, g);
+	_haveInputsChanged = true;
+	matsuParams.t1 = t1;    matsuParams.t2 = t2;
+	matsuParams.c1 = c1;    matsuParams.c2 = c2;
+	matsuParams.b = b;      matsuParams.g = g;
 }
 
 void MatsuNode::setParams(double t1, double t2, double c,
-    double b, double g) 
+	double b, double g)
 {
-    setParams(t1, t2, c, c, b, g);
+	setParams(t1, t2, c, c, b, g);
 }
 
-double MatsuNode::getParam(matsuParam param) const 
+double MatsuNode::getParam(matsuParam param) const
 {
-    switch(param)
-    {
-    case matsuParam::T:
-    case matsuParam::T1: 
-        return matsuParams.t1;
-        break;
-    case matsuParam::T2: 
-        return matsuParams.t2;
-        break;
-    case matsuParam::T2OverT1:
-        return matsuParams.t2 / matsuParams.t1;
-    case matsuParam::C:
-    case matsuParam::C1:
-        return matsuParams.c1;
-        break;
-    case matsuParam::C2:
-        return matsuParams.c2;
-        break;
-    case matsuParam::B: 
-        return matsuParams.b;
-        break;
-    case matsuParam::G: 
-        return matsuParams.g;
-        break;
-    default: 
-        throw std::invalid_argument("invalid parameter");
-        break;
-    }
+	switch (param) {
+	case matsuParam::T:
+	case matsuParam::T1:
+		return matsuParams.t1;
+		break;
+	case matsuParam::T2:
+		return matsuParams.t2;
+		break;
+	case matsuParam::T2OverT1:
+		return matsuParams.t2 / matsuParams.t1;
+	case matsuParam::C:
+	case matsuParam::C1:
+		return matsuParams.c1;
+		break;
+	case matsuParam::C2:
+		return matsuParams.c2;
+		break;
+	case matsuParam::B:
+		return matsuParams.b;
+		break;
+	case matsuParam::G:
+		return matsuParams.g;
+		break;
+	default:
+		throw std::invalid_argument("invalid parameter");
+		break;
+	}
 }
 
 
 void MatsuNode::setDelayLineLength(unsigned length)
 {
-    if (length < INIT_DELAY_LENGTH) { length = INIT_DELAY_LENGTH; }
+	if (length < INIT_DELAY_LENGTH) { length = INIT_DELAY_LENGTH; }
 
-    if (_nodeOutputDelay > length) { 
-        _nodeOutputDelay = length; 
-    }
+	if (_nodeOutputDelay > length) {
+		_nodeOutputDelay = length;
+	}
 
-    matsuParams.out.resize(length);
+	matsuParams.out.resize(length);
 }
 
 
 void MatsuNode::setNodeOutputDelay(unsigned samples)
 {
-    if (samples < MIN_DELAY_LENGTH) { samples = MIN_DELAY_LENGTH; }
-    if (samples >= matsuParams.out.size()) { 
-        samples = matsuParams.out.size()-1; 
-    }
+	if (samples < MIN_DELAY_LENGTH) { samples = MIN_DELAY_LENGTH; }
+	if (samples >= matsuParams.out.size()) {
+		samples = (unsigned)matsuParams.out.size() - 1;
+	}
 
-    _nodeOutputDelay = samples;
+	_nodeOutputDelay = samples;
 }
 
 
@@ -653,97 +653,98 @@ void MatsuNode::setNodeOutputDelay(unsigned samples)
 
 
 
-void MatsuNode::setParent(unsigned nodeID) 
+void MatsuNode::setParent(unsigned nodeID)
 {
-    if (isInput(nodeID)) {
-        _haveInputsChanged = true;
-        _parentNodeID = nodeID;
-        return;
-    }
-    throw std::invalid_argument("node to be added as parent is not an input");
+	if (isInput(nodeID)) {
+		_haveInputsChanged = true;
+		_parentNodeID = nodeID;
+		return;
+	}
+	throw std::invalid_argument("node to be added as parent is not an input");
 }
 
 
-void MatsuNode::removeParent() { 
-    _haveInputsChanged = true;
-    _parentNodeID = -1; 
+void MatsuNode::removeParent()
+{
+	_haveInputsChanged = true;
+	_parentNodeID = -1;
 }
 
 
-bool MatsuNode::addChild(MatsuNode &node) 
+bool MatsuNode::addChild(MatsuNode &node)
 {
-    if (&node == this) {
-        throw std::invalid_argument("node cannot be its own child");
+	if (&node == this) {
+		throw std::invalid_argument("node cannot be its own child");
 
-    }
-    if (isChild(node)) { return false; }
-    _children.push_back(&node);
-    std::sort(_children.begin(), _children.end());
-    _haveInputsChanged = true;
-    return true;
+	}
+	if (isChild(node)) { return false; }
+	_children.push_back(&node);
+	std::sort(_children.begin(), _children.end());
+	_haveInputsChanged = true;
+	return true;
 }
 
 
-bool MatsuNode::removeChild(unsigned nodeID) 
+bool MatsuNode::removeChild(unsigned nodeID)
 {
-    for (auto iter = _children.begin(); iter != _children.end(); iter++) {
-        if ((*iter)->getIdentifier() == nodeID) {
-            _children.erase(iter);
-            _haveInputsChanged = true;
-            return true;
-        }
-    }
-    return false;
+	for (auto iter = _children.begin(); iter != _children.end(); iter++) {
+		if ((*iter)->getIdentifier() == nodeID) {
+			_children.erase(iter);
+			_haveInputsChanged = true;
+			return true;
+		}
+	}
+	return false;
 }
 
 
-bool MatsuNode::removeChild(MatsuNode &node) 
+bool MatsuNode::removeChild(MatsuNode &node)
 {
-    for (auto iter = _children.begin(); iter != _children.end(); iter++) {
-        if (*iter == &node) {
-            _children.erase(iter);
-            _haveInputsChanged = true;
-            return true;
-        }
-    }
-    return false;
+	for (auto iter = _children.begin(); iter != _children.end(); iter++) {
+		if (*iter == &node) {
+			_children.erase(iter);
+			_haveInputsChanged = true;
+			return true;
+		}
+	}
+	return false;
 }
 
 
 int MatsuNode::getParentID() const { return _parentNodeID; }
 
 
-bool MatsuNode::isChild(MatsuNode & node) const 
+bool MatsuNode::isChild(MatsuNode & node) const
 {
-    for (auto iter = _children.begin(); iter != _children.end(); iter++) {
-        if (&node == *iter) { return true; }
-    }
-    return false;
+	for (auto iter = _children.begin(); iter != _children.end(); iter++) {
+		if (&node == *iter) { return true; }
+	}
+	return false;
 }
 
-bool MatsuNode::isChild(unsigned nodeID) const 
+bool MatsuNode::isChild(unsigned nodeID) const
 {
-    for (auto iter = _children.begin(); iter != _children.end(); iter++) {
-        if ((*iter)->getIdentifier() == nodeID) { return true; }
-    }
-    return false;
-}
-
-
-std::vector<unsigned> MatsuNode::getChildIDs() const 
-{
-    std::vector<unsigned> childIDs;
-    childIDs.reserve(_children.size());
-    for (auto iter = _children.begin(); iter != _children.end(); iter++) {
-        childIDs.push_back((*iter)->getIdentifier());
-    }
-    return childIDs;
+	for (auto iter = _children.begin(); iter != _children.end(); iter++) {
+		if ((*iter)->getIdentifier() == nodeID) { return true; }
+	}
+	return false;
 }
 
 
-unsigned MatsuNode::getChildCount() const 
+std::vector<unsigned> MatsuNode::getChildIDs() const
 {
-    return (int)_children.size();
+	std::vector<unsigned> childIDs;
+	childIDs.reserve(_children.size());
+	for (auto iter = _children.begin(); iter != _children.end(); iter++) {
+		childIDs.push_back((*iter)->getIdentifier());
+	}
+	return childIDs;
+}
+
+
+unsigned MatsuNode::getChildCount() const
+{
+	return (int)_children.size();
 }
 
 
@@ -751,17 +752,17 @@ unsigned MatsuNode::getChildCount() const
 
 void MatsuNode::clone(MatsuNode &from)
 {
-    matsuParams.t1 = from.getParam(matsuParam::T1);
-    matsuParams.t2 = from.getParam(matsuParam::T2);
-    matsuParams.c1 = from.getParam(matsuParam::C1);
-    matsuParams.c2 = from.getParam(matsuParam::C2);
-    matsuParams.b = from.getParam(matsuParam::B);
-    matsuParams.g = from.getParam(matsuParam::G);
-    _freqCompensation = from.getFreqCompensation();
-    _hasCrossedZero = 0;
-    _signalState = signalState::nonSignificant;
-    _lastMaxima = _lastMinima = 0;
-    _haveParamsChanged = _haveInputsChanged = false;
+	matsuParams.t1 = from.getParam(matsuParam::T1);
+	matsuParams.t2 = from.getParam(matsuParam::T2);
+	matsuParams.c1 = from.getParam(matsuParam::C1);
+	matsuParams.c2 = from.getParam(matsuParam::C2);
+	matsuParams.b = from.getParam(matsuParam::B);
+	matsuParams.g = from.getParam(matsuParam::G);
+	_freqCompensation = from.getFreqCompensation();
+	_hasCrossedZero = 0;
+	_signalState = signalState::nonSignificant;
+	_lastMaxima = _lastMinima = 0;
+	_haveParamsChanged = _haveInputsChanged = false;
 }
 
 
@@ -777,139 +778,139 @@ MatsuNode::synchMode MatsuNode::getSynchMode() const { return _synchMode; }
 // PRIVATE
 ///////////////////////////////////////////////////////////////////////////////
 
-void MatsuNode::create(unsigned id, double t1, double t2, double c1, 
-                        double c2, double b, double g) 
+void MatsuNode::create(unsigned id, double t1, double t2, double c1,
+	double c2, double b, double g)
 {
-    _inputs.reserve(MAX_NODES);
-    _children.reserve(MAX_NODES);
+	_inputs.reserve(MAX_NODES);
+	_children.reserve(MAX_NODES);
 
-    validateParams(t1, t2, c1, c2, b, g);
-    _active = true;
-    _identifier = id;
-    matsuParams.t1 = t1;
-    matsuParams.t2 = t2;
-    matsuParams.c1 = c1;
-    matsuParams.c2 = c2;
-    matsuParams.b = b;
-    matsuParams.g = g;
-    mCalcs.x1(X1_INIT);
-    mCalcs.x2(X2_INIT);
-    mCalcs.v1(V1_INIT);
-    mCalcs.v2(V2_INIT);
-    matsuParams.out.pushSample(
-        POSPART(mCalcs.x1()) - POSPART(mCalcs.x2()));
-    _selfNoiseAmount = 0.0;
+	validateParams(t1, t2, c1, c2, b, g);
+	_active = true;
+	_identifier = id;
+	matsuParams.t1 = t1;
+	matsuParams.t2 = t2;
+	matsuParams.c1 = c1;
+	matsuParams.c2 = c2;
+	matsuParams.b = b;
+	matsuParams.g = g;
+	matsuParams.state.x1 = X1_INIT;
+	matsuParams.state.x2 = X2_INIT;
+	matsuParams.state.v1 = V1_INIT;
+	matsuParams.state.v2 = V2_INIT;
+	matsuParams.out.pushSample(
+		POSPART(matsuParams.state.x1) - POSPART(matsuParams.state.x2));
+	_selfNoiseAmount = 0.0;
 
-    _nodeOutputDelay = 0;
-    _freqCompensation = DEFAULTFREQCOMPENSAITON;
-    _ext_input =  0.0;
-    _parentNodeID = -1;
-    _hasCrossedZero = 0;
-    _signalState = signalState::nonSignificant;
-    _lastMaxima = _lastMinima = 0;
-    _haveParamsChanged = _haveInputsChanged = false;
-    _synchMode = synchMode::free;
+	_nodeOutputDelay = 0;
+	_freqCompensation = DEFAULTFREQCOMPENSAITON;
+	_ext_input = 0.0;
+	_parentNodeID = -1;
+	_hasCrossedZero = 0;
+	_signalState = signalState::nonSignificant;
+	_lastMaxima = _lastMinima = 0;
+	_haveParamsChanged = _haveInputsChanged = false;
+	_synchMode = synchMode::free;
 }
 
-void MatsuNode::uncreate() 
+void MatsuNode::uncreate()
 {
-// nothing to do yuet
+	// nothing to do yuet
 }
 
 
 // throws exception if any parameters invalid
 void MatsuNode::validateParams(double t1, double t2, double c1, double c2,
-                                double b, double g)
+	double b, double g)
 {
-    validateT(t1);
-    validateT(t2);
-    validateC(c1);
-    validateC(c2);
-    validateB(b);
-    validateG(g);
+	validateT(t1);
+	validateT(t2);
+	validateC(c1);
+	validateC(c2);
+	validateB(b);
+	validateG(g);
 }
 
 void MatsuNode::validateT(double t)
 {
-    if (t<T_MIN || t>T_MAX) {
-        throw std::invalid_argument("t out of bounds");
-    }
+	if (t<T_MIN || t>T_MAX) {
+		throw std::invalid_argument("t out of bounds");
+	}
 }
 
 void MatsuNode::validateC(double c)
 {
-    if (c<C_MIN || c>C_MAX) {
-        throw std::invalid_argument("c out of bounds");
-    }
+	if (c<C_MIN || c>C_MAX) {
+		throw std::invalid_argument("c out of bounds");
+	}
 }
 
 void MatsuNode::validateB(double b)
 {
-    if (b<B_MIN || b>B_MAX) {
-        throw std::invalid_argument("b out of bounds");
-    }
+	if (b<B_MIN || b>B_MAX) {
+		throw std::invalid_argument("b out of bounds");
+	}
 }
 
 void MatsuNode::validateG(double g)
 {
-    if (g<G_MIN || g>G_MAX) {
-        throw std::invalid_argument("g out of bounds");
-    }
+	if (g<G_MIN || g>G_MAX) {
+		throw std::invalid_argument("g out of bounds");
+	}
 }
 
 
 void MatsuNode::updateSignalState()
 {
 
-    if (matsuParams.out.getDelayed(_nodeOutputDelay) > 0
-            && matsuParams.out.getDelayed(_nodeOutputDelay + 1) <= 0) {
-        _signalState = signalState::zeroXup;
-        _hasCrossedZero = 1;
-        return;
-    }
-    if (matsuParams.out.getDelayed(_nodeOutputDelay) < 0 
-            && matsuParams.out.getDelayed(_nodeOutputDelay+1) >= 0) {
-        _signalState = signalState::zeroXdown;
-        _hasCrossedZero = -1;
-        return;
-    }
-    if (_hasCrossedZero == 1 
-            && matsuParams.out.getDelayed(_nodeOutputDelay) 
-                < matsuParams.out.getDelayed(_nodeOutputDelay+1)) {
-        _signalState = signalState::firstPeak;
-        _lastMaxima = matsuParams.out.getDelayed(_nodeOutputDelay+1);
-        _hasCrossedZero = 0;
+	if (matsuParams.out.getDelayed(_nodeOutputDelay) > 0
+		&& matsuParams.out.getDelayed(_nodeOutputDelay + 1) <= 0) {
+		_signalState = signalState::zeroXup;
+		_hasCrossedZero = 1;
+		return;
+	}
+	if (matsuParams.out.getDelayed(_nodeOutputDelay) < 0
+		&& matsuParams.out.getDelayed(_nodeOutputDelay + 1) >= 0) {
+		_signalState = signalState::zeroXdown;
+		_hasCrossedZero = -1;
+		return;
+	}
+	if (_hasCrossedZero == 1
+		&& matsuParams.out.getDelayed(_nodeOutputDelay)
+		< matsuParams.out.getDelayed(_nodeOutputDelay + 1)) {
+		_signalState = signalState::firstPeak;
+		_lastMaxima = matsuParams.out.getDelayed(_nodeOutputDelay + 1);
+		_hasCrossedZero = 0;
 
 #ifdef _DEBUG_LOG
-        // dump last 2 states (_DEBUG_LOG only)
-        if (_identifier != 0 && prevState.x1 > 0.475) {
-            std::string out;
-            out = std::to_string(matsuParams.t1) + ", ";
-            out += std::to_string(matsuParams.t2) + ", ";
-            out += std::to_string(matsuParams.c1) + ", ";
-            out += std::to_string(matsuParams.c2) + ", ";
-            out += std::to_string(matsuParams.b) + ", ";
-            out += std::to_string(matsuParams.g) + ", , ";
-            out += std::to_string(prevState.v1) + ", ";
-            out += std::to_string(prevState.v2) + ", ";
-            out += std::to_string(prevState.x1) + ", ";
-            out += std::to_string(prevState.x2) + ", , ";
-            out += std::to_string(_freqCompensation) + ", , ";
+		// dump last 2 states (_DEBUG_LOG only)
+		if (_identifier != 0 && prevState.x1 > 0.475) {
+			std::string out;
+			out = std::to_string(matsuParams.t1) + ", ";
+			out += std::to_string(matsuParams.t2) + ", ";
+			out += std::to_string(matsuParams.c1) + ", ";
+			out += std::to_string(matsuParams.c2) + ", ";
+			out += std::to_string(matsuParams.b) + ", ";
+			out += std::to_string(matsuParams.g) + ", , ";
+			out += std::to_string(prevState.v1) + ", ";
+			out += std::to_string(prevState.v2) + ", ";
+			out += std::to_string(prevState.x1) + ", ";
+			out += std::to_string(prevState.x2) + ", , ";
+			out += std::to_string(_freqCompensation) + ", , ";
 
-            dtb_text_to_log(out);
-        }
+			dtb_text_to_log(out);
+		}
 
 
 #endif
-        return;
-    }
-    if (_hasCrossedZero == -1 
-            && matsuParams.out.getDelayed(_nodeOutputDelay) 
-                > matsuParams.out.getDelayed(_nodeOutputDelay+1)) {
-        _signalState = signalState::firstTrough;
-        _lastMinima = matsuParams.out.getDelayed(_nodeOutputDelay+1);
-        _hasCrossedZero = 0;
-        return;
-    }
-    _signalState = signalState::nonSignificant;
+		return;
+	}
+	if (_hasCrossedZero == -1
+		&& matsuParams.out.getDelayed(_nodeOutputDelay)
+	> matsuParams.out.getDelayed(_nodeOutputDelay + 1)) {
+		_signalState = signalState::firstTrough;
+		_lastMinima = matsuParams.out.getDelayed(_nodeOutputDelay + 1);
+		_hasCrossedZero = 0;
+		return;
+	}
+	_signalState = signalState::nonSignificant;
 }
