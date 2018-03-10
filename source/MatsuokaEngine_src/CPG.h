@@ -193,7 +193,7 @@ protected:
 private:
     std::vector<MatsuNode> _nodes;
     std::vector<unsigned> _activeNodes;
-    double _sampleRate;
+    unsigned _sampleRate;
     ScalingCurve scaler;
 
     /// Removes the specified node from the CPG.

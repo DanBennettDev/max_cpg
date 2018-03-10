@@ -105,7 +105,7 @@ void CPG::setConnectionPhaseOffset(unsigned nodeFrom, unsigned nodeTo,
     if (phaseOffset > 1.0) { phaseOffset = 1.0; }
     double freq = _nodes[nodeFrom].getFrequency(_sampleRate);
     _nodes[nodeTo].setInputDelay(_nodes[nodeFrom], 
-                                    (phaseOffset * _sampleRate)/ freq);
+                                    (unsigned)((phaseOffset * _sampleRate)/ freq));
 }
 
 
@@ -347,7 +347,7 @@ void CPG::setNodeFrequency(unsigned nodeID, double freq, bool inherit)
         throw std::exception("tried to set freq on inactive node");
         return; 
     }
-    float oldFreq = _nodes[nodeID].getFrequency(_sampleRate);
+    float oldFreq = (float)_nodes[nodeID].getFrequency(_sampleRate);
 
     if (inherit) {
         setNodeFrequencyInherit(nodeID, freq);
@@ -379,7 +379,7 @@ void CPG::setNodeFrequencyMultiple(unsigned nodeID, double multipleOfParent,
     double newFreq = _nodes[parentID].getFrequency(_sampleRate)
         * multipleOfParent;
 
-    float oldFreq = _nodes[nodeID].getFrequency(_sampleRate);
+    float oldFreq = (float)_nodes[nodeID].getFrequency(_sampleRate);
     _nodes[nodeID].setFrequency(newFreq, _sampleRate);
     updateConnectionBasedOnFreq(nodeID, oldFreq);
     setNodeDelayLine(nodeID, newFreq);
@@ -394,7 +394,7 @@ void CPG::setNodePhaseOffset(unsigned nodeID, double offset)
     // phase is relative to parent freq, except in case of root
     unsigned relativeTo = nodeID == 0 ? nodeID : getNode(nodeID).getParentID();
     double freq = _nodes[relativeTo].getFrequency(_sampleRate);
-    double offSamp = (offset * _sampleRate) / freq;
+	unsigned offSamp = (unsigned)((offset * _sampleRate) / freq);
     _nodes[nodeID].setNodeOutputDelay(offSamp);
 
 }
@@ -571,15 +571,15 @@ void CPG::connect(unsigned NodeID_A, unsigned NodeID_B, double weightAtoB,
     if (!exists(NodeID_B)) { throw std::invalid_argument("invalid node ID B"); }
 
     // scale weights based on frequency ratios;
-    float freqRatioAB = _nodes[NodeID_B].getFrequency(_sampleRate) 
-                            / _nodes[NodeID_A].getFrequency(_sampleRate);
-    float freqRatioBA = 1.0 / freqRatioAB;
-    weightAtoB = scaler.getValue(freqRatioAB, weightAtoB);
+    float freqRatioAB = (float)(_nodes[NodeID_B].getFrequency(_sampleRate) 
+                            / _nodes[NodeID_A].getFrequency(_sampleRate));
+    float freqRatioBA = 1.0f / freqRatioAB;
+    weightAtoB = scaler.getValue(freqRatioAB, (float)weightAtoB);
     
 
     _nodes[NodeID_B].setInputWeight(_nodes[NodeID_A], weightAtoB);
     if (bothWays) {
-        weightBtoA = scaler.getValue(freqRatioBA, weightBtoA);
+        weightBtoA = scaler.getValue(freqRatioBA, (float)weightBtoA);
         _nodes[NodeID_A].setInputWeight(_nodes[NodeID_B], weightBtoA);
     }
 }
@@ -592,7 +592,7 @@ void CPG::setNodeFrequencyInherit(unsigned nodeID, double newFreq)
 {
     if (!exists(nodeID)) { throw std::invalid_argument("invalid node ID"); }
 
-    float oldFreq = _nodes[nodeID].getFrequency(_sampleRate);
+    float oldFreq = (float)_nodes[nodeID].getFrequency(_sampleRate);
     double childFreq;
 
     // update frequencies of child nodes (recursive)
@@ -642,7 +642,7 @@ unsigned CPG::calculateDelayLineLength(unsigned nodeID)
         slowestFreq = _nodes[getNode(nodeID).getParentID()].getFrequency(_sampleRate);
         slowestFreq = slowestFreq < thisNodeFreq ? slowestFreq : thisNodeFreq;
     }
-    unsigned len = _sampleRate / slowestFreq;
+    unsigned len = _sampleRate / (unsigned)slowestFreq;
 
     if (len > MAX_DELAYLINE_LENGTH) { len = MAX_DELAYLINE_LENGTH; }
     return len;
@@ -654,7 +654,7 @@ void CPG::setNodeDelayLine(unsigned nodeID, double freq)
     unsigned newLength = calculateDelayLineLength(nodeID);
     if (newLength > (double)(_nodes[nodeID].getDelayLineLength())
         * DELAYLINE_RESIZE_THRESHOLD) {
-        _nodes[nodeID].setDelayLineLength(newLength * DELAYLINE_RESIZE_AMOUNT);
+        _nodes[nodeID].setDelayLineLength(unsigned(newLength * DELAYLINE_RESIZE_AMOUNT));
     }
 }
 
@@ -669,18 +669,18 @@ void CPG::updateConnectionBasedOnFreq(unsigned nodeID, float oldFreq)
             auto inputList = getNode(destinationID).getInputIds();
             for (auto inputID : inputList) {
                 if (inputID == nodeID) {
-                    float destFreq = _nodes[destinationID].getFrequency(_sampleRate);
+                    float destFreq = (float)_nodes[destinationID].getFrequency(_sampleRate);
                     float oldFreqRatio = destFreq / oldFreq;
-                    float oldWeight = _nodes[destinationID].getInputWeight(nodeID);
+                    float oldWeight = (float)_nodes[destinationID].getInputWeight(nodeID);
                     setConnection(nodeID, destinationID, scaler.getInputValue(oldFreqRatio, oldWeight));
                 }
             }
         }
         // handle all nodes which send input to this node
         for (auto inputID : _nodes[nodeID].getInputIds()) {
-            float inputFreq = _nodes[inputID].getFrequency(_sampleRate);
+            float inputFreq = (float)_nodes[inputID].getFrequency(_sampleRate);
             float oldFreqRatio = oldFreq / inputFreq;
-            float oldWeight = _nodes[nodeID].getInputWeight(inputID);
+            float oldWeight = (float)_nodes[nodeID].getInputWeight(inputID);
             setConnection(inputID, nodeID, scaler.getInputValue(oldFreqRatio, oldWeight));
         }
     }

@@ -30,7 +30,7 @@ MatsuokaEngine::MatsuokaEngine(unsigned sampleRate,
     _paused = false;
     _idle = true;
     _callbackSet = false;
-    _quantiser.setTempo(_cpg.getNode(0).getFrequency(sampleRate));
+    _quantiser.setTempo((float)_cpg.getNode(0).getFrequency(sampleRate));
     _stepCounter = 0;
 
 }
@@ -50,7 +50,7 @@ MatsuokaEngine::MatsuokaEngine(const MatsuokaEngine& rhs)
     _shutdown = false;
     _paused = false;
     _idle = true;
-    _quantiser.setTempo(60.0 / _cpg.getNode(0).getFrequency(_sampleRate));
+    _quantiser.setTempo(60.0f / (float)_cpg.getNode(0).getFrequency(_sampleRate));
 
 }
 
@@ -558,13 +558,13 @@ void MatsuokaEngine::setNodeQuantiser_Grid(unsigned nodeID, gridType grid)
 
 void MatsuokaEngine::setNodeQuantiser_Multiple(unsigned nodeID, float mult)
 {
-    _quantiser.setNodeGridMultiple(nodeID, mult);
+    _quantiser.setNodeGridMultiple(nodeID, (unsigned)mult);
 }
 
 
 void    MatsuokaEngine::setNodeQuantiser_Offset(unsigned nodeID, float off)
 {
-    _quantiser.setNodeGridOffset(nodeID, off);
+    _quantiser.setNodeGridOffset(nodeID, (unsigned)off);
 
 }
 
@@ -579,13 +579,13 @@ MatsuokaEngine::gridType MatsuokaEngine::getNodeQuantiser_Grid(unsigned nodeID)
 
 float MatsuokaEngine::getNodeQuantiser_Multiple(unsigned nodeID)
 {
-    return _quantiser.getNodeGridMultiple(nodeID);
+    return (float)_quantiser.getNodeGridMultiple(nodeID);
 }
 
 
 float    MatsuokaEngine::getNodeQuantiser_Offset(unsigned nodeID)
 {
-    return _quantiser.getNodeGridOffset(nodeID);
+    return (float)_quantiser.getNodeGridOffset(nodeID);
 
 }
 
@@ -694,7 +694,7 @@ void MatsuokaEngine::fillOutputs()
     for (auto ev : _quantiser.getNotes()) {
         _outputs.push_back(ev);
         if (_eventCallback) {
-            _eventCallback(ev.nodeID, ev.velocity);
+            _eventCallback(ev.nodeID, (float)ev.velocity);
         }
     }
 }
@@ -766,8 +766,8 @@ void MatsuokaEngine::synchroniseChildren(std::vector<unsigned> childIDs)
 
 void MatsuokaEngine::updateQuantiserTempo()
 {
-    double freq = _cpg.getNode(0).getFrequency(_sampleRate);
-    _quantiser.setTempo(60.0 * freq);
+    float freq = (float)_cpg.getNode(0).getFrequency(_sampleRate);
+    _quantiser.setTempo(60.0f * freq);
 }
 
 
