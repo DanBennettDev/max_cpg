@@ -55,6 +55,8 @@ public:
 
 	node_basic(const atoms& args = {})
 	{
+		m_initialized = 0;
+
 		cout << "started" << endl;
 
 		inVal = 0;
@@ -157,27 +159,29 @@ public:
 
 	sample operator()(sample in, sample t1, sample t2, sample c1, sample c2, sample b, sample g) {
 
-		if (local_srate == (int)samplerate()) {
-			matsuOut_1 = matsuOut_2;
-			matsuOut_2 = matsuOut_3;
-			matsuOut_3 = matsuOut_4;
-			matsuOut_4 = runMatsu(in, t1, t2, c1, c2, b, g);
-			return matsuOut_1;
-
-		} else {
-			phase += phaseStep;
-			if (phase > 1.0) {
-				phase -= 1.0;
-
+		if (m_initialized) {
+			if (local_srate == (int)samplerate()) {
 				matsuOut_1 = matsuOut_2;
 				matsuOut_2 = matsuOut_3;
 				matsuOut_3 = matsuOut_4;
 				matsuOut_4 = runMatsu(in, t1, t2, c1, c2, b, g);
-			} else if (phase < 0.0) { // sholdn't happen
-				phase += 1.0;
-			}
+				return matsuOut_1;
 
-			return interpolate(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
+			} else {
+				phase += phaseStep;
+				if (phase > 1.0) {
+					phase -= 1.0;
+
+					matsuOut_1 = matsuOut_2;
+					matsuOut_2 = matsuOut_3;
+					matsuOut_3 = matsuOut_4;
+					matsuOut_4 = runMatsu(in, t1, t2, c1, c2, b, g);
+				} else if (phase < 0.0) { // sholdn't happen
+					phase += 1.0;
+				}
+
+				return interpolate(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
+			}
 		}
 
 	}
