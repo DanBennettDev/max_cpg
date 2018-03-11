@@ -1,22 +1,14 @@
 /// @file	
-///	@ingroup 	minexamples
-///	@copyright	Copyright (c) 2017, Cycling '74
-/// @author		Timothy Place
+///	@ingroup 	CPG
+/// @author		Dan Bennett
 ///	@license	Usage of this file and its contents is governed by the MIT License
 
 
 /*
 TODO:
-1) Simple version without just direct parameter controls
-- add external input and input handler
-
-2) version with freq directly settable
-- set parameters via message
-- offline freq comp recalc when equation parameters are changed
--
-
-
-
+	Freq Compensation not working
+	No output if external is reinitialised, or if new instance is initialised
+	Message input to change equation values
 */
 
 #include "matsuNode.h"
@@ -47,10 +39,11 @@ private:
 	sample matsuOut_3{ 0 };
 	sample matsuOut_4{ 0 };
 
-	lib::interpolator::cubic<sample> interpolate;
+	lib::interpolator::hermite<sample> interpolate;
+	bool m_initialized{ false };
 
 public:
-	bool m_initialized{ false };
+	
 
 	MIN_DESCRIPTION{ "A basic, no frills Matsuoka Oscillator node" };
 	MIN_TAGS{ "audio, oscillator" };
@@ -125,7 +118,6 @@ public:
 
 		calibrate();
 
-
 		m_initialized = true;
 	}
 
@@ -173,6 +165,8 @@ public:
 		_freq = freq;
 		if (m_initialized) {
 			if (local_srate == (int)samplerate()) {
+				node.setExternalInput(in);
+				node.setFreqCompensation(freqComp);
 				node.setFrequency(freq, local_srate);
 
 				node.doCalcStep(true, true);
@@ -183,6 +177,8 @@ public:
 				phase += phaseStep;
 				if (phase > 1.0) {
 					phase -= 1.0;
+					node.setExternalInput(in);
+					node.setFreqCompensation(freqComp);
 					node.setFrequency(freq, local_srate);
 
 					node.doCalcStep(true, true);
@@ -196,9 +192,9 @@ public:
 
 				return interpolate(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
 			}
-		} else {
-			return 0;
 		}
+		return 0;
+
 
 	}
 

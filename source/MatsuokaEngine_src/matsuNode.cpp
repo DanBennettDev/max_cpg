@@ -207,12 +207,14 @@ void MatsuNode::setFrequency(double freq, unsigned sampleRate)
 		(matsuParams.g * mult));
 
 	double t2 = t1 * mult;
+
 	if (t1<T_MIN) { t1 = T_MIN; }
 	if (t2<T_MIN) { t2 = T_MIN; }
 	if (t1>T_MAX) { t1 = T_MAX; }
 	if (t2>T_MAX) { t2 = T_MAX; }
 	//validateT(t1);
 	//validateT(t2);
+
 	matsuParams.t1 = t1;
 	matsuParams.t2 = t2;
 	_haveParamsChanged = true;
