@@ -39,7 +39,8 @@ private:
 	sample matsuOut_3{ 0 };
 	sample matsuOut_4{ 0 };
 
-	lib::interpolator::hermite<sample> interpolate;
+	lib::interpolator::hermite<sample> interp_herm;
+	lib::interpolator::linear<sample> interp_lin;
 	bool m_initialized{ false };
 
 public:
@@ -94,26 +95,35 @@ public:
 		if (args.size() > 1) {
 			node.set_t1(args[1]);
 			dummyNode.set_t1(args[1]);
+			cout << "T1: " << (float)args[1] << endl;
 		}
 		if (args.size() > 2) {
 			node.set_t2(args[2]);
 			dummyNode.set_t2(args[2]);
+			cout << "T2: " << (float)args[2] << endl;
+
 		}
 		if (args.size() > 3) {
 			node.set_c1(args[3]);
 			dummyNode.set_c1(args[3]);
+			cout << "C1: " << (float)args[3] << endl;
 		}
 		if (args.size() > 4) {
 			node.set_c2(args[4]);
 			dummyNode.set_c2(args[4]);
+			cout << "C2: " << (float)args[4] << endl;
 		}
 		if (args.size() > 5) {
 			node.set_b(args[5]);
 			dummyNode.set_b(args[5]);
+			cout << "B: " << (float)args[5] << endl;
+
 		}
 		if (args.size() > 6) {
 			node.set_g(args[6]);
 			dummyNode.set_g(args[6]);
+			cout << "G: " << (float)args[6] << endl;
+
 		}
 
 		calibrate();
@@ -190,7 +200,11 @@ public:
 					phase += 1.0;
 				}
 
-				return interpolate(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
+				if (local_srate > 11024) {
+					return interp_herm(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
+				} else {
+					return interp_lin(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
+				}
 			}
 		}
 		return 0;
