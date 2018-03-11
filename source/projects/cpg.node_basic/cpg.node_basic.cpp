@@ -31,9 +31,19 @@ private:
 	MatsuNode dummyNode;
 	double freq;
 	double freqComp;
+	int local_srate;
 
 	int testCounter{ 0 };
 
+	number phase{ 0 };
+	number phaseStep;
+
+	sample matsuOut_1{ 0 };
+	sample matsuOut_2{ 0 };
+	sample matsuOut_3{ 0 };
+	sample matsuOut_4{ 0 };
+
+	lib::interpolator::cubic<sample> interpolate;
 
 public:
 	bool m_initialized{ false };
@@ -56,35 +66,49 @@ public:
 
 
 		if (args.size() > 0) {
-			node.set_t1(args[0]);
-		}
-		if (1 < args.size()) {
-			node.set_t2(args[1]);
-		}
-		if (args.size() > 2) {
-			node.set_c1(args[2]);
-		}
-		if (args.size() > 3) {
-			node.set_c2(args[3]);
-		}
-		if (args.size() > 4) {
-			node.set_b(args[4]);
-		}
-		if (args.size() > 5) {
-			node.set_g(args[5]);
+			unsigned srate_in = (unsigned)(int)args[0];
+			cout << "sample rate requested: " << srate_in << endl;
+			if ((int)srate_in > samplerate()/2 || (int)srate_in < 0) {
+				cout << "sample rate must be system sample rate, or else >0 and < system sample-rate / 2: " << srate_in << endl;
+				cout << "setting to system sample rate" << endl;
+
+				local_srate = (int)samplerate();
+			} else {
+				local_srate = srate_in;
+			}
+		} else {
+			local_srate = (int)samplerate();
 		}
 
-		// calibrate nodes
-		freq = 1;
-		int settleTime = samplerate();
-		node.setFrequency(freq, samplerate());
-		dummyNode.setFrequency(freq, samplerate());
+		phaseStep = local_srate / samplerate();
 
-		while (settleTime-- > 0) {
-			dummyNode.doCalcStep(true, true);
-			node.doCalcStep(true, true);
-		}
-		freqComp = dummyNode.calcFreqCompensation(4, samplerate());
+		//if (1 < args.size()) {
+		//	node.set_t2(args[1]);
+		//}
+		//if (args.size() > 2) {
+		//	node.set_c1(args[2]);
+		//}
+		//if (args.size() > 3) {
+		//	node.set_c2(args[3]);
+		//}
+		//if (args.size() > 4) {
+		//	node.set_b(args[4]);
+		//}
+		//if (args.size() > 5) {
+		//	node.set_g(args[5]);
+		//}
+
+		//// calibrate nodes (not required in basic case)
+		//freq = 1;
+		//int settleTime = local_srate;
+		//node.setFrequency(freq, local_srate);
+		//dummyNode.setFrequency(freq, local_srate);
+
+		//while (settleTime-- > 0) {
+		//	dummyNode.doCalcStep(true, true);
+		//	node.doCalcStep(true, true);
+		//}
+		//freqComp = dummyNode.calcFreqCompensation(4, local_srate);
 
 		m_initialized = true;
 	}
@@ -133,6 +157,33 @@ public:
 
 	sample operator()(sample in, sample t1, sample t2, sample c1, sample c2, sample b, sample g) {
 
+		if (local_srate == (int)samplerate()) {
+			matsuOut_1 = matsuOut_2;
+			matsuOut_2 = matsuOut_3;
+			matsuOut_3 = matsuOut_4;
+			matsuOut_4 = runMatsu(in, t1, t2, c1, c2, b, g);
+			return matsuOut_1;
+
+		} else {
+			phase += phaseStep;
+			if (phase > 1.0) {
+				phase -= 1.0;
+
+				matsuOut_1 = matsuOut_2;
+				matsuOut_2 = matsuOut_3;
+				matsuOut_3 = matsuOut_4;
+				matsuOut_4 = runMatsu(in, t1, t2, c1, c2, b, g);
+			} else if (phase < 0.0) { // sholdn't happen
+				phase += 1.0;
+			}
+
+			return interpolate(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
+		}
+
+	}
+
+	sample runMatsu(sample in, sample t1, sample t2, sample c1, sample c2, sample b, sample g)
+	{
 		node.set_t1(t1);
 		node.set_t2(t2);
 		node.set_c1(c1);
@@ -140,10 +191,12 @@ public:
 		node.set_b(b);
 		node.set_g(g);
 		node.setExternalInput(in);
-
 		node.doCalcStep(true, true);
 		return node.getOutput();
 	}
+
+
+
 };
 
 MIN_EXTERNAL(node_basic);
