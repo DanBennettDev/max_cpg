@@ -60,8 +60,8 @@ extern "C" {
 
 #define T1_INIT     853.855
 #define T2_INIT     3415.420
-#define T_MIN       0.04     // must be >0.0
-#define T_MAX       500000.0
+#define T_MIN       (0.004 )   
+#define T_MAX       (5000000.0)
 
 #define C_INIT     1.0
 #define C_MIN     0.0

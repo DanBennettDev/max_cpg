@@ -23,6 +23,7 @@ TODO:
 #include "c74_min.h"
 
 #define CALIBRATION_CYCLES 20
+#define FREQ_MIN 0.001
 
 using namespace c74::min;
 
@@ -39,6 +40,7 @@ private:
 
 	number phase{ 0 };
 	number phaseStep;
+	number _freq{ 50 };
 
 	sample matsuOut_1{ 0 };
 	sample matsuOut_2{ 0 };
@@ -121,17 +123,9 @@ public:
 			dummyNode.set_g(args[6]);
 		}
 
-		// calibrate nodes 
-		int settleTime = local_srate * 2;
-		node.setFrequency(1, local_srate);
-		dummyNode.setFrequency(CALIBRATION_CYCLES, local_srate);
+		calibrate();
 
-		while (settleTime-- > 0) {
-			dummyNode.doCalcStep(true, true);
-			node.doCalcStep(true, true);
-		}
-		freqComp = dummyNode.calcFreqCompensation(CALIBRATION_CYCLES, local_srate);
-		node.setFreqCompensation(freqComp);
+
 		m_initialized = true;
 	}
 
@@ -175,10 +169,12 @@ public:
 
 	sample operator()(sample in, sample freq)
 	{
-
+		freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
+		_freq = freq;
 		if (m_initialized) {
 			if (local_srate == (int)samplerate()) {
 				node.setFrequency(freq, local_srate);
+
 				node.doCalcStep(true, true);
 				return node.getOutput();
 
@@ -188,6 +184,7 @@ public:
 				if (phase > 1.0) {
 					phase -= 1.0;
 					node.setFrequency(freq, local_srate);
+
 					node.doCalcStep(true, true);
 					matsuOut_1 = matsuOut_2;
 					matsuOut_2 = matsuOut_3;
@@ -205,7 +202,20 @@ public:
 
 	}
 
+	void calibrate()
+	{
+		// calibrate nodes 
+		int settleTime = local_srate * 2;
+		dummyNode.setFrequency(CALIBRATION_CYCLES, local_srate);
 
+		while (settleTime-- > 0) {
+			dummyNode.doCalcStep(true, true);
+			node.doCalcStep(true, true);
+		}
+		freqComp = dummyNode.calcFreqCompensation(CALIBRATION_CYCLES, local_srate);
+		node.setFreqCompensation(freqComp);
+		node.setFrequency(_freq, local_srate);
+	}
 
 };
 
