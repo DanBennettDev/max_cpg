@@ -1,20 +1,12 @@
 /// @file	
-///	@ingroup 	minexamples
-///	@copyright	Copyright (c) 2017, Cycling '74
-/// @author		Timothy Place
+///	@ingroup 	CPG
+/// @author		Dan Bennett
 ///	@license	Usage of this file and its contents is governed by the MIT License
 
 
 /*
 	TODO:
-		1) Simple version without just direct parameter controls
-			- add external input and input handler
-
-		2) version with freq directly settable
-			- set parameters via message
-			- offline freq comp recalc when equation parameters are changed
-			- 
-
+		Add interpolation options: Cheaper for enveloping uses
 
 
 */
@@ -29,7 +21,6 @@ private:
 	number inVal;
 	MatsuNode node;
 	MatsuNode dummyNode;
-	double freq;
 	double freqComp;
 	int local_srate;
 
@@ -43,7 +34,8 @@ private:
 	sample matsuOut_3{ 0 };
 	sample matsuOut_4{ 0 };
 
-	lib::interpolator::cubic<sample> interpolate;
+	lib::interpolator::hermite<sample> interp_herm;
+	lib::interpolator::linear<sample> interp_lin;
 
 public:
 	bool m_initialized{ false };
@@ -179,10 +171,14 @@ public:
 				} else if (phase < 0.0) { // sholdn't happen
 					phase += 1.0;
 				}
-
-				return interpolate(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
+				if (local_srate > 11025) {
+					return interp_herm(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
+				} else {
+					return interp_lin(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
+				}
 			}
 		}
+		return 0;
 
 	}
 
@@ -195,7 +191,7 @@ public:
 		node.set_b(b);
 		node.set_g(g);
 		node.setExternalInput(in);
-		node.doCalcStep(true, true);
+		node.doCalcStep(true, false);
 		return node.getOutput();
 	}
 

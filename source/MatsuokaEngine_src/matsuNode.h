@@ -199,7 +199,7 @@ public:
 	*  see K. Matsuoka, "Analysis of a neural oscillator," Biological cybernetics, vol. 104, no. 4-5,pp. 297{304, 2011.
 	*  TODO - provide more details here
 	*/
-	void    setFrequency(double freq, unsigned sampleRate);
+	int    setFrequency(double freq, unsigned sampleRate);
 
 
 	/// Returns frequency of Matsuoka Oscillator. 

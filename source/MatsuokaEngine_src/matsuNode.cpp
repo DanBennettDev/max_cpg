@@ -194,10 +194,12 @@ bool MatsuNode::hasChanged_Inputs() const { return _haveInputsChanged; }
 // invalidated by direct change of parameters
 // Only accurate within limited range of values of B, G
 // compensation must be recalculated if b,g change
-void MatsuNode::setFrequency(double freq, unsigned sampleRate)
+int MatsuNode::setFrequency(double freq, unsigned sampleRate)
 {
-	if (freq < 0.0) {
-		throw std::invalid_argument("freq cannot be negative");
+	int retval = 0;
+	if (freq < 0.00001) {
+		freq = 0.00001;
+		retval = 1;
 	};
 
 	double mult = matsuParams.t2 / matsuParams.t1;
@@ -207,11 +209,14 @@ void MatsuNode::setFrequency(double freq, unsigned sampleRate)
 		(matsuParams.g * mult));
 
 	double t2 = t1 * mult;
-	validateT(t1);
-	validateT(t2);
+	if (t1<T_MIN ) {t1 = T_MIN; retval = 2; }
+	if (t2<T_MIN) { t2 = T_MIN; retval = 3; }
+	if (t1>T_MAX) { t1 = T_MAX; retval = 4; }
+	if (t2>T_MAX) { t2 = T_MAX; retval = 5; }
 	matsuParams.t1 = t1;
 	matsuParams.t2 = t2;
 	_haveParamsChanged = true;
+	return retval;
 }
 
 double MatsuNode::getFrequency(unsigned sampleRate) const

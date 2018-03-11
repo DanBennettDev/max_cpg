@@ -1,28 +1,20 @@
 /// @file	
-///	@ingroup 	minexamples
-///	@copyright	Copyright (c) 2017, Cycling '74
-/// @author		Timothy Place
+///	@ingroup 	CPG
+/// @author		Dan Bennett
 ///	@license	Usage of this file and its contents is governed by the MIT License
 
 
 /*
 TODO:
-1) Simple version without just direct parameter controls
-- add external input and input handler
-
-2) version with freq directly settable
-- set parameters via message
-- offline freq comp recalc when equation parameters are changed
--
-
-
-
+	Freq Compensation not working
+	No output if external is reinitialised, or if new instance is initialised
+	Message input to change equation values
 */
 
 #include "matsuNode.h"
 #include "c74_min.h"
 
-#define CALIBRATION_CYCLES 20
+#define CALIBRATION_CYCLES 200
 
 using namespace c74::min;
 
@@ -45,10 +37,11 @@ private:
 	sample matsuOut_3{ 0 };
 	sample matsuOut_4{ 0 };
 
-	lib::interpolator::cubic<sample> interpolate;
+	lib::interpolator::hermite<sample> interpolate;
+	bool m_initialized{ false };
 
 public:
-	bool m_initialized{ false };
+	
 
 	MIN_DESCRIPTION{ "A basic, no frills Matsuoka Oscillator node" };
 	MIN_TAGS{ "audio, oscillator" };
@@ -120,18 +113,7 @@ public:
 			node.set_g(args[6]);
 			dummyNode.set_g(args[6]);
 		}
-
-		// calibrate nodes 
-		int settleTime = local_srate * 2;
-		node.setFrequency(1, local_srate);
-		dummyNode.setFrequency(CALIBRATION_CYCLES, local_srate);
-
-		while (settleTime-- > 0) {
-			dummyNode.doCalcStep(true, true);
-			node.doCalcStep(true, true);
-		}
-		freqComp = dummyNode.calcFreqCompensation(CALIBRATION_CYCLES, local_srate);
-		node.setFreqCompensation(freqComp);
+		calibrate.set();
 		m_initialized = true;
 	}
 
@@ -178,6 +160,8 @@ public:
 
 		if (m_initialized) {
 			if (local_srate == (int)samplerate()) {
+				node.setExternalInput(in);
+				node.setFreqCompensation(freqComp);
 				node.setFrequency(freq, local_srate);
 				node.doCalcStep(true, true);
 				return node.getOutput();
@@ -187,6 +171,8 @@ public:
 				phase += phaseStep;
 				if (phase > 1.0) {
 					phase -= 1.0;
+					node.setExternalInput(in);
+					node.setFreqCompensation(freqComp);
 					node.setFrequency(freq, local_srate);
 					node.doCalcStep(true, true);
 					matsuOut_1 = matsuOut_2;
@@ -199,13 +185,30 @@ public:
 
 				return interpolate(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
 			}
-		} else {
-			return 0;
 		}
+		return 0;
+
 
 	}
 
 
+
+	queue calibrate	{ this,
+		MIN_FUNCTION{
+			// calibrate nodes 
+			dummyNode = MatsuNode();
+			int settleTime = local_srate * 2;
+			cout << dummyNode.setFrequency(CALIBRATION_CYCLES, local_srate) << endl;
+
+			while (settleTime-- > 0) {
+				dummyNode.doCalcStep(true, true);
+			}
+
+
+			freqComp = dummyNode.calcFreqCompensation(CALIBRATION_CYCLES, local_srate);
+			return{};
+		}
+	};
 
 };
 
