@@ -6,8 +6,7 @@
 
 /*
 TODO:
-	Freq Compensation not working
-	No output if external is reinitialised, or if new instance is initialised
+	
 	Message input to change equation values
 */
 
@@ -93,36 +92,24 @@ public:
 		dummyNode.set_g(G_INIT);
 
 		if (args.size() > 1) {
-			node.set_t1(args[1]);
-			dummyNode.set_t1(args[1]);
-			cout << "T1: " << (float)args[1] << endl;
+			node.set_t2_over_t1(args[1]);
+			dummyNode.set_t2_over_t1(args[1]);
 		}
 		if (args.size() > 2) {
-			node.set_t2(args[2]);
-			dummyNode.set_t2(args[2]);
-			cout << "T2: " << (float)args[2] << endl;
-
+			node.set_c(args[2]);
+			dummyNode.set_c(args[2]);
 		}
+
 		if (args.size() > 3) {
-			node.set_c1(args[3]);
-			dummyNode.set_c1(args[3]);
-			cout << "C1: " << (float)args[3] << endl;
+			node.set_b(args[3]);
+			dummyNode.set_b(args[3]);
+			cout << "B: " << (float)args[3] << endl;
+
 		}
 		if (args.size() > 4) {
-			node.set_c2(args[4]);
-			dummyNode.set_c2(args[4]);
-			cout << "C2: " << (float)args[4] << endl;
-		}
-		if (args.size() > 5) {
-			node.set_b(args[5]);
-			dummyNode.set_b(args[5]);
-			cout << "B: " << (float)args[5] << endl;
-
-		}
-		if (args.size() > 6) {
-			node.set_g(args[6]);
-			dummyNode.set_g(args[6]);
-			cout << "G: " << (float)args[6] << endl;
+			node.set_g(args[4]);
+			dummyNode.set_g(args[4]);
+			cout << "G: " << (float)args[4] << endl;
 
 		}
 
