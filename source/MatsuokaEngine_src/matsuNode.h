@@ -371,17 +371,17 @@ private:
 
 	void uncreate();
 
-	static void validateParams(double t1 = T1_INIT,
+	static bool validateParams(double t1 = T1_INIT,
 		double t2 = T2_INIT,
 		double c1 = C_INIT,
 		double c2 = C_INIT,
 		double b = B_INIT,
 		double g = G_INIT);
 
-	static void validateT(double t);
-	static void validateC(double c);
-	static void validateB(double b);
-	static void validateG(double g);
+	static bool validateT(double t);
+	static bool validateC(double c);
+	static bool validateB(double b);
+	static bool validateG(double g);
 	void MatsuNode::updateSignalState();
 
 };

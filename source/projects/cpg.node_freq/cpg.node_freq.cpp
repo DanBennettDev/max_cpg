@@ -91,29 +91,9 @@ public:
 		node.set_g(G_INIT);
 		dummyNode.set_g(G_INIT);
 
-		if (args.size() > 1) {
-			node.set_t2_over_t1(args[1]);
-			dummyNode.set_t2_over_t1(args[1]);
-		}
-		if (args.size() > 2) {
-			node.set_c(args[2]);
-			dummyNode.set_c(args[2]);
-		}
+		setparams(args, true);
 
-		if (args.size() > 3) {
-			node.set_b(args[3]);
-			dummyNode.set_b(args[3]);
-			cout << "B: " << (float)args[3] << endl;
-
-		}
-		if (args.size() > 4) {
-			node.set_g(args[4]);
-			dummyNode.set_g(args[4]);
-			cout << "G: " << (float)args[4] << endl;
-
-		}
-
-		calibrate();
+		calibrate.set();
 
 		m_initialized = true;
 	}
@@ -138,12 +118,22 @@ public:
 
 	message<> bang{ this, "bang", "reset the node",
 		MIN_FUNCTION{
-		if (m_initialized) {
-			node.reset();
+			if (m_initialized) {
+				node.reset();
+			}
+			return {};
 		}
-	return {};
-	}
 	};
+
+	message<> params{ this, "params",
+		MIN_FUNCTION{
+			setparams(args, false);
+			calibrate.set();
+			return {};
+		}
+	};
+
+
 
 
 	//attribute<number> frequency { this, "frequency" , 1.0, description{"Frequency in Hz"},
@@ -199,19 +189,64 @@ public:
 
 	}
 
-	void calibrate()
-	{
-		// calibrate nodes 
-		int settleTime = local_srate * 2;
-		dummyNode.setFrequency(CALIBRATION_CYCLES, local_srate);
+	//void calibrate()
+	//{
+	//	// calibrate nodes 
+	//	int settleTime = local_srate * 2;
+	//	dummyNode.setFrequency(CALIBRATION_CYCLES, local_srate);
 
-		while (settleTime-- > 0) {
-			dummyNode.doCalcStep(true, true);
-			node.doCalcStep(true, true);
+	//	while (settleTime-- > 0) {
+	//		dummyNode.doCalcStep(true, true);
+	//		node.doCalcStep(true, true);
+	//	}
+	//	freqComp = dummyNode.calcFreqCompensation(CALIBRATION_CYCLES, local_srate);
+	//	node.setFreqCompensation(freqComp);
+	//	node.setFrequency(_freq, local_srate);
+	//}
+
+	queue calibrate{ this,
+		MIN_FUNCTION{
+			m_initialized = false;
+			// calibrate nodes 
+			int settleTime = local_srate * 2;
+			dummyNode.setFrequency(CALIBRATION_CYCLES, local_srate);
+
+			while (settleTime-- > 0) {
+				dummyNode.doCalcStep(true, true);
+				node.doCalcStep(true, true);
+			}
+			freqComp = dummyNode.calcFreqCompensation(CALIBRATION_CYCLES, local_srate);
+			node.setFreqCompensation(freqComp);
+			node.setFrequency(_freq, local_srate);
+			m_initialized = true;
+			return {};
 		}
-		freqComp = dummyNode.calcFreqCompensation(CALIBRATION_CYCLES, local_srate);
-		node.setFreqCompensation(freqComp);
-		node.setFrequency(_freq, local_srate);
+	};
+
+
+
+	void setparams(const atoms& args, bool startup)
+	{
+		int firstParam = startup ? 1 : 0;
+
+		if (args.size() > firstParam) {
+			node.set_t2_over_t1(args[firstParam]);
+			dummyNode.set_t2_over_t1(args[firstParam]);
+		}
+		if (args.size() > firstParam+1) {
+			node.set_c(args[firstParam+1]);
+			dummyNode.set_c(args[firstParam+1]);
+		}
+
+		if (args.size() > firstParam+2) {
+			node.set_b(args[firstParam+2]);
+			dummyNode.set_b(args[firstParam+2]);
+		}
+
+		if (args.size() > firstParam+3) {
+			node.set_g(args[firstParam + 3]);
+			dummyNode.set_g(args[firstParam + 3]);
+		}
 	}
 
 };

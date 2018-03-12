@@ -208,16 +208,15 @@ void MatsuNode::setFrequency(double freq, unsigned sampleRate)
 
 	double t2 = t1 * mult;
 
-	if (t1<T_MIN) { t1 = T_MIN; }
-	if (t2<T_MIN) { t2 = T_MIN; }
-	if (t1>T_MAX) { t1 = T_MAX; }
-	if (t2>T_MAX) { t2 = T_MAX; }
-	//validateT(t1);
-	//validateT(t2);
-
-	matsuParams.t1 = t1;
-	matsuParams.t2 = t2;
-	_haveParamsChanged = true;
+	//if (t1<T_MIN) { t1 = T_MIN; }
+	//if (t2<T_MIN) { t2 = T_MIN; }
+	//if (t1>T_MAX) { t1 = T_MAX; }
+	//if (t2>T_MAX) { t2 = T_MAX; }
+	if (validateT(t1) && validateT(t2)) {
+		matsuParams.t1 = t1;
+		matsuParams.t2 = t2;
+		_haveParamsChanged = true;
+	}
 }
 
 double MatsuNode::getFrequency(unsigned sampleRate) const
@@ -429,43 +428,52 @@ void MatsuNode::setParam(matsuParam param, double val)
 
 	switch (param) {
 	case matsuParam::T:
-		validateT(val);
-		matsuParams.t1 = val;
-		matsuParams.t2 = val;
+		if (validateT(val)) {
+			matsuParams.t1 = val;
+			matsuParams.t2 = val;
+		}
 		break;
 	case matsuParam::T1:
-		validateT(val);
-		matsuParams.t1 = val;
+		if (validateT(val)) {
+			matsuParams.t1 = val;
+		}
 		break;
 	case matsuParam::T2:
-		validateT(val);
-		matsuParams.t2 = val;
+		if (validateT(val)) {
+			matsuParams.t2 = val;
+		}
 		break;
 	case matsuParam::T2OverT1:
 		t2 = matsuParams.t1 * val;
-		validateT(t2);
-		matsuParams.t2 = t2;
+		if (validateT(t2)) {
+			matsuParams.t2 = t2;
+		}
 		break;
 	case matsuParam::C:
-		validateC(val);
-		matsuParams.c1 = val;
-		matsuParams.c2 = val;
+		if (validateC(val)) {
+			matsuParams.c1 = val;
+			matsuParams.c2 = val;
+		}
 		break;
 	case matsuParam::C1:
-		validateC(val);
-		matsuParams.c1 = val;
+		if (validateC(val)) {
+			matsuParams.c1 = val;
+		}
 		break;
 	case matsuParam::C2:
-		validateC(val);
-		matsuParams.c2 = val;
+		if (validateC(val)) {
+			matsuParams.c2 = val;
+		}
 		break;
 	case matsuParam::B:
-		validateB(val);
-		matsuParams.b = val;
+		if (validateB(val)) {
+			matsuParams.b = val;
+		}
 		break;
 	case matsuParam::G:
-		validateG(val);
-		matsuParams.g = val;
+		if (validateG(val)) {
+			matsuParams.g = val;
+		}
 		break;
 	default:
 		throw std::invalid_argument("invalid parameter");
@@ -584,11 +592,12 @@ void    MatsuNode::set_t2_over_t1(double val)
 void MatsuNode::setParams(double t1, double t2, double c1, double c2,
 	double b, double g)
 {
-	validateParams(t1, t2, c1, c2, b, g);
-	_haveInputsChanged = true;
-	matsuParams.t1 = t1;    matsuParams.t2 = t2;
-	matsuParams.c1 = c1;    matsuParams.c2 = c2;
-	matsuParams.b = b;      matsuParams.g = g;
+	if (validateParams(t1, t2, c1, c2, b, g)) {
+		_haveInputsChanged = true;
+		matsuParams.t1 = t1;    matsuParams.t2 = t2;
+		matsuParams.c1 = c1;    matsuParams.c2 = c2;
+		matsuParams.b = b;      matsuParams.g = g;
+	}
 }
 
 void MatsuNode::setParams(double t1, double t2, double c,
@@ -790,32 +799,33 @@ void MatsuNode::create(unsigned id, double t1, double t2, double c1,
 	_inputs.reserve(MAX_NODES);
 	_children.reserve(MAX_NODES);
 
-	validateParams(t1, t2, c1, c2, b, g);
-	_active = true;
-	_identifier = id;
-	matsuParams.t1 = t1;
-	matsuParams.t2 = t2;
-	matsuParams.c1 = c1;
-	matsuParams.c2 = c2;
-	matsuParams.b = b;
-	matsuParams.g = g;
-	matsuParams.state.x1 = X1_INIT;
-	matsuParams.state.x2 = X2_INIT;
-	matsuParams.state.v1 = V1_INIT;
-	matsuParams.state.v2 = V2_INIT;
-	matsuParams.out.pushSample(
-		POSPART(matsuParams.state.x1) - POSPART(matsuParams.state.x2));
-	_selfNoiseAmount = 0.0;
+	if (validateParams(t1, t2, c1, c2, b, g)) {
+		_active = true;
+		_identifier = id;
+		matsuParams.t1 = t1;
+		matsuParams.t2 = t2;
+		matsuParams.c1 = c1;
+		matsuParams.c2 = c2;
+		matsuParams.b = b;
+		matsuParams.g = g;
+		matsuParams.state.x1 = X1_INIT;
+		matsuParams.state.x2 = X2_INIT;
+		matsuParams.state.v1 = V1_INIT;
+		matsuParams.state.v2 = V2_INIT;
+		matsuParams.out.pushSample(
+			POSPART(matsuParams.state.x1) - POSPART(matsuParams.state.x2));
+		_selfNoiseAmount = 0.0;
 
-	_nodeOutputDelay = 0;
-	_freqCompensation = DEFAULTFREQCOMPENSAITON;
-	_ext_input = 0.0;
-	_parentNodeID = -1;
-	_hasCrossedZero = 0;
-	_signalState = signalState::nonSignificant;
-	_lastMaxima = _lastMinima = 0;
-	_haveParamsChanged = _haveInputsChanged = false;
-	_synchMode = synchMode::free;
+		_nodeOutputDelay = 0;
+		_freqCompensation = DEFAULTFREQCOMPENSAITON;
+		_ext_input = 0.0;
+		_parentNodeID = -1;
+		_hasCrossedZero = 0;
+		_signalState = signalState::nonSignificant;
+		_lastMaxima = _lastMinima = 0;
+		_haveParamsChanged = _haveInputsChanged = false;
+		_synchMode = synchMode::free;
+	}
 }
 
 void MatsuNode::uncreate()
@@ -825,43 +835,43 @@ void MatsuNode::uncreate()
 
 
 // throws exception if any parameters invalid
-void MatsuNode::validateParams(double t1, double t2, double c1, double c2,
+bool MatsuNode::validateParams(double t1, double t2, double c1, double c2,
 	double b, double g)
 {
-	validateT(t1);
-	validateT(t2);
-	validateC(c1);
-	validateC(c2);
-	validateB(b);
-	validateG(g);
+	return validateT(t1) || validateT(t2) || validateC(c1)
+			|| validateC(c2) || validateB(b) || validateG(g);
 }
 
-void MatsuNode::validateT(double t)
+bool MatsuNode::validateT(double t)
 {
 	if (t<T_MIN || t>T_MAX) {
-		throw std::invalid_argument("t out of bounds");
+		return false;
 	}
+	return true;
 }
 
-void MatsuNode::validateC(double c)
+bool MatsuNode::validateC(double c)
 {
 	if (c<C_MIN || c>C_MAX) {
-		throw std::invalid_argument("c out of bounds");
+		return false;
 	}
+	return true;
 }
 
-void MatsuNode::validateB(double b)
+bool MatsuNode::validateB(double b)
 {
 	if (b<B_MIN || b>B_MAX) {
-		throw std::invalid_argument("b out of bounds");
+		return false;
 	}
+	return true;
 }
 
-void MatsuNode::validateG(double g)
+bool MatsuNode::validateG(double g)
 {
 	if (g<G_MIN || g>G_MAX) {
-		throw std::invalid_argument("g out of bounds");
+		return false;
 	}
+	return true;
 }
 
 

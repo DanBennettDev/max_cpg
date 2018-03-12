@@ -30,6 +30,11 @@
 
 	<methodlist>
 
+		<method name='params'>
+			<digest></digest>
+			<description></description>
+		</method>
+
 		<method name='bang'>
 			<digest>reset the node </digest>
 			<description>reset the node </description>
