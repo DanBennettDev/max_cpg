@@ -146,7 +146,7 @@ double MatsuNode::getInternal(matsuInternal param) const
 
 void MatsuNode::setFreqCompensation(double comp)
 {
-	_freqCompensation = comp;
+	_freqCompensation = comp > MINFREQCOMPENSAITON ? comp : DEFAULTFREQCOMPENSAITON;
 }
 
 double MatsuNode::getFreqCompensation() const
@@ -206,16 +206,13 @@ void MatsuNode::setFrequency(double freq, unsigned sampleRate)
 		sqrt((matsuParams.b + (matsuParams.b * mult) - (matsuParams.g * mult)) /
 		(matsuParams.g * mult));
 
-	double t2 = t1 * mult;
-
-	//if (t1<T_MIN) { t1 = T_MIN; }
-	//if (t2<T_MIN) { t2 = T_MIN; }
-	//if (t1>T_MAX) { t1 = T_MAX; }
-	//if (t2>T_MAX) { t2 = T_MAX; }
-	if (validateT(t1) && validateT(t2)) {
-		matsuParams.t1 = t1;
-		matsuParams.t2 = t2;
-		_haveParamsChanged = true;
+	if (validateT(t1)) {
+		double t2 = t1 * mult;
+		if (validateT(t2)) {
+			matsuParams.t1 = t1;
+			matsuParams.t2 = t2;
+			_haveParamsChanged = true;
+		}
 	}
 }
 
@@ -399,8 +396,9 @@ double MatsuNode::calcFreqCompensation(int cycleCount, int sampleRate)
 	_signalState = signalState::nonSignificant;
 	bool isCounting = false;
 	int counter = 0;
+	int bail_out = CALIBRATION_STOP_LIMIT * cycleCount * sampleRate;
 
-	while (cyclesCompleted < cycleCount) {
+	while (cyclesCompleted < cycleCount && bail_out > 0) {
 		doCalcStep(false, false);
 		if (getSignalState() == signalState::zeroXup) {
 			if (isCounting) {
@@ -410,13 +408,19 @@ double MatsuNode::calcFreqCompensation(int cycleCount, int sampleRate)
 			}
 		}
 		counter = isCounting ? counter + 1 : counter;
+		bail_out--;
+	}
+
+	// node is in hung state - frequency = 0;
+	if (bail_out <= 0) {
+		return _freqCompensation;
 	}
 
 	double desired = getFrequency(sampleRate);
 	double actual = (double)sampleRate / (double)(counter / cycleCount);
 	double error = actual / desired;
 	double _freqCompensation = getFreqCompensation() * error;
-	return _freqCompensation;
+	return _freqCompensation > MINFREQCOMPENSAITON ? _freqCompensation : DEFAULTFREQCOMPENSAITON;
 }
 
 
@@ -523,6 +527,9 @@ void    MatsuNode::set_b(double val)
 	} else if (val > B_MAX) {
 		val = B_MAX;
 	}
+	if (val < matsuParams.g) {
+		val = matsuParams.g;
+	}
 	matsuParams.b = val;
 	_haveParamsChanged = true;
 }
@@ -533,6 +540,9 @@ void    MatsuNode::set_g(double val)
 		val = G_MIN;
 	} else if (val > G_MAX) {
 		val = G_MAX;
+	}
+	if (matsuParams.b < val) {
+		matsuParams.b = val;
 	}
 	matsuParams.g = val;
 	_haveParamsChanged = true;
@@ -844,7 +854,7 @@ bool MatsuNode::validateParams(double t1, double t2, double c1, double c2,
 
 bool MatsuNode::validateT(double t)
 {
-	if (t<T_MIN || t>T_MAX) {
+	if (t != t || t<T_MIN || t>T_MAX) {
 		return false;
 	}
 	return true;
@@ -852,7 +862,7 @@ bool MatsuNode::validateT(double t)
 
 bool MatsuNode::validateC(double c)
 {
-	if (c<C_MIN || c>C_MAX) {
+	if (c!=c || c<C_MIN || c>C_MAX) {
 		return false;
 	}
 	return true;
@@ -860,7 +870,7 @@ bool MatsuNode::validateC(double c)
 
 bool MatsuNode::validateB(double b)
 {
-	if (b<B_MIN || b>B_MAX) {
+	if (b!=b || b<B_MIN || b>B_MAX) {
 		return false;
 	}
 	return true;
@@ -868,7 +878,7 @@ bool MatsuNode::validateB(double b)
 
 bool MatsuNode::validateG(double g)
 {
-	if (g<G_MIN || g>G_MAX) {
+	if (g!=g || g<G_MIN || g>G_MAX) {
 		return false;
 	}
 	return true;

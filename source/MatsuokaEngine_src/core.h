@@ -53,6 +53,8 @@
 // see K.Matsuoka, "Analysis of a neural oscillator," Biological 
 // cybernetics, vol. 104, no. 4 - 5, pp. 297{304, 2011.
 #define DEFAULTFREQCOMPENSAITON 0.9732
+#define MINFREQCOMPENSAITON 0.0000001
+
 
 // maximum number of nodes handled by system. In several places
 // arrays large enough for all nodes are allocated on initialisation, 

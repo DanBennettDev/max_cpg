@@ -10,6 +10,7 @@ TODO:
 	Message input to change equation values
 */
 
+
 #include "matsuNode.h"
 #include "c74_min.h"
 
@@ -24,7 +25,7 @@ private:
 	number inVal;
 	MatsuNode node;
 	MatsuNode dummyNode;
-	double freqComp;
+	double freqComp{ DEFAULTFREQCOMPENSAITON };
 	int local_srate;
 
 	int testCounter{ 0 };
@@ -206,23 +207,28 @@ public:
 
 	queue calibrate{ this,
 		MIN_FUNCTION{
-			m_initialized = false;
-			// calibrate nodes 
-			int settleTime = local_srate * 2;
-			dummyNode.setFrequency(CALIBRATION_CYCLES, local_srate);
-
-			while (settleTime-- > 0) {
-				dummyNode.doCalcStep(true, true);
-				node.doCalcStep(true, true);
-			}
-			freqComp = dummyNode.calcFreqCompensation(CALIBRATION_CYCLES, local_srate);
-			node.setFreqCompensation(freqComp);
-			node.setFrequency(_freq, local_srate);
-			m_initialized = true;
+			doCalibration();
 			return {};
 		}
 	};
 
+
+	void doCalibration()
+	{
+		m_initialized = false;
+		// calibrate nodes 
+		int settleTime = local_srate * 2;
+		dummyNode.setFrequency(CALIBRATION_CYCLES, local_srate);
+
+		while (settleTime-- > 0) {
+			dummyNode.doCalcStep(true, true);
+			node.doCalcStep(true, true);
+		}
+		freqComp = dummyNode.calcFreqCompensation(CALIBRATION_CYCLES, local_srate);
+		node.setFreqCompensation(freqComp);
+		node.setFrequency(_freq, local_srate);
+		m_initialized = true;
+	}
 
 
 	void setparams(const atoms& args, bool startup)

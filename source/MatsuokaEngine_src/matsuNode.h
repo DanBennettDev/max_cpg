@@ -11,6 +11,7 @@
 #include "XORRand.h"
 
 #define MIN_MATSUOKA_FREQ 0.001
+#define CALIBRATION_STOP_LIMIT 2
 
 
 

@@ -8,7 +8,19 @@ aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} MAT_SOURCES)
 
 add_library(MatsuokaEngine STATIC ${MAT_SOURCES})
 
-set(
-    CMAKE_LIBRARY_OUTPUT_DIRECTORY
-    ../../build/x64/Release
-)
+
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	add_definitions(
+		-DDEBUG
+	)
+	set(
+		CMAKE_LIBRARY_OUTPUT_DIRECTORY
+		../../build/x64/Debug
+	)
+else ()
+	set(
+		CMAKE_LIBRARY_OUTPUT_DIRECTORY
+		../../build/x64/Release
+	)
+endif ()
