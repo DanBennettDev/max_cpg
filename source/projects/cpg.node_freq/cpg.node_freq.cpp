@@ -219,7 +219,7 @@ public:
 		// calibrate nodes 
 		int settleTime = local_srate * 2;
 		dummyNode.setFrequency(CALIBRATION_CYCLES, local_srate);
-
+		dummyNode.reset();
 		while (settleTime-- > 0) {
 			dummyNode.doCalcStep(true, true);
 			node.doCalcStep(true, true);
@@ -227,6 +227,7 @@ public:
 		freqComp = dummyNode.calcFreqCompensation(CALIBRATION_CYCLES, local_srate);
 		node.setFreqCompensation(freqComp);
 		node.setFrequency(_freq, local_srate);
+		node.reset();
 		m_initialized = true;
 	}
 
