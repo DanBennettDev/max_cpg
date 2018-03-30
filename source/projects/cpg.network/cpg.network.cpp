@@ -9,7 +9,6 @@
 
 	TODO:
 
-		- initialise fully connected with zero weights
 		- write new operator
 		- add controls for 
 			- delay out change
@@ -19,6 +18,7 @@
 
 	LONGER TERM:
 		External input(s)
+		Smoothing control changes
 		Waveshaping between connections
 
 
@@ -26,8 +26,9 @@
 
 
 
-#include "matsuokaEngine.h"
 #include "c74_min.h"
+#include "matsuokaEngine.h"
+#include "matsuNode.h"
 
 #define CALIBRATION_CYCLES 20
 #define FREQ_MIN 0.001
@@ -52,8 +53,12 @@ private:
 	double freqComp{ DEFAULTFREQCOMPENSAITON };
 	int local_srate;
 
-	sample matsuOuts[MAX_NODES][INTERP_SAMPLES]{ 0 };
+	// holds raw output values for interpolation. Barebones ringbuffer approach.
+	sample outRingBuff[MAX_NODES][INTERP_SAMPLES]{ 0 };
+	int ringIndex{ 0 };
 	number freqs[MAX_NODES]{ 0 };
+	number phase{ 0 };
+	number phaseStep;
 
 	lib::interpolator::hermite<sample> interp_herm;
 	lib::interpolator::linear<sample> interp_lin;
@@ -94,7 +99,7 @@ public:
 			nodeCount = args[0];
 		}
 
-		if (args.size() >1) {
+		if (args.size() > 1) {
 			unsigned srate_in = (unsigned)(int)args[1];
 			cout << "sample rate requested: " << srate_in << endl;
 			if ((int)srate_in > samplerate() / 2 || (int)srate_in < 0) {
@@ -111,23 +116,31 @@ public:
 			local_srate = (int)samplerate();
 		}
 
+		engine_ptr = std::shared_ptr<MatsuokaEngine>(
+			new  MatsuokaEngine(local_srate, true, false, true));
+		dummyNode = MatsuNode();
+
 		// will be adding more (replacing this) later
 		inlets.push_back(std::make_unique<inlet<>>(this, "(messages) control input"));
 
-		for (auto i = 0; i<nodeCount; ++i) {
+		// set up nodes and inlets/outlets for them
+		for (int nodeID = 0; nodeID < nodeCount; ++nodeID) {
 			//inlets.push_back(std::make_unique<inlet<>>(this, "(signal) audio input"));
-			outlets.push_back(std::make_unique<outlet<>>(this, "(signal) audio output " + i, "signal"));
+			outlets.push_back(std::make_unique<outlet<>>(this, "(signal) audio output " + nodeID, "signal"));
+			if (nodeID != 0) {
+				engine_ptr->addChild(0, nodeID);
+			}
+		}
+		// connect all nodes to all others, but with 0 signal weight
+		for (int nodeID = 0; nodeID < nodeCount; ++nodeID) {
+			for (int connectToID = 0; connectToID < nodeCount; ++connectToID) {
+				if (nodeID != connectToID) {
+					engine_ptr->setConnection(nodeID, connectToID, 0.0);
+				}
+			}
 		}
 
-		engine_ptr = std::shared_ptr<MatsuokaEngine>
-			(new  MatsuokaEngine(local_srate, true, false, true));
-		dummyNode = MatsuNode();
-
 		engine_ptr->setUnityConnectionWeight(UNITY_CONN_WEIGHT);
-
-
-
-
 		engine_ptr->setConnectionWeightScaling(true);
 		engine_ptr->setParam_t2Overt1(T2_INIT / T1_INIT);
 		engine_ptr->setParam_c(C_INIT);
@@ -142,8 +155,7 @@ public:
 		dummyNode.set_b(B_INIT);
 		dummyNode.set_g(G_INIT);
 
-		
-		setparams(args, true);
+		setParams(args, true);
 
 		engine_ptr->calibrate();
 		calibrate.set();
@@ -153,10 +165,6 @@ public:
 		m_initialized = true;
 	}
 
-	~cpg_net()
-	{
-		// object-specific tear-down code here
-	}
 
 	inlet<>			in{ this, "(signal) input" };
 	inlet<>			freq{ this, "(signal) node frequency" };
@@ -182,7 +190,7 @@ public:
 
 	message<> params{ this, "params",
 		MIN_FUNCTION{
-		setparams(args, false);
+		setParams(args, false);
 	calibrate.set();
 	return {};
 	}
@@ -231,6 +239,13 @@ public:
 	}
 	};
 
+	queue calibrate{ this,
+		MIN_FUNCTION{
+		doCalibration();
+	return {};
+	}
+	};
+
 
 
 	//attribute<number> frequency { this, "frequency" , 1.0, description{"Frequency in Hz"},
@@ -244,52 +259,83 @@ public:
 
 
 
-	// TODO - COMPLETELY REWRITE
-	/// Process N channels of audio
-	/// Max takes care of squashing denormal for us by setting the FTZ bit on the CPU.
 
-	void operator()(audio_bundle input, audio_bundle output) 
+	void calcVector_nonInterp(audio_bundle input, audio_bundle output)
 	{
-		freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
-		_freq = freq;
-		if (m_initialized) {
-			if (local_srate == (int)samplerate()) {
-				node.setExternalInput(in);
-				node.setFreqCompensation(freqComp);
-				node.setFrequency(freq, local_srate);
+		// For each frame in the vector calc each channel
 
-				node.doCalcStep(true, true);
-				return node.getOutput();
-
-
-			}
-			else {
-				phase += phaseStep;
-				if (phase > 1.0) {
-					phase -= 1.0;
-					node.setExternalInput(in);
-					node.setFreqCompensation(freqComp);
-					node.setFrequency(freq, local_srate);
-
-					node.doCalcStep(true, true);
-					matsuOut_1 = matsuOut_2;
-					matsuOut_2 = matsuOut_3;
-					matsuOut_3 = matsuOut_4;
-					matsuOut_4 = node.getOutput();
-				}
-				else if (phase < 0.0) { // sholdn't happen
-					phase += 1.0;
-				}
-
-				if (local_srate > 11024) {
-					return interp_herm(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
-				}
-				else {
-					return interp_lin(matsuOut_1, matsuOut_2, matsuOut_3, matsuOut_4, phase);
-				}
+		for (auto frame = 0; frame<input.frame_count(); ++frame) {
+			engine_ptr->doQueuedActions();
+			engine_ptr->step();
+			// send to max output
+			for (int channel = 0; channel < nodeCount; ++channel) {
+				output.samples(channel)[frame] = outRingBuff[channel][ringIndex];
 			}
 		}
-		return 0;
+	}
+
+
+
+	void calcVector_interp(audio_bundle input, audio_bundle output)
+	{
+		// For each frame in the vector calc each channel
+
+		for (auto frame = 0; frame<input.frame_count(); ++frame) {
+
+			// if phase wraps, calc sample from network
+			phase += phaseStep;
+			if (phase > 1.0) {
+
+				ringIndex++;
+				if (ringIndex >= INTERP_SAMPLES) { ringIndex = 0; }
+				engine_ptr->doQueuedActions();
+				engine_ptr->step();
+			}
+			else if (phase < 0.0) { // sholdn't happen
+				phase += 1.0;
+			}
+
+			// regardless of phase wrap, calculate our interpolated sample for outputs
+			for (int channel = 0; channel < nodeCount; ++channel) {
+				outRingBuff[channel][ringIndex] = engine_ptr->getNodeOutput(channel);
+
+				if (local_srate > 11024) {
+					output.samples(channel)[frame] =
+							interp_herm(interpRingLookup(outRingBuff[channel], ringIndex,-3),
+										interpRingLookup(outRingBuff[channel], ringIndex, -2),
+										interpRingLookup(outRingBuff[channel], ringIndex, -1),
+										outRingBuff[channel][ringIndex],
+										phase);
+				}
+				else {
+					output.samples(channel)[frame] =
+						interp_lin(interpRingLookup(outRingBuff[channel], ringIndex, -3),
+							interpRingLookup(outRingBuff[channel], ringIndex, -2),
+							interpRingLookup(outRingBuff[channel], ringIndex, -1),
+							outRingBuff[channel][ringIndex],
+							phase);
+				}
+				
+			}
+		}
+	}
+
+
+
+	/// Process N channels of audio
+	/// Max takes care of squashing denormal for us by setting the FTZ bit on the CPU.
+	void operator()(audio_bundle input, audio_bundle output) 
+	{
+		if (m_initialized) {
+			phaseStep = local_srate / samplerate();
+
+			if (local_srate == (int)samplerate()) {
+				calcVector_nonInterp(input, output);
+			}
+			else {
+				calcVector_interp(input, output);
+			}
+		}
 
 	}
 
@@ -311,12 +357,7 @@ public:
 	//	node.setFrequency(_freq, local_srate);
 	//}
 
-	queue calibrate{ this,
-		MIN_FUNCTION{
-		doCalibration();
-	return {};
-	}
-	};
+
 
 
 	void doCalibration()
@@ -342,7 +383,7 @@ public:
 	}
 
 
-	void setparams(const atoms& args, bool startup)
+	void setParams(const atoms& args, bool startup)
 	{
 
 		int firstParam = startup ? 2 : 0;
@@ -365,6 +406,15 @@ public:
 			engine_ptr->setParam_g(args[firstParam + 3]);
 			dummyNode.set_g(args[firstParam + 3]);
 		}
+	}
+
+	// Helper function for our barebones ring buffer approach
+	// CAREFUL: offset must be negative - 
+	// adding branch here to protect against invalid values would be a waste of resource
+	sample interpRingLookup(sample samps[INTERP_SAMPLES], int curr, int offset)
+	{
+		int raw = curr + offset;
+		return samps[raw < 0 ? raw + INTERP_SAMPLES : raw];
 	}
 
 };
