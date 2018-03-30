@@ -2,7 +2,6 @@ __*
 sysbuild
 *.sdf
 *.suo
-*.sln
 *.opensdf
 log.txt
 externals
