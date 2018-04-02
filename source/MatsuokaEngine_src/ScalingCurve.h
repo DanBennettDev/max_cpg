@@ -18,6 +18,7 @@ public:
     ScalingCurve();
 
     bool loadCurve(std::string filename);
+	bool loadCurve(std::vector<float> x, std::vector<float> y);
     void setInputMax(float max);
 
     float getValue(float lookupVal, float in);

@@ -35,6 +35,27 @@ bool ScalingCurve::loadCurve(std::string filename)
 }
 
 
+bool ScalingCurve::loadCurve(std::vector<float> x, std::vector<float> y)
+{
+	if (x.size() != y.size()) {
+		return false;
+	}
+	for (int i = 0; i < x.size(); i++) {
+		_curve.push_back(pair(x[i], y[i]));
+	}
+
+	if (_curve.size() > 0) {
+		_minLookup = _curve[0].x;
+		_maxLookup = _curve.back().x;
+		_lookupRange = _maxLookup - _minLookup;
+		_curveLoaded = true;
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 
 
 void ScalingCurve::setInputMax(float max)
@@ -68,7 +89,7 @@ float ScalingCurve::getInputValue(float lookupVal, float output)
 void ScalingCurve::enableScaling()
 {
     // only allow to be turned on if curve is loaded
-    if (_curve.size() > 0) {
+    if (_curveLoaded) {
         _isScalingOn = true;
     }
 }
@@ -86,43 +107,45 @@ bool ScalingCurve::isScalingOn()
 
 float ScalingCurve::_lookup(float lookup)
 {
-    if (_curve.size() > 128) {
-        // for largish table, binary search and don't bother interpolating
-        // binary search for the lookup val
-        int min = 0, max = _curve.size();
-        int cursor = min + ((max - min) / 2);
-        while (min < max - 1 && _curve[cursor].x != lookup) {
-            if (_curve[cursor].x < lookup) {
-                min = cursor;
-            } else {
-                max = cursor;
-            }
-            if (_curve[cursor].x != lookup) {
-                cursor = min + ((max - min) / 2);
-            }
-        }
-        return _curve[cursor].y;
-    }
+	if (_curveLoaded) {
+		if (_curve.size() > 128) {
+			// for largish table, binary search and don't bother interpolating
+			// binary search for the lookup val
+			int min = 0, max = _curve.size();
+			int cursor = min + ((max - min) / 2);
+			while (min < max - 1 && _curve[cursor].x != lookup) {
+				if (_curve[cursor].x < lookup) {
+					min = cursor;
+				}
+				else {
+					max = cursor;
+				}
+				if (_curve[cursor].x != lookup) {
+					cursor = min + ((max - min) / 2);
+				}
+			}
+			return _curve[cursor].y;
+		}
 
-    // 
-    int cursor = 0;
-    float y = 0;
-    while (cursor < _curve.size() && _curve[cursor].x <= lookup) {
-        cursor++;
-    }
-    if (cursor >= _curve.size()) { return _curve.back().y; } 
-    if (cursor == 0 ) { return _curve[0].y; }
+		// 
+		int cursor = 0;
+		float y = 0;
+		while (cursor < _curve.size() && _curve[cursor].x <= lookup) {
+			cursor++;
+		}
+		if (cursor >= _curve.size()) { return _curve.back().y; }
+		if (cursor == 0) { return _curve[0].y; }
 
-    if (_curve[cursor].x == lookup) {
-        return _curve[cursor].y;
-    }
-    // interpolate
-    float error = lookup - _curve[cursor-1].x;
-    float errorScaled = error / (_curve[cursor].x - _curve[cursor - 1].x);
-    float delta  = _curve[cursor].y - _curve[cursor - 1].y;
+		if (_curve[cursor].x == lookup) {
+			return _curve[cursor].y;
+		}
+		// interpolate
+		float error = lookup - _curve[cursor - 1].x;
+		float errorScaled = error / (_curve[cursor].x - _curve[cursor - 1].x);
+		float delta = _curve[cursor].y - _curve[cursor - 1].y;
 
-    return _curve[cursor - 1].y + (errorScaled*delta);
-
+		return _curve[cursor - 1].y + (errorScaled*delta);
+	}
 }
 
 

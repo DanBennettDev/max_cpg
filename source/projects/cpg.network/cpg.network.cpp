@@ -11,11 +11,12 @@
 
 		- add signal inputs for freq
 
-
+		- load scaling curve
+		Does weight scaling work correctly?
+		
 		- add param controls for 
 			- delay out change
 
-		Does weight scaling work correctly?
 
 
 	LONGER TERM:
@@ -65,10 +66,10 @@ private:
 	lib::interpolator::hermite<sample> _interp_herm;
 	lib::interpolator::linear<sample> _interp_lin;
 	bool _initialized{ false };
-	int _nodeCount{ 1 };
+	int _nodeCount{ 1 };	// defaults to 1 channel / 1 node
 
-	vector< unique_ptr<inlet<>> >			ins;				///< this object's ins
-	vector< unique_ptr<outlet<>> >			outs;				///< this object's outs
+	vector< unique_ptr<inlet<>> >			_ins;				///< this object's ins
+	vector< unique_ptr<outlet<>> >			_outs;				///< this object's outs
 
 public:
 
@@ -122,19 +123,27 @@ public:
 			new  MatsuokaEngine(_local_srate, true, false, true));
 		_dummyNode = MatsuNode();
 
-		// will be adding more (replacing this) later
-		ins.push_back(std::make_unique<inlet<>>(this, "(messages) control input"));
-
 		// set up nodes and ins/outs for them
 		for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) {
-			//ins.push_back(std::make_unique<inlet<>>(this, "(signal) audio input"));
-			outs.push_back(std::make_unique<outlet<>>(this, "(signal) audio output " + nodeID, "signal"));
+			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) audio input"));
+			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) audio output", "signal"));
+
 			if (nodeID != 0) {
 				_engine_ptr->addChild(0, nodeID);
 			}
 		}
-		// connect all nodes to all others, but with 0 signal weight
+
+		_engine_ptr->setUnityConnectionWeight(UNITY_CONN_WEIGHT);
+		_engine_ptr->setConnectionWeightScaling(true);
+		_engine_ptr->setFreqCompensation(DEFAULTFREQCOMPENSAITON);
+		setParams(args, true);
+
+		calibrate.set();
+
+		// set frequencies and connect all nodes to all others, but with 0 signal weight
 		for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) {
+			//set all frequencies to 1
+			_engine_ptr->setNodeFrequency(nodeID, 1.0, false);
 			for (int connectToID = 0; connectToID < _nodeCount; ++connectToID) {
 				if (nodeID != connectToID) {
 					_engine_ptr->setConnection(nodeID, connectToID, 0.0);
@@ -142,25 +151,6 @@ public:
 			}
 		}
 
-		_engine_ptr->setUnityConnectionWeight(UNITY_CONN_WEIGHT);
-		_engine_ptr->setConnectionWeightScaling(true);
-		_engine_ptr->setParam_t2Overt1(T2_INIT / T1_INIT);
-		_engine_ptr->setParam_c(C_INIT);
-		_engine_ptr->setParam_b(B_INIT);
-		_engine_ptr->setParam_g(G_INIT);
-		_engine_ptr->setFreqCompensation(DEFAULTFREQCOMPENSAITON);
-		_engine_ptr->setNodeFrequency(0u, 1.0, true);
-
-		_dummyNode.set_t1(T1_INIT);
-		_dummyNode.set_t2(T2_INIT);
-		_dummyNode.set_c(C_INIT);
-		_dummyNode.set_b(B_INIT);
-		_dummyNode.set_g(G_INIT);
-
-		setParams(args, true);
-
-		_engine_ptr->calibrate();
-		calibrate.set();
 
 		cout << "initialised network" << endl;
 
@@ -260,12 +250,19 @@ public:
 	void calcVector_nonInterp(audio_bundle input, audio_bundle output)
 	{
 		// For each frame in the vector calc each channel
-
+		sample freq;
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
 			_engine_ptr->doQueuedActions();
 			_engine_ptr->step();
-			// send to max output
-			for (int channel = 0; channel < _nodeCount; ++channel) {
+			
+			for (int channel = 0; channel < output.channel_count(); ++channel) {
+				// send to max output
+				if (_ins[channel]->has_signal_connection()){
+					freq = input.samples(channel)[frame];
+					freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
+					_engine_ptr->setNodeFrequency(channel, freq ,false);
+				}
+				_outRingBuff[channel][_ringIndex] = _engine_ptr->getNodeOutput(channel);
 				output.samples(channel)[frame] = _outRingBuff[channel][_ringIndex];
 			}
 		}
@@ -294,6 +291,12 @@ public:
 
 			// regardless of _phase wrap, calculate our interpolated sample for outputs
 			for (int channel = 0; channel < _nodeCount; ++channel) {
+				sample freq;
+				if (_ins[channel]->has_signal_connection()) {
+					freq = input.samples(channel)[frame];
+					freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
+					_engine_ptr->setNodeFrequency(channel, freq, false);
+				}
 				_outRingBuff[channel][_ringIndex] = _engine_ptr->getNodeOutput(channel);
 
 				if (_local_srate > 11024) {
@@ -389,20 +392,40 @@ public:
 			_engine_ptr->setParam_t2Overt1(args[firstParam]);
 			_dummyNode.set_t2_over_t1(args[firstParam]);
 		}
+		else if(!_initialized){
+			_engine_ptr->setParam_t2Overt1(T2_INIT / T1_INIT);
+			_dummyNode.set_t1(T1_INIT);
+			_dummyNode.set_t2(T2_INIT);
+
+		}
+
 		if (args.size() > firstParam + 1) {
 			_engine_ptr->setParam_c(args[firstParam + 1]);
 			_dummyNode.set_c(args[firstParam + 1]);
+		}
+		else if (!_initialized) {
+			_engine_ptr->setParam_c(C_INIT);
+			_dummyNode.set_c(C_INIT);
 		}
 
 		if (args.size() > firstParam + 2) {
 			_engine_ptr->setParam_b(args[firstParam + 2]);
 			_dummyNode.set_b(args[firstParam + 2]);
 		}
+		else if (!_initialized) {
+			_engine_ptr->setParam_b(B_INIT);
+			_dummyNode.set_b(B_INIT);
+		}
 
 		if (args.size() > firstParam + 3) {
 			_engine_ptr->setParam_g(args[firstParam + 3]);
 			_dummyNode.set_g(args[firstParam + 3]);
 		}
+		else if (!_initialized) {
+			_engine_ptr->setParam_g(G_INIT);
+			_dummyNode.set_g(G_INIT);
+		}
+
 	}
 
 	// Helper function for our barebones ring buffer approach
