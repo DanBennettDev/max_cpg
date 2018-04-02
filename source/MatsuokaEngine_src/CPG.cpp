@@ -642,7 +642,7 @@ unsigned CPG::calculateDelayLineLength(unsigned nodeID)
         slowestFreq = _nodes[getNode(nodeID).getParentID()].getFrequency(_sampleRate);
         slowestFreq = slowestFreq < thisNodeFreq ? slowestFreq : thisNodeFreq;
     }
-    unsigned len = _sampleRate / (unsigned)slowestFreq;
+    unsigned len = (double)_sampleRate / slowestFreq;
 
     if (len > MAX_DELAYLINE_LENGTH) { len = MAX_DELAYLINE_LENGTH; }
     return len;

@@ -110,6 +110,7 @@ public:
 				cout << "setting to system sample rate" << endl;
 
 				_local_srate = (int)samplerate();
+
 			}
 			else {
 				_local_srate = srate_in;
@@ -118,6 +119,9 @@ public:
 		else {
 			_local_srate = (int)samplerate();
 		}
+
+		// TODO: TEST ONLY - REMOVE 
+		_local_srate = 1000;
 
 		_engine_ptr = std::shared_ptr<MatsuokaEngine>(
 			new  MatsuokaEngine(_local_srate, true, false, true));
@@ -290,7 +294,7 @@ public:
 			}
 
 			// regardless of _phase wrap, calculate our interpolated sample for outputs
-			for (int channel = 0; channel < _nodeCount; ++channel) {
+			for (int channel = 0; channel < output.channel_count(); ++channel) {
 				sample freq;
 				if (_ins[channel]->has_signal_connection()) {
 					freq = input.samples(channel)[frame];
@@ -431,7 +435,7 @@ public:
 	// Helper function for our barebones ring buffer approach
 	// CAREFUL: offset must be negative - 
 	// adding branch here to protect against invalid values would be a waste of resource
-	sample interpRingLookup(sample samps[INTERP_SAMPLES], int curr, int offset)
+	sample interpRingLookup(sample *samps, int curr, int offset)
 	{
 		int raw = curr + offset;
 		return samps[raw < 0 ? raw + INTERP_SAMPLES : raw];

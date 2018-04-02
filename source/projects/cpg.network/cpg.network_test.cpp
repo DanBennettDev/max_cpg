@@ -17,7 +17,7 @@ TEST_CASE( "initialises and runs correctly with 1 node" ) {
 	cpg_net& my_object = an_instance;
 
 	//// create an impulse buffer to process
-	const int		buffersize = 256;
+	const int		buffersize = 256000;
 	sample_vector	impulse(buffersize);
 
 	sample_vector	output;
