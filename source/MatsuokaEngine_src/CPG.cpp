@@ -298,6 +298,12 @@ bool CPG::loadWeightScalingCurve(std::string curveSource)
     return scaler.loadCurve(curveSource);
 }
 
+bool CPG::loadWeightScalingCurve(std::vector<float> x, std::vector<float> y)
+{
+	return scaler.loadCurve(x,y);
+}
+
+
 // every node in the network
 void CPG::setFreqCompensation(double compensation)
 {

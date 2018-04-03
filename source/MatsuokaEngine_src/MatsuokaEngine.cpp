@@ -539,6 +539,11 @@ bool MatsuokaEngine::loadConnectionWeightCurve(std::string source)
     return _cpg.loadWeightScalingCurve(source);
 }
 
+bool MatsuokaEngine::loadConnectionWeightCurve(std::vector<float> x, std::vector<float> y)
+{
+	return _cpg.loadWeightScalingCurve(x,y);
+}
+
 void MatsuokaEngine::setUnityConnectionWeight(float unity)
 {
     _cpg.setUnityConnectionWeight(unity);

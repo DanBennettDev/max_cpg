@@ -75,17 +75,12 @@
 			<description></description>
 		</method>
 
+		<method name='scalingCurve'>
+			<digest></digest>
+			<description></description>
+		</method>
+
 		<method name='offset'>
-			<digest></digest>
-			<description></description>
-		</method>
-
-		<method name='node_freq'>
-			<digest></digest>
-			<description></description>
-		</method>
-
-		<method name='net_freq'>
 			<digest></digest>
 			<description></description>
 		</method>

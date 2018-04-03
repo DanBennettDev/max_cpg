@@ -10,22 +10,32 @@
 	TODO:
 		
 
-		- params isn't changing eq params properly
-
-
 		- load scaling curve
 		- Does weight scaling work correctly?
+		- float frequencies
+
+		- does phase offset control work?
 		
 		- add param controls for 
 			- delay out change
 
-		- close down network correctly on destroy
+		- trigger outputs
+		- Quantiser stuff
+
+		- OSC front end
 
 
 	LONGER TERM:
 		External input(s)
 		Smoothing control changes
 		Waveshaping between connections
+		
+		Do I need a proper shutdown proces?
+
+		PERFORMANCE:
+			switchable triggering
+			Curve lookup every sample? (for freq check)
+			Look for other bottlenecks
 
 
 */
@@ -40,12 +50,14 @@
 #define FREQ_MIN 0.001
 #define MAX_NODES 16
 #define INTERP_SAMPLES 4
-#define UNITY_CONN_WEIGHT 1
+#define UNITY_CONN_WEIGHT 3
 #define P_TRATIO 4
 #define P_C 1
-#define P_B 4.07
-#define P_G 4.07
-
+#define P_B 7
+#define P_G 7
+#define P_COMPENSATION 0.973200f
+#define DEFAULT_CURVE_X 0.25f, 0.333f, 0.5f, 1.111f, 1.333f, 2.f, 3.f, 4.f, 6.f, 8.f
+#define DEFAULT_CURVE_Y 1.955492228f, 1.098290155f, 0.107150259f, 0.133937824f, 0.321450777f, 0.517f, 0.641026425f, 0.937029016f, 1.194725389f, 1.259015544f
 
 
 
@@ -56,7 +68,7 @@ class cpg_net : public object<cpg_net>, public vector_operator<>
 private:
 	std::shared_ptr<MatsuokaEngine> _engine_ptr;
 	MatsuNode _dummyNode;
-	double _freqComp{ DEFAULTFREQCOMPENSAITON };
+	double _freqComp{ P_COMPENSATION };
 	int _local_srate;
 
 	// holds raw output values for interpolation. Barebones ringbuffer approach.
@@ -142,9 +154,13 @@ public:
 			}
 		}
 
+		vector<float> curvX = { DEFAULT_CURVE_X };
+		vector<float> curvY = { DEFAULT_CURVE_Y };
+
+		_engine_ptr->loadConnectionWeightCurve(curvX, curvY);
 		_engine_ptr->setUnityConnectionWeight(UNITY_CONN_WEIGHT);
 		_engine_ptr->setConnectionWeightScaling(true);
-		_engine_ptr->setFreqCompensation(DEFAULTFREQCOMPENSAITON);
+		_engine_ptr->setFreqCompensation(P_COMPENSATION);
 		setParams(args, true);
 
 
@@ -202,6 +218,28 @@ public:
 	return {};
 	}
 	};
+
+
+	message<> scalingCurve{ this, "scalingCurve",
+		MIN_FUNCTION{
+		if (args.size() % 2 == 0) {
+			int itemCount = args.size() / 2;
+			std::vector<float> x, y;
+			for (int i = 0; i < itemCount; i++) {
+				x.push_back(args[i * 2]);
+				y.push_back(args[(i * 2)+1]);
+			}
+			_engine_ptr->loadConnectionWeightCurve(x, y);
+		}
+	return {};
+	}
+	};
+
+
+
+
+
+
 
 	message<> offset{ this, "offset",
 		MIN_FUNCTION{
@@ -377,9 +415,9 @@ public:
 			_dummyNode.set_t2_over_t1(args[firstParam]);
 		}
 		else if(!_initialized){
-			_engine_ptr->setParam_t2Overt1(T2_INIT / T1_INIT);
-			_dummyNode.set_t1(T1_INIT);
-			_dummyNode.set_t2(T2_INIT);
+			_engine_ptr->setParam_t2Overt1(P_TRATIO);
+			_dummyNode.set_t1(1.0);
+			_dummyNode.set_t2(P_TRATIO);
 
 		}
 
@@ -388,8 +426,8 @@ public:
 			_dummyNode.set_c(args[firstParam + 1]);
 		}
 		else if (!_initialized) {
-			_engine_ptr->setParam_c(C_INIT);
-			_dummyNode.set_c(C_INIT);
+			_engine_ptr->setParam_c(P_C);
+			_dummyNode.set_c(P_C);
 		}
 
 		if (args.size() > firstParam + 2) {
@@ -397,8 +435,8 @@ public:
 			_dummyNode.set_b(args[firstParam + 2]);
 		}
 		else if (!_initialized) {
-			_engine_ptr->setParam_b(B_INIT);
-			_dummyNode.set_b(B_INIT);
+			_engine_ptr->setParam_b(P_B);
+			_dummyNode.set_b(P_B);
 		}
 
 		if (args.size() > firstParam + 3) {
@@ -406,8 +444,8 @@ public:
 			_dummyNode.set_g(args[firstParam + 3]);
 		}
 		else if (!_initialized) {
-			_engine_ptr->setParam_g(G_INIT);
-			_dummyNode.set_g(G_INIT);
+			_engine_ptr->setParam_g(P_G);
+			_dummyNode.set_g(P_G);
 		}
 
 	}

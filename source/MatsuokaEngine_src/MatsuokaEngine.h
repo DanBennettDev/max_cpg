@@ -84,6 +84,8 @@ public:
     /// for the weight multiplier. See ScalingCurve.h
     bool loadConnectionWeightCurve(std::string source);
 
+	bool loadConnectionWeightCurve(std::vector<float> x, std::vector<float> y);
+
     /// sets the input value which should map to weight of 1 when setting connections
     void setUnityConnectionWeight(float unity);
 

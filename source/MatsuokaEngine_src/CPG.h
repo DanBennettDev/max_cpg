@@ -152,6 +152,8 @@ public:
     void setSampleRate(unsigned sampleRate);
 
     bool loadWeightScalingCurve(std::string curveSource);
+
+	bool loadWeightScalingCurve(std::vector<float> x, std::vector<float> y);
     
     void setUnityConnectionWeight(float unity);
     void setConnectionWeightScaling(bool on);
