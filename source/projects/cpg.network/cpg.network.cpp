@@ -9,15 +9,8 @@
 
 	TODO:
 
-		- float frequencies
-
-		- does phase offset control work?
-		
-		- add param controls for 
-			- delay out change
-
-		- trigger outputs
 		- Quantiser stuff
+		- when Quantiser is off (global) no delay on trigger gen
 
 		- OSC front end
 
@@ -26,8 +19,8 @@
 		External input(s)
 		Smoothing control changes
 		Waveshaping between connections
-		
 		Do I need a proper shutdown proces?
+		Sync to max internal timings
 
 		PERFORMANCE:
 			switchable triggering
@@ -43,6 +36,9 @@
 #include "matsuokaEngine.h"
 #include "matsuNode.h"
 
+
+#define TRIG_LEN 100
+#define ARGS_BEFORE_PARAMS 3
 #define CALIBRATION_CYCLES 20
 #define FREQ_MIN 0.001
 #define MAX_NODES 16
@@ -63,25 +59,64 @@ using namespace c74::min;
 class cpg_net : public object<cpg_net>, public vector_operator<>
 {
 private:
+	class _ramp {
+	public:
+		_ramp() {
+			setLength(TRIG_LEN);
+		}
+
+		float tick() {
+			_phase += _phaseStep;
+			if (_phase < 1) {
+				return 1;
+			}
+			return 0;
+		}
+
+		float phase() {
+			return _phase;
+		}
+
+		void setTrigger() {
+			_phase = 0;
+		}
+
+		void setLength(int samples) {
+			_length = samples;
+			_phaseStep = 1.f / _length;
+		}
+
+	private:
+		int _length;
+		float _phase{ 0 };
+		float _phaseStep;
+	};
+
 	std::shared_ptr<MatsuokaEngine> _engine_ptr;
 	MatsuNode _dummyNode;
 	double _freqComp{ P_COMPENSATION };
 	int _local_srate;
+	bool _send_noteTriggers{ true };
 
 	// holds raw output values for interpolation. Barebones ringbuffer approach.
 	DelayLine<float> _outRingBuff[MAX_NODES];
 	int _ringIndex{ 0 };
 	number _freqs[MAX_NODES]{ 0 };
 	number _phase{ 0 };
-	number _phaseStep;
+	number _phaseStep{ 0 };
+	_ramp _trigs[MAX_NODES];
 
 	lib::interpolator::hermite<sample> _interp_herm;
 	lib::interpolator::linear<sample> _interp_lin;
 	bool _initialized{ false };
-	int _nodeCount{ 2  };	// defaults to 1 channel / 1 node
+	int _nodeCount{ 1  };	// defaults to 1 channel / 1 node
 
 	vector< unique_ptr<inlet<>> >			_ins;				///< this object's ins
 	vector< unique_ptr<outlet<>> >			_outs;				///< this object's outs
+
+	
+
+
 
 public:
 
@@ -96,6 +131,8 @@ public:
 	// documentation purposes only.
 	argument<int> node_count_arg{ this, "node_count", "The number of nodes in the network." };
 	argument<int> sample_rate_arg{ this, "sample_rate", "The sample rate of network calculations." };
+	argument<int> trigger_outputs_arg{ this, "trigger_outputs", "1(default) object has signal and note trigger outputs, 0: object has only signal outputs" };
+
 	argument<int> tRatio_arg{ this, "tRatio_param", "The ratio of equation params t2:t1." };
 	argument<int> c_arg{ this, "c_param", "The equation parameter c." };
 	argument<int> b_arg{ this, "b_param", "The equation parameter b." };
@@ -135,7 +172,11 @@ public:
 			_local_srate = (int)samplerate();
 		}
 
-		// TODO: TEST ONLY - REMOVE 
+		if (args.size() > 2) {
+			_send_noteTriggers = args[2] == 1 ? true : false;
+		}
+
+
 
 		_engine_ptr = std::shared_ptr<MatsuokaEngine>(
 			new  MatsuokaEngine(_local_srate, true, false, true));
@@ -143,13 +184,20 @@ public:
 
 		// set up nodes and ins/outs for them
 		for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) {
-			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) audio input"));
-			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) audio output", "signal"));
+			_engine_ptr->setNodeQuantiser_Grid(nodeID, MatsuokaEngine::gridType::unQuantised);
+			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) freq input " + nodeID));
+			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) signal output " + nodeID, "signal"));
 
 			if (nodeID != 0) {
 				_engine_ptr->addChild(0, nodeID);
 			}
 		}
+
+		if (_send_noteTriggers) {
+			for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) 
+				_outs.push_back(std::make_unique<outlet<>>(this, "(signal) trigger output " + nodeID, "signal"));
+		}
+
 
 		vector<float> curvX = { DEFAULT_CURVE_X };
 		vector<float> curvY = { DEFAULT_CURVE_Y };
@@ -244,11 +292,7 @@ public:
 
 
 
-
-
-
-
-	message<> offset{ this, "offset",
+	message<> offset_conn{ this, "offset_conn",
 		MIN_FUNCTION{
 		if (args.size() >= 3) {
 			_engine_ptr->setConnectionPhaseOffset((int)args[0],(int)args[1], (double)args[2]);
@@ -256,6 +300,17 @@ public:
 	return {};
 	}
 	};
+
+	message<> offset_out{ this, "offset_out",
+		MIN_FUNCTION{
+		if (args.size() >= 2) {
+			_engine_ptr->setNodePhaseOffset((int)args[0],(double)args[1]);
+		}
+	return {};
+	}
+	};
+
+
 
 
 	queue calibrate{ this,
@@ -286,7 +341,8 @@ public:
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
 			_engine_ptr->step();
 			
-			for (int channel = 0; channel < output.channel_count(); ++channel) {
+			// signals
+			for (int channel = 0; channel < _nodeCount; ++channel) {
 				// send to max output
 				if (_ins[channel]->has_signal_connection()){
 					freq = input.samples(channel)[frame];
@@ -296,8 +352,23 @@ public:
 				_outRingBuff[channel].pushSample(_engine_ptr->getNodeOutput(channel));
 				output.samples(channel)[frame] = _outRingBuff[channel].getDelayed(0);
 			}
+
+			if (_send_noteTriggers) {
+				auto noteEvents = _engine_ptr->getEvents();
+				for each (auto note in noteEvents) {
+					_trigs[note.nodeID].setTrigger();
+				}
+				for (int channel = 0; channel < _nodeCount; channel++) {
+					output.samples(channel + _nodeCount)[frame] = _trigs[channel].tick();
+				}
+			}
+			// triggers
+
+
 		}
+
 	}
+
 
 
 
@@ -318,6 +389,7 @@ public:
 			}
 
 			// regardless of _phase wrap, calculate our interpolated sample for outputs
+
 			for (int channel = 0; channel < output.channel_count(); ++channel) {
 				sample freq;
 				if (_ins[channel]->has_signal_connection()) {
@@ -415,7 +487,7 @@ public:
 	void setParams(const atoms& args, bool startup)
 	{
 
-		int firstParam = startup ? 2 : 0;
+		int firstParam = startup ? ARGS_BEFORE_PARAMS : 0;
 
 		if (args.size() > firstParam) {
 			_engine_ptr->setParam_t2Overt1(args[firstParam]);

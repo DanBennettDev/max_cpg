@@ -33,6 +33,11 @@
 			<description>The sample rate of network calculations. </description>
 		</objarg>
 
+		<objarg name='trigger_outputs' optional='1' type='int'>
+			<digest>1(default) object has signal and note trigger outputs, 0: object has only signal outputs </digest>
+			<description>1(default) object has signal and note trigger outputs, 0: object has only signal outputs </description>
+		</objarg>
+
 		<objarg name='tRatio_param' optional='1' type='int'>
 			<digest>The ratio of equation params t2:t1</digest>
 			<description>The ratio of equation params t2:t1. </description>
@@ -80,12 +85,17 @@
 			<description>Set frequency. </description>
 		</method>
 
-		<method name='weight'>
+		<method name='offset_out'>
 			<digest></digest>
 			<description></description>
 		</method>
 
-		<method name='offset'>
+		<method name='offset_conn'>
+			<digest></digest>
+			<description></description>
+		</method>
+
+		<method name='weight'>
 			<digest></digest>
 			<description></description>
 		</method>
