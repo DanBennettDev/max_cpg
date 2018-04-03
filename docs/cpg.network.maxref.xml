@@ -70,12 +70,17 @@
 			<description>reset the node </description>
 		</method>
 
-		<method name='weight'>
+		<method name='scalingCurve'>
 			<digest></digest>
 			<description></description>
 		</method>
 
-		<method name='scalingCurve'>
+		<method name='float'>
+			<digest>Set frequency</digest>
+			<description>Set frequency. </description>
+		</method>
+
+		<method name='weight'>
 			<digest></digest>
 			<description></description>
 		</method>

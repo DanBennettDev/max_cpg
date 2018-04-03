@@ -8,10 +8,7 @@
 	No Quantiser on this one
 
 	TODO:
-		
 
-		- load scaling curve
-		- Does weight scaling work correctly?
 		- float frequencies
 
 		- does phase offset control work?
@@ -198,6 +195,16 @@ public:
 			_engine_ptr->reset();
 		}
 	return {};
+	}
+	};
+
+
+	message<threadsafe::yes> number{ this, "number", "Set frequency.",
+		MIN_FUNCTION{
+			if (!args.empty()) {
+				_engine_ptr->setNodeFrequency(inlet,args[0], false);
+			}
+		return {};
 	}
 	};
 
