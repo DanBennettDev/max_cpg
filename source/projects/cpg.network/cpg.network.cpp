@@ -197,11 +197,6 @@ public:
 	message<> weight{ this, "weight",
 		MIN_FUNCTION{
 		if (args.size() >= 3) {
-			auto ins = _engine_ptr->getInputs((int)args[0]);
-			cout << "current connections: " << endl;
-			for each(auto input in ins) {
-				cout << input.sourceID << ": " << input.weight << endl;
-			}
 			_engine_ptr->setConnection((int)args[0],(int)args[1], (double)args[2]);
 		}
 	return {};
@@ -217,29 +212,6 @@ public:
 	}
 	};
 
-	message<> node_freq{ this, "node_freq",
-		MIN_FUNCTION{
-		if (args.size() >= 2){
-			_freqs[(int)args[0]] = args[1];
-			_engine_ptr->setNodeFrequency((int)args[0],(int)args[1], false);
-		}
-	return {};
-	}
-	};
-
-	message<> net_freq{ this, "net_freq",
-		MIN_FUNCTION{
-		if (!args.empty()) {
-			number freqMult = (float)args[0] / _freqs[0];
-			_freqs[0] = args[0];
-			_engine_ptr->setNodeFrequency(0,(int)args[0], true);
-			for (int i = 1; i < _nodeCount; i++) {
-				_freqs[i] *= freqMult;
-			}
-		}
-	return {};
-	}
-	};
 
 	queue calibrate{ this,
 		MIN_FUNCTION{

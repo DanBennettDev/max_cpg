@@ -22,7 +22,7 @@ TEST_CASE( "initialises and runs correctly with 1 node" ) {
 
 	sample_vector	output;
 
-	my_object.weight({ 0,1,1.0 }, 0);
+	my_object.params({ 2,1,4.07,4.07}, 0);
 
 	// run the calculations
 	for (auto x : impulse) {

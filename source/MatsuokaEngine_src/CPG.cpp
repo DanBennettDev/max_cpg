@@ -313,7 +313,6 @@ void CPG::setParam_t2Overt1(double val)
 {
     for (int i = 0; i < MAX_NODES; i++) {
 		_nodes[i].set_t2_over_t1(val);
-		_nodes[i].set_c2(val);
     }
 }
 
@@ -329,15 +328,13 @@ void CPG::setParam_b(double val)
 {
 	for (int i = 0; i < MAX_NODES; i++) {
 		_nodes[i].set_b(val);
-		_nodes[i].set_b(val);
 	}
 }
 
 void CPG::setParam_g(double val)
 {
 	for (int i = 0; i < MAX_NODES; i++) {
-		_nodes[i].set_b(val);
-		_nodes[i].set_b(val);
+		_nodes[i].set_g(val);
 	}
 }
 
