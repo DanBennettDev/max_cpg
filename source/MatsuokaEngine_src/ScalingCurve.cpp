@@ -81,8 +81,11 @@ float ScalingCurve::getValue(float lookupVal, float in)
 
 float ScalingCurve::getInputValue(float lookupVal, float output)
 {
-    float oldScaler = _lookup(lookupVal);
-    return  output * _maxInput / oldScaler;
+	if (_isScalingOn && _curveLoaded) {
+		float oldScaler = _lookup(lookupVal);
+		return  output * _maxInput / oldScaler;
+	}
+	return output;
 }
 
 

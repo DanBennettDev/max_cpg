@@ -8,11 +8,13 @@
 	No Quantiser on this one
 
 	TODO:
+		
 
-		- add signal inputs for freq
+		- params isn't changing eq params properly
+
 
 		- load scaling curve
-		Does weight scaling work correctly?
+		- Does weight scaling work correctly?
 		
 		- add param controls for 
 			- delay out change
@@ -67,7 +69,7 @@ private:
 	lib::interpolator::hermite<sample> _interp_herm;
 	lib::interpolator::linear<sample> _interp_lin;
 	bool _initialized{ false };
-	int _nodeCount{ 1 };	// defaults to 1 channel / 1 node
+	int _nodeCount{ 2  };	// defaults to 1 channel / 1 node
 
 	vector< unique_ptr<inlet<>> >			_ins;				///< this object's ins
 	vector< unique_ptr<outlet<>> >			_outs;				///< this object's outs
@@ -145,7 +147,6 @@ public:
 		_engine_ptr->setFreqCompensation(DEFAULTFREQCOMPENSAITON);
 		setParams(args, true);
 
-		calibrate.set();
 
 		// set frequencies and connect all nodes to all others, but with 0 signal weight
 		for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) {
@@ -158,6 +159,8 @@ public:
 			}
 		}
 
+		_engine_ptr->doQueuedActions();
+		calibrate.set();
 
 		cout << "initialised network" << endl;
 
@@ -185,7 +188,7 @@ public:
 	message<> params{ this, "params",
 		MIN_FUNCTION{
 		setParams(args, false);
-	calibrate.set();
+		calibrate.set();
 	return {};
 	}
 	};
@@ -194,6 +197,11 @@ public:
 	message<> weight{ this, "weight",
 		MIN_FUNCTION{
 		if (args.size() >= 3) {
+			auto ins = _engine_ptr->getInputs((int)args[0]);
+			cout << "current connections: " << endl;
+			for each(auto input in ins) {
+				cout << input.sourceID << ": " << input.weight << endl;
+			}
 			_engine_ptr->setConnection((int)args[0],(int)args[1], (double)args[2]);
 		}
 	return {};
@@ -259,7 +267,6 @@ public:
 		// For each frame in the vector calc each channel
 		sample freq;
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
-			_engine_ptr->doQueuedActions();
 			_engine_ptr->step();
 			
 			for (int channel = 0; channel < output.channel_count(); ++channel) {
@@ -287,7 +294,6 @@ public:
 			_phase += _phaseStep;
 			if (_phase > 1.0) {
 				_phase -= 1.0;
-				_engine_ptr->doQueuedActions();
 				_engine_ptr->step();
 			}
 			else if (_phase < 0.0) { // sholdn't happen
@@ -332,6 +338,7 @@ public:
 	void operator()(audio_bundle input, audio_bundle output) 
 	{
 		if (_initialized) {
+			_engine_ptr->doQueuedActions();
 			_phaseStep = _local_srate / samplerate();
 
 			if (_local_srate == (int)samplerate()) {

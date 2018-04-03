@@ -17,16 +17,19 @@ TEST_CASE( "initialises and runs correctly with 1 node" ) {
 	cpg_net& my_object = an_instance;
 
 	//// create an impulse buffer to process
-	const int		buffersize = 256000;
+	const int		buffersize = 256;
 	sample_vector	impulse(buffersize);
 
 	sample_vector	output;
+
+	my_object.weight({ 0,1,1.0 }, 0);
 
 	// run the calculations
 	for (auto x : impulse) {
 		auto y = my_object(x);
 		////output.push_back(y);
 	}
+
 
 
 	// check it
