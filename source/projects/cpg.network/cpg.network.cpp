@@ -17,6 +17,7 @@
 		- add param controls for 
 			- delay out change
 
+		- close down network correctly on destroy
 
 
 	LONGER TERM:
@@ -57,7 +58,7 @@ private:
 	int _local_srate;
 
 	// holds raw output values for interpolation. Barebones ringbuffer approach.
-	sample _outRingBuff[MAX_NODES][INTERP_SAMPLES]{ 0 };
+	DelayLine<float> _outRingBuff[MAX_NODES];
 	int _ringIndex{ 0 };
 	number _freqs[MAX_NODES]{ 0 };
 	number _phase{ 0 };
@@ -96,6 +97,9 @@ public:
 		_initialized = false;
 
 		cout << "started" << endl;
+		for (int i = 0; i < MAX_NODES; i++)
+			_outRingBuff[i].resize(INTERP_SAMPLES);
+
 
 		// gather info for basic object init
 		if (args.size() > 0) {
@@ -121,7 +125,6 @@ public:
 		}
 
 		// TODO: TEST ONLY - REMOVE 
-		_local_srate = 1000;
 
 		_engine_ptr = std::shared_ptr<MatsuokaEngine>(
 			new  MatsuokaEngine(_local_srate, true, false, true));
@@ -192,7 +195,7 @@ public:
 		MIN_FUNCTION{
 		if (args.size() >= 3) {
 			_engine_ptr->setConnection((int)args[0],(int)args[1], (double)args[2]);
-			}
+		}
 	return {};
 	}
 	};
@@ -266,8 +269,8 @@ public:
 					freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
 					_engine_ptr->setNodeFrequency(channel, freq ,false);
 				}
-				_outRingBuff[channel][_ringIndex] = _engine_ptr->getNodeOutput(channel);
-				output.samples(channel)[frame] = _outRingBuff[channel][_ringIndex];
+				_outRingBuff[channel].pushSample(_engine_ptr->getNodeOutput(channel));
+				output.samples(channel)[frame] = _outRingBuff[channel].getDelayed(0);
 			}
 		}
 	}
@@ -283,9 +286,7 @@ public:
 			// if _phase wraps, calc sample from network
 			_phase += _phaseStep;
 			if (_phase > 1.0) {
-
-				_ringIndex++;
-				if (_ringIndex >= INTERP_SAMPLES) { _ringIndex = 0; }
+				_phase -= 1.0;
 				_engine_ptr->doQueuedActions();
 				_engine_ptr->step();
 			}
@@ -301,22 +302,22 @@ public:
 					freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
 					_engine_ptr->setNodeFrequency(channel, freq, false);
 				}
-				_outRingBuff[channel][_ringIndex] = _engine_ptr->getNodeOutput(channel);
+				_outRingBuff[channel].pushSample(_engine_ptr->getNodeOutput(channel));
 
 				if (_local_srate > 11024) {
 					output.samples(channel)[frame] =
-							_interp_herm(interpRingLookup(_outRingBuff[channel], _ringIndex,-3),
-										interpRingLookup(_outRingBuff[channel], _ringIndex, -2),
-										interpRingLookup(_outRingBuff[channel], _ringIndex, -1),
-										_outRingBuff[channel][_ringIndex],
+						_interp_herm(	_outRingBuff[channel].getDelayed(3),
+										_outRingBuff[channel].getDelayed(2),
+										_outRingBuff[channel].getDelayed(1),
+										_outRingBuff[channel].getDelayed(0),
 										_phase);
 				}
 				else {
 					output.samples(channel)[frame] =
-						_interp_lin(interpRingLookup(_outRingBuff[channel], _ringIndex, -3),
-							interpRingLookup(_outRingBuff[channel], _ringIndex, -2),
-							interpRingLookup(_outRingBuff[channel], _ringIndex, -1),
-							_outRingBuff[channel][_ringIndex],
+						_interp_lin(_outRingBuff[channel].getDelayed(3),
+							_outRingBuff[channel].getDelayed(2),
+							_outRingBuff[channel].getDelayed(1),
+							_outRingBuff[channel].getDelayed(0),
 							_phase);
 				}
 				
@@ -432,14 +433,6 @@ public:
 
 	}
 
-	// Helper function for our barebones ring buffer approach
-	// CAREFUL: offset must be negative - 
-	// adding branch here to protect against invalid values would be a waste of resource
-	sample interpRingLookup(sample *samps, int curr, int offset)
-	{
-		int raw = curr + offset;
-		return samps[raw < 0 ? raw + INTERP_SAMPLES : raw];
-	}
 
 };
 

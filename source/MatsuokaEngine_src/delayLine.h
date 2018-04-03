@@ -20,7 +20,12 @@ public:
         _size = size > 0 ? size : 1;
         _write = 0;
     }
-
+	DelayLine()
+		: _buffer(1)
+	{
+		_size = 1;
+		_write = 0;
+	}
 
     /// resize the delay line 
     void resize(unsigned size)
