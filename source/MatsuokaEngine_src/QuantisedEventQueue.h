@@ -68,6 +68,9 @@ public:
     /// sets the grid offset 
     void setNodeGridOffset(unsigned nodeID, unsigned off);
 
+
+	unsigned getNoteDelay() const;
+
     unsigned getSampleRate() const;
     float getTempo() const;
     gridType getNodeGrid(unsigned nodeID);

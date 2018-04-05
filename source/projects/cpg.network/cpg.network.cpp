@@ -278,7 +278,7 @@ public:
 	message<> scalingCurve{ this, "scalingCurve",
 		MIN_FUNCTION{
 		if (args.size() % 2 == 0) {
-			int itemCount = args.size() / 2;
+			int itemCount = (int)(args.size() / 2);
 			std::vector<float> x, y;
 			for (int i = 0; i < itemCount; i++) {
 				x.push_back(args[i * 2]);
@@ -349,7 +349,7 @@ public:
 					freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
 					_engine_ptr->setNodeFrequency(channel, freq ,false);
 				}
-				_outRingBuff[channel].pushSample(_engine_ptr->getNodeOutput(channel));
+				_outRingBuff[channel].pushSample((float)_engine_ptr->getNodeOutput(channel, _send_noteTriggers));
 				output.samples(channel)[frame] = _outRingBuff[channel].getDelayed(0);
 			}
 
@@ -397,7 +397,7 @@ public:
 					freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
 					_engine_ptr->setNodeFrequency(channel, freq, false);
 				}
-				_outRingBuff[channel].pushSample(_engine_ptr->getNodeOutput(channel));
+				_outRingBuff[channel].pushSample((float)_engine_ptr->getNodeOutput(channel, _send_noteTriggers));
 
 				if (_local_srate > 11024) {
 					output.samples(channel)[frame] =

@@ -76,7 +76,7 @@ void QuantisedEventQueue::addEvent(outputEvent e)
     } else {
         queuedEvent_free qe;
         qe.event = e;
-        qe.countDown = _delayNotes;
+        qe.countDown = (float)_delayNotes;
         _eventQueueFree.push_back(qe);
     }
 }
@@ -225,7 +225,7 @@ unsigned QuantisedEventQueue::getNodeBarDivision(unsigned nodeID)
         return 0;
     }
 
-    return grid / nodes[nodeID].multiple;
+    return (unsigned)(grid / nodes[nodeID].multiple);
 }
 
 
@@ -244,4 +244,9 @@ void QuantisedEventQueue::setNoteDelays()
     _delayNotes =  (_sampleRate * 60 ) / (_tempo * 4);
     _grid24.setDelay(_delayNotes);
     _grid32.setDelay(_delayNotes);
+}
+
+unsigned QuantisedEventQueue::getNoteDelay() const
+{
+	return _delayNotes;
 }
