@@ -11,6 +11,7 @@
 
 		- Quantiser stuff
 
+		- offset should apply to signal out
 		- Apply changes to interpolated version
 
 		- OSC front end
