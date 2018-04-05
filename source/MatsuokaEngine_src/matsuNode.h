@@ -126,7 +126,7 @@ public:
 
 
 	/// returns output signal value for the node at indicated delay   
-	double  getOutput(unsigned samplesDelay) const;
+	double  getOutput(unsigned samplesDelay, bool startAtPhaseOffset = false) const;
 
 	/// returns output signal value for the node at its most recent first local maximum after positive zero crossing
 	double getLastMaxima() const;

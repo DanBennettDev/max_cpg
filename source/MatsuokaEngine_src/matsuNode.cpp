@@ -92,8 +92,9 @@ double MatsuNode::getOutput() const
 }
 
 
-double MatsuNode::getOutput(unsigned samplesDelay) const
+double MatsuNode::getOutput(unsigned samplesDelay, bool startAtPhaseOffset) const
 {
+	samplesDelay += startAtPhaseOffset ? _nodeOutputDelay : 0;
 	if (samplesDelay > matsuParams.out.size()) {
 		samplesDelay = (unsigned)matsuParams.out.size();
 	}

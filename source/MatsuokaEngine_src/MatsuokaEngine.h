@@ -103,7 +103,7 @@ public:
     std::vector<unsigned> getNodeChildren(unsigned nodeID) const;
     
     /// returns the current oscillator output value of the requested node
-    double getNodeOutput(unsigned nodeID, bool matchQuantiser = false) const;
+	double getNodeOutput(unsigned nodeID, unsigned sampleOffset = 0 , bool matchQuantiser = false) const;
 
     /// returns the frequency error correction value currently set for the network
     double getFrequencyCompensation() const;

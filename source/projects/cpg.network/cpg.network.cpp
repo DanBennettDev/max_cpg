@@ -9,10 +9,7 @@
 
 	TODO:
 
-		- Quantiser stuff
-
-		- offset should apply to signal out
-		- Apply changes to interpolated version
+		- Quantiser offset should apply to signal out
 
 		- OSC front end
 
@@ -409,7 +406,7 @@ public:
 				if (_ins[channel]->has_signal_connection()){
 					setFreq(channel, (float)input.samples(channel)[frame]);
 				}
-				_outRingBuff[channel].pushSample((float)_engine_ptr->getNodeOutput(channel, _send_noteTriggers));
+				_outRingBuff[channel].pushSample((float)_engine_ptr->getNodeOutput(channel,0, _send_noteTriggers));
 				output.samples(channel)[frame] = _outRingBuff[channel].getDelayed(0);
 			}
 			if (_send_noteTriggers) {
@@ -458,7 +455,7 @@ public:
 				if (_ins[channel]->has_signal_connection()) {
 					setFreq(channel, (float)input.samples(channel)[frame]);
 				}
-				_outRingBuff[channel].pushSample((float)_engine_ptr->getNodeOutput(channel, _send_noteTriggers));
+				_outRingBuff[channel].pushSample((float)_engine_ptr->getNodeOutput(channel, 0, _send_noteTriggers));
 
 				if (_local_srate > 11024) {
 					output.samples(channel)[frame] =

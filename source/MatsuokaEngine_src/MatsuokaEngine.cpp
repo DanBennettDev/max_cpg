@@ -100,11 +100,11 @@ std::vector<unsigned> MatsuokaEngine::getNodeChildren(unsigned nodeID) const
 
 }
 
-double MatsuokaEngine::getNodeOutput(unsigned nodeID, bool matchQuantiser) const
+double MatsuokaEngine::getNodeOutput(unsigned nodeID, unsigned sampleOffset, bool matchQuantiser) const
 {
     return !matchQuantiser ? 
-				getNode(nodeID).getOutput() 
-				: getNode(nodeID).getOutput(_quantiser.getNoteDelay());
+				getNode(nodeID).getOutput(sampleOffset, true)
+				: getNode(nodeID).getOutput(_quantiser.getNoteDelay() + sampleOffset, true);
 }
 
 double MatsuokaEngine::getNodePhaseOffset(unsigned nodeID) const
