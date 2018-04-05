@@ -46,7 +46,7 @@
 
 #define ARGS_BEFORE_PARAMS 3
 #define CALIBRATION_CYCLES 20
-#define TRIGGER_WIDTH 600
+#define TRIGGER_WIDTH 0.02
 
 #define FREQ_MIN 0.001f
 #define MAX_NODES 16
@@ -70,7 +70,7 @@ private:
 	class _ramp {
 	public:
 		_ramp() {
-			setLength(TRIGGER_WIDTH);
+			setLength(TRIGGER_WIDTH * 44100);
 		}
 
 		float tick() {
@@ -80,6 +80,8 @@ private:
 			}
 			return 0;
 		}
+
+
 
 		float phase() {
 			return _phase;
@@ -195,6 +197,7 @@ public:
 			_engine_ptr->setNodeQuantiser_Grid(nodeID, MatsuokaEngine::gridType::unQuantised);
 			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) freq input " + nodeID));
 			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) signal output " + nodeID, "signal"));
+			_trigs[nodeID].setLength(TRIGGER_WIDTH * _local_srate);
 
 			if (nodeID != 0) {
 				_engine_ptr->addChild(0, nodeID);
@@ -347,7 +350,6 @@ public:
 	message<> quant_mult{ this, "quant_mult",
 		MIN_FUNCTION{
 			if (args.size() >= 2) {
-				cout << "node " << (int)args[0] << " set to grid multiplier" << (float)args[1] << endl;
 				_engine_ptr->setNodeQuantiser_Multiple((int)args[0], (float)args[1]);
 			}
 	return {};
@@ -357,7 +359,6 @@ public:
 	message<> quant_offset{ this, "quant_offset",
 		MIN_FUNCTION{
 		if (args.size() >= 2) {
-			cout << "node " << (int)args[0] << " set to grid offset" << (float)args[1] << endl;
 			_engine_ptr->setNodeQuantiser_Offset((int)args[0], (float)args[1]);
 		}
 	return {};
@@ -402,7 +403,6 @@ public:
 		// For each frame in the vector calc each channel
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
 			_engine_ptr->step();
-
 			// signals
 			for (int channel = 0; channel < _nodeCount; ++channel) {
 				// send to max output
@@ -412,7 +412,6 @@ public:
 				_outRingBuff[channel].pushSample((float)_engine_ptr->getNodeOutput(channel, _send_noteTriggers));
 				output.samples(channel)[frame] = _outRingBuff[channel].getDelayed(0);
 			}
-
 			if (_send_noteTriggers) {
 				auto noteEvents = _engine_ptr->getEvents();
 				for each (auto note in noteEvents) {
@@ -422,20 +421,13 @@ public:
 					output.samples(channel + _nodeCount)[frame] = _trigs[channel].tick();
 				}
 			}
-			// triggers
-
-
 		}
-
 	}
-
-
 
 
 	void calcVector_interp(audio_bundle input, audio_bundle output)
 	{
 		// For each frame in the vector calc each channel
-
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
 
 			// if _phase wraps, calc sample from network
@@ -443,6 +435,17 @@ public:
 			if (_phase > 1.0) {
 				_phase -= 1.0;
 				_engine_ptr->step();
+
+				if (_send_noteTriggers) {
+					auto noteEvents = _engine_ptr->getEvents();
+					for each (auto note in noteEvents) {
+						_trigs[note.nodeID].setTrigger();
+					}
+					for (int channel = 0; channel < _nodeCount; channel++) {
+						_trigs[channel].tick();
+					}
+				}
+
 			}
 			else if (_phase < 0.0) { // sholdn't happen
 				_phase += 1.0;
@@ -450,7 +453,7 @@ public:
 
 			// regardless of _phase wrap, calculate our interpolated sample for outputs
 
-			for (int channel = 0; channel < output.channel_count(); ++channel) {
+			for (int channel = 0; channel < _nodeCount; ++channel) {
 				
 				if (_ins[channel]->has_signal_connection()) {
 					setFreq(channel, (float)input.samples(channel)[frame]);
@@ -473,6 +476,8 @@ public:
 							_outRingBuff[channel].getDelayed(0),
 							_phase);
 				}
+
+				output.samples(channel + _nodeCount)[frame] = _trigs[channel].phase() < 1 ? 1 : 0;
 				
 			}
 		}
