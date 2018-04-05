@@ -20,7 +20,7 @@
 		External input(s)
 		Smoothing control changes
 		Waveshaping between connections
-		Do I need a proper shutdown proces?
+		Do I need a proper shutdown process?
 		Sync to max internal timings
 
 		PERFORMANCE:
@@ -28,6 +28,9 @@
 			Curve lookup every sample? (for freq check)
 			Look for other bottlenecks
 			setting root freq is SLOOW
+			why is higher freq more demanding on CPU?
+
+			audio version: no need to sync children
 
 
 */
@@ -41,6 +44,8 @@
 
 #define ARGS_BEFORE_PARAMS 3
 #define CALIBRATION_CYCLES 20
+#define TRIGGER_WIDTH 600
+
 #define FREQ_MIN 0.001f
 #define MAX_NODES 16
 #define INTERP_SAMPLES 4
@@ -63,15 +68,15 @@ private:
 	class _ramp {
 	public:
 		_ramp() {
-			setLength(10);
+			setLength(TRIGGER_WIDTH);
 		}
 
 		float tick() {
 			_phase += _phaseStep;
 			if (_phase < 1) {
-				return _phase;
+				return 1;
 			}
-			return 1;
+			return 0;
 		}
 
 		float phase() {
@@ -105,12 +110,12 @@ private:
 	float _freqs[MAX_NODES]{ 1 };
 	number _phase{ 0 };
 	number _phaseStep{ 0 };
-	float _trigs[MAX_NODES]{ 0 };
+	_ramp _trigs[MAX_NODES];
 
 	lib::interpolator::hermite<sample> _interp_herm;
 	lib::interpolator::linear<sample> _interp_lin;
 	bool _initialized{ false };
-	int _nodeCount{ 1  };	// defaults to 1 channel / 1 node
+	int _nodeCount{ 2  };	// defaults to 1 channel / 1 node
 
 	vector< unique_ptr<inlet<>> >			_ins;				///< this object's ins
 	vector< unique_ptr<outlet<>> >			_outs;				///< this object's outs
@@ -180,7 +185,7 @@ public:
 
 
 		_engine_ptr = std::shared_ptr<MatsuokaEngine>(
-			new  MatsuokaEngine(_local_srate, _send_noteTriggers, _send_noteTriggers, false));
+			new  MatsuokaEngine(_local_srate, _send_noteTriggers, false, false));
 		_dummyNode = MatsuNode();
 
 		// set up nodes and ins/outs for them
@@ -318,11 +323,15 @@ public:
 		if (args.size() >= 2) {
 			if (args[1] == "none") {
 				_engine_ptr->setNodeQuantiser_Grid((int)args[0], gridType::unQuantised);
+				cout << "node " << (int)args[0] << " set to unquantised" <<endl;
+
 			}
-			else  if (args[1] == "24") {
+			else  if (args[1] == 24) {
+				cout << "node " << (int)args[0] << " set to grid size 24" << endl;
 				_engine_ptr->setNodeQuantiser_Grid((int)args[0], gridType::_24th);
 			}
-			else  if (args[1] == "32") {
+			else  if (args[1] == 32) {
+				cout << "node " << (int)args[0] << " set to grid size 32" << endl;
 				_engine_ptr->setNodeQuantiser_Grid((int)args[0], gridType::_32nd);
 			}
 			else {
@@ -336,6 +345,7 @@ public:
 	message<> quant_mult{ this, "quant_mult",
 		MIN_FUNCTION{
 			if (args.size() >= 2) {
+				cout << "node " << (int)args[0] << " set to grid multiplier" << (float)args[1] << endl;
 				_engine_ptr->setNodeQuantiser_Multiple((int)args[0], (float)args[1]);
 			}
 	return {};
@@ -345,6 +355,7 @@ public:
 	message<> quant_offset{ this, "quant_offset",
 		MIN_FUNCTION{
 		if (args.size() >= 2) {
+			cout << "node " << (int)args[0] << " set to grid offset" << (float)args[1] << endl;
 			_engine_ptr->setNodeQuantiser_Offset((int)args[0], (float)args[1]);
 		}
 	return {};
@@ -380,7 +391,7 @@ public:
 		// For each frame in the vector calc each channel
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
 			_engine_ptr->step();
-			
+
 			// signals
 			for (int channel = 0; channel < _nodeCount; ++channel) {
 				// send to max output
@@ -394,10 +405,10 @@ public:
 			if (_send_noteTriggers) {
 				auto noteEvents = _engine_ptr->getEvents();
 				for each (auto note in noteEvents) {
-					_trigs[note.nodeID]= note.velocity > 0 ? 1.f : 0.f;
+					_trigs[note.nodeID].setTrigger();
 				}
 				for (int channel = 0; channel < _nodeCount; channel++) {
-					output.samples(channel + _nodeCount)[frame] = _trigs[channel];
+					output.samples(channel + _nodeCount)[frame] = _trigs[channel].tick();
 				}
 			}
 			// triggers

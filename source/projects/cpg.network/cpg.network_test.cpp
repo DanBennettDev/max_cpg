@@ -24,6 +24,12 @@ TEST_CASE( "initialises and runs correctly with 1 node" ) {
 
 	my_object.params({ 2,1,4.07,4.07}, 0);
 
+	my_object.quant_grid({ 1, "32"}, 0);
+	my_object.quant_mult({ 1, 8 }, 0);
+	my_object.number( 10, 0);
+	my_object.number(9, 1);
+
+
 	// run the calculations
 	for (auto x : impulse) {
 		auto y = my_object(x);
