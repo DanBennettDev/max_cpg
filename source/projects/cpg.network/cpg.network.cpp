@@ -10,7 +10,8 @@
 	TODO:
 
 		- Quantiser stuff
-		- when Quantiser is off (global) no delay on trigger gen
+
+		- Apply changes to interpolated version
 
 		- OSC front end
 
@@ -26,6 +27,7 @@
 			switchable triggering
 			Curve lookup every sample? (for freq check)
 			Look for other bottlenecks
+			setting root freq is SLOOW
 
 
 */
@@ -39,7 +41,7 @@
 
 #define ARGS_BEFORE_PARAMS 3
 #define CALIBRATION_CYCLES 20
-#define FREQ_MIN 0.001
+#define FREQ_MIN 0.001f
 #define MAX_NODES 16
 #define INTERP_SAMPLES 4
 #define UNITY_CONN_WEIGHT 3
@@ -50,7 +52,7 @@
 #define P_COMPENSATION 0.973200f
 #define DEFAULT_CURVE_X 0.25f, 0.333f, 0.5f, 1.111f, 1.333f, 2.f, 3.f, 4.f, 6.f, 8.f
 #define DEFAULT_CURVE_Y 1.955492228f, 1.098290155f, 0.107150259f, 0.133937824f, 0.321450777f, 0.517f, 0.641026425f, 0.937029016f, 1.194725389f, 1.259015544f
-
+#define FLOAT_EPSILON 0.00001f
 
 
 using namespace c74::min;
@@ -100,7 +102,7 @@ private:
 	// holds raw output values for interpolation. Barebones ringbuffer approach.
 	DelayLine<float> _outRingBuff[MAX_NODES];
 	int _ringIndex{ 0 };
-	number _freqs[MAX_NODES]{ 0 };
+	float _freqs[MAX_NODES]{ 1 };
 	number _phase{ 0 };
 	number _phaseStep{ 0 };
 	float _trigs[MAX_NODES]{ 0 };
@@ -249,7 +251,7 @@ public:
 	message<threadsafe::yes> number{ this, "number", "Set frequency.",
 		MIN_FUNCTION{
 			if (!args.empty()) {
-				_engine_ptr->setNodeFrequency(inlet,args[0], false);
+				setFreq(inlet, args[0]);
 			}
 		return {};
 	}
@@ -310,6 +312,46 @@ public:
 	};
 
 
+	message<> quant_grid{ this, "quant_grid",
+		MIN_FUNCTION{
+		using gridType = QuantisedEventQueue::gridType;
+		if (args.size() >= 2) {
+			if (args[1] == "none") {
+				_engine_ptr->setNodeQuantiser_Grid((int)args[0], gridType::unQuantised);
+			}
+			else  if (args[1] == "24") {
+				_engine_ptr->setNodeQuantiser_Grid((int)args[0], gridType::_24th);
+			}
+			else  if (args[1] == "32") {
+				_engine_ptr->setNodeQuantiser_Grid((int)args[0], gridType::_32nd);
+			}
+			else {
+				cout << "invalid quantiser grid" << endl;
+			}
+		}
+	return {};
+	}
+	};
+
+	message<> quant_mult{ this, "quant_mult",
+		MIN_FUNCTION{
+			if (args.size() >= 2) {
+				_engine_ptr->setNodeQuantiser_Multiple((int)args[0], (float)args[1]);
+			}
+	return {};
+	}
+	};
+
+	message<> quant_offset{ this, "quant_offset",
+		MIN_FUNCTION{
+		if (args.size() >= 2) {
+			_engine_ptr->setNodeQuantiser_Offset((int)args[0], (float)args[1]);
+		}
+	return {};
+	}
+	};
+
+
 
 
 	queue calibrate{ this,
@@ -336,7 +378,6 @@ public:
 	void calcVector_nonInterp(audio_bundle input, audio_bundle output)
 	{
 		// For each frame in the vector calc each channel
-		sample freq;
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
 			_engine_ptr->step();
 			
@@ -344,9 +385,7 @@ public:
 			for (int channel = 0; channel < _nodeCount; ++channel) {
 				// send to max output
 				if (_ins[channel]->has_signal_connection()){
-					freq = input.samples(channel)[frame];
-					freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
-					_engine_ptr->setNodeFrequency(channel, freq ,false);
+					setFreq(channel, (float)input.samples(channel)[frame]);
 				}
 				_outRingBuff[channel].pushSample((float)_engine_ptr->getNodeOutput(channel, _send_noteTriggers));
 				output.samples(channel)[frame] = _outRingBuff[channel].getDelayed(0);
@@ -355,7 +394,7 @@ public:
 			if (_send_noteTriggers) {
 				auto noteEvents = _engine_ptr->getEvents();
 				for each (auto note in noteEvents) {
-					_trigs[note.nodeID]= note.velocity > 0 ? 1 : 0;
+					_trigs[note.nodeID]= note.velocity > 0 ? 1.f : 0.f;
 				}
 				for (int channel = 0; channel < _nodeCount; channel++) {
 					output.samples(channel + _nodeCount)[frame] = _trigs[channel];
@@ -390,11 +429,9 @@ public:
 			// regardless of _phase wrap, calculate our interpolated sample for outputs
 
 			for (int channel = 0; channel < output.channel_count(); ++channel) {
-				sample freq;
+				
 				if (_ins[channel]->has_signal_connection()) {
-					freq = input.samples(channel)[frame];
-					freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
-					_engine_ptr->setNodeFrequency(channel, freq, false);
+					setFreq(channel, (float)input.samples(channel)[frame]);
 				}
 				_outRingBuff[channel].pushSample((float)_engine_ptr->getNodeOutput(channel, _send_noteTriggers));
 
@@ -526,6 +563,25 @@ public:
 			_dummyNode.set_g(P_G);
 		}
 
+	}
+
+
+	void setFreq(int node, float freq) {
+		if (node == 0 && !fEqual(freq,_freqs[0]) ){
+			_freqs[0] = freq;
+			_freqs[0] = _freqs[0] < FREQ_MIN ? FREQ_MIN : _freqs[0];
+			_engine_ptr->setNodeFrequency(node, _freqs[0], true);
+		}
+		else if(!fEqual(freq, _freqs[node])) {
+			_freqs[node] = freq;
+			float thisF = _freqs[node] * _freqs[0];
+			thisF = thisF < FREQ_MIN ? FREQ_MIN : thisF;
+			_engine_ptr->setNodeFrequency(node, thisF, false);
+		}
+	}
+
+	bool fEqual(float f1, float f2) {
+		return f2 > f1 - FLOAT_EPSILON && f2 < f1 + FLOAT_EPSILON;
 	}
 
 

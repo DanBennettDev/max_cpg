@@ -65,7 +65,7 @@
 
 	<methodlist>
 
-		<method name='params'>
+		<method name='quant_mult'>
 			<digest></digest>
 			<description></description>
 		</method>
@@ -73,6 +73,16 @@
 		<method name='bang'>
 			<digest>reset the node </digest>
 			<description>reset the node </description>
+		</method>
+
+		<method name='params'>
+			<digest></digest>
+			<description></description>
+		</method>
+
+		<method name='quant_grid'>
+			<digest></digest>
+			<description></description>
 		</method>
 
 		<method name='scalingCurve'>
@@ -90,12 +100,17 @@
 			<description></description>
 		</method>
 
+		<method name='weight'>
+			<digest></digest>
+			<description></description>
+		</method>
+
 		<method name='offset_conn'>
 			<digest></digest>
 			<description></description>
 		</method>
 
-		<method name='weight'>
+		<method name='quant_offset'>
 			<digest></digest>
 			<description></description>
 		</method>
