@@ -683,17 +683,22 @@ void MatsuokaEngine::fillOutputs()
       
         } else if (_fireOnPeak &&
             (_eventOnFall && thisNode.getSignalState() == signalState::firstTrough)) {
-            outputEvent e = { thisNode.getIdentifier(), abs(thisNode.getLastMinima()) };
+            outputEvent e = { thisNode.getIdentifier(), thisNode.getLastMinima() };
             _quantiser.addEvent(e);
             // TODO - not synchronising on fall,  - revisit
       
         } else if (!_fireOnPeak &&
-            (_eventOnRise &&thisNode.getSignalState() == signalState::zeroXup) ||
-            (_eventOnFall && thisNode.getSignalState() == signalState::zeroXdown)) {
+            (_eventOnRise &&thisNode.getSignalState() == signalState::zeroXup) ) {
             outputEvent e = { thisNode.getIdentifier(), 1.0 };
             _quantiser.addEvent(e);
             synchroniseChildren(thisNode.getChildIDs());
-        }
+		}
+		else if (!_fireOnPeak &&
+			(_eventOnFall && thisNode.getSignalState() == signalState::zeroXdown)) {
+			outputEvent e = { thisNode.getIdentifier(), -1.0 };
+			_quantiser.addEvent(e);
+			synchroniseChildren(thisNode.getChildIDs());
+		}
         iter++;
     }
 

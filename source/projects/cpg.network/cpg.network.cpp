@@ -37,7 +37,6 @@
 #include "matsuNode.h"
 
 
-#define TRIG_LEN 100
 #define ARGS_BEFORE_PARAMS 3
 #define CALIBRATION_CYCLES 20
 #define FREQ_MIN 0.001
@@ -62,15 +61,15 @@ private:
 	class _ramp {
 	public:
 		_ramp() {
-			setLength(TRIG_LEN);
+			setLength(10);
 		}
 
 		float tick() {
 			_phase += _phaseStep;
 			if (_phase < 1) {
-				return 1;
+				return _phase;
 			}
-			return 0;
+			return 1;
 		}
 
 		float phase() {
@@ -104,7 +103,7 @@ private:
 	number _freqs[MAX_NODES]{ 0 };
 	number _phase{ 0 };
 	number _phaseStep{ 0 };
-	_ramp _trigs[MAX_NODES];
+	float _trigs[MAX_NODES]{ 0 };
 
 	lib::interpolator::hermite<sample> _interp_herm;
 	lib::interpolator::linear<sample> _interp_lin;
@@ -179,7 +178,7 @@ public:
 
 
 		_engine_ptr = std::shared_ptr<MatsuokaEngine>(
-			new  MatsuokaEngine(_local_srate, true, false, true));
+			new  MatsuokaEngine(_local_srate, _send_noteTriggers, _send_noteTriggers, false));
 		_dummyNode = MatsuNode();
 
 		// set up nodes and ins/outs for them
@@ -356,10 +355,10 @@ public:
 			if (_send_noteTriggers) {
 				auto noteEvents = _engine_ptr->getEvents();
 				for each (auto note in noteEvents) {
-					_trigs[note.nodeID].setTrigger();
+					_trigs[note.nodeID]= note.velocity > 0 ? 1 : 0;
 				}
 				for (int channel = 0; channel < _nodeCount; channel++) {
-					output.samples(channel + _nodeCount)[frame] = _trigs[channel].tick();
+					output.samples(channel + _nodeCount)[frame] = _trigs[channel];
 				}
 			}
 			// triggers
