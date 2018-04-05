@@ -22,6 +22,7 @@
 		Waveshaping between connections
 		Do I need a proper shutdown process?
 		Sync to max internal timings
+		Per node quantiser amount setting
 
 		PERFORMANCE:
 			switchable triggering
@@ -357,6 +358,15 @@ public:
 		if (args.size() >= 2) {
 			cout << "node " << (int)args[0] << " set to grid offset" << (float)args[1] << endl;
 			_engine_ptr->setNodeQuantiser_Offset((int)args[0], (float)args[1]);
+		}
+	return {};
+	}
+	};
+
+	message<> quant_amount{ this, "quant_amount",
+		MIN_FUNCTION{
+		if (args.size() >= 1) {
+			_engine_ptr->setQuantiseAmount((float)args[0]);
 		}
 	return {};
 	}
