@@ -101,19 +101,17 @@ std::vector<QuantisedEventQueue::outputEvent> QuantisedEventQueue::getNotes()
     if (!_eventQueue24.empty() && _eventQueue24.begin()->queueMarker <= _mark24) {
         auto eventIt = _eventQueue24.begin();
         while (eventIt != _eventQueue24.end() && eventIt->queueMarker <= _mark24) {
-            output.push_back(eventIt->event);
+				output.push_back(eventIt->event);
             eventIt = _eventQueue24.erase(eventIt);
         }
     }
     if (!_eventQueue32.empty() && _eventQueue32.begin()->queueMarker <= _mark32) {
-        
         auto eventIt = _eventQueue32.begin();
         while (eventIt!= _eventQueue32.end() && eventIt->queueMarker <= _mark32) {
-            output.push_back(eventIt->event);
+				output.push_back(eventIt->event);
             eventIt = _eventQueue32.erase(eventIt);
         }
     }
-
     while (!_eventQueueFree.empty() && _eventQueueFree.begin()->countDown<=0) {
         output.push_back(_eventQueueFree.front().event);
         // note 0 is the root and sets the tempo
@@ -241,7 +239,7 @@ void QuantisedEventQueue::setNoteDelays()
 {
     // all notes are delayed a 1/4 note - this allows free and 
     // quantised notes to be played alongside each other
-    _delayNotes =  (_sampleRate * 60 ) / (_tempo * 4);
+    _delayNotes =  (unsigned)((_sampleRate * 60 ) / (_tempo * 4));
     _grid24.setDelay(_delayNotes);
     _grid32.setDelay(_delayNotes);
 }

@@ -5,22 +5,21 @@
 
 
 /*
-	No Quantiser on this one
 
 	TODO:
-
-		- Quantiser offset should apply to signal out
-
 		- OSC front end
+		- Handle DSP stop/start
 
 
 	LONGER TERM:
-		External input(s)
+		Invertable connections
 		Smoothing control changes
-		Waveshaping between connections
-		Do I need a proper shutdown process?
 		Sync to max internal timings
+		External input(s)
+		Waveshaping between connections (raise to power and threshold)
+
 		Per node quantiser amount setting
+		Tool for converting network params back into a a network graph for tweaking (ML?)
 
 		PERFORMANCE:
 			switchable triggering
@@ -309,10 +308,20 @@ public:
 	}
 	};
 
+
 	message<> offset_out{ this, "offset_out",
 		MIN_FUNCTION{
 		if (args.size() >= 2) {
 			_engine_ptr->setNodePhaseOffset((int)args[0],(double)args[1]);
+		}
+	return {};
+	}
+	};
+
+	message<> noise{ this, "noise",
+		MIN_FUNCTION{
+		if (args.size() >= 3) {
+			_engine_ptr->setNodeSelfNoise((int)args[0], (double)args[1]);
 		}
 	return {};
 	}
