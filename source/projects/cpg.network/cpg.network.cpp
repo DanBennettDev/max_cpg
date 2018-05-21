@@ -274,44 +274,25 @@ public:
 
 	message<> weight{ this, "weight",
 		MIN_FUNCTION{
-		if (args.size() >= 3) {
-			_engine_ptr->setConnection((int)args[0],(int)args[1], (double)args[2]);
+		if (args.size() >= 3 && _engine_ptr->nodeExists((int)args[0]) && _engine_ptr->nodeExists((int)args[1])) {
+			_engine_ptr->setConnection((int)args[0], (int)args[1], (double)args[2]);
 		}
 	return {};
 	}
 	};
-
-
-	message<> scalingCurve{ this, "scalingCurve",
-		MIN_FUNCTION{
-		if (args.size() % 2 == 0) {
-			int itemCount = (int)(args.size() / 2);
-			std::vector<float> x, y;
-			for (int i = 0; i < itemCount; i++) {
-				x.push_back(args[i * 2]);
-				y.push_back(args[(i * 2)+1]);
-			}
-			_engine_ptr->loadConnectionWeightCurve(x, y);
-		}
-	return {};
-	}
-	};
-
-
 
 	message<> offset_conn{ this, "offset_conn",
 		MIN_FUNCTION{
-		if (args.size() >= 3) {
-			_engine_ptr->setConnectionPhaseOffset((int)args[0],(int)args[1], (double)args[2]);
+		if (args.size() >= 3 && _engine_ptr->nodeExists((int)args[0]) && _engine_ptr->nodeExists((int)args[1])) {
+			_engine_ptr->setConnectionPhaseOffset((int)args[0], (int)args[1], (double)args[2]);
 		}
 	return {};
 	}
 	};
 
-
 	message<> offset_out{ this, "offset_out",
 		MIN_FUNCTION{
-		if (args.size() >= 2) {
+		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 			_engine_ptr->setNodePhaseOffset((int)args[0],(double)args[1]);
 		}
 	return {};
@@ -320,7 +301,7 @@ public:
 
 	message<> noise{ this, "noise",
 		MIN_FUNCTION{
-		if (args.size() >= 3) {
+		if (args.size() >= 3 && _engine_ptr->nodeExists((int)args[0])) {
 			_engine_ptr->setNodeSelfNoise((int)args[0], (double)args[1]);
 		}
 	return {};
@@ -331,7 +312,7 @@ public:
 	message<> quant_grid{ this, "quant_grid",
 		MIN_FUNCTION{
 		using gridType = QuantisedEventQueue::gridType;
-		if (args.size() >= 2) {
+		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 			if (args[1] == "none") {
 				_engine_ptr->setNodeQuantiser_Grid((int)args[0], gridType::unQuantised);
 				cout << "node " << (int)args[0] << " set to unquantised" <<endl;
@@ -355,7 +336,7 @@ public:
 
 	message<> quant_mult{ this, "quant_mult",
 		MIN_FUNCTION{
-			if (args.size() >= 2) {
+			if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 				_engine_ptr->setNodeQuantiser_Multiple((int)args[0], (float)args[1]);
 			}
 	return {};
@@ -364,8 +345,9 @@ public:
 
 	message<> quant_offset{ this, "quant_offset",
 		MIN_FUNCTION{
-		if (args.size() >= 2) {
-			_engine_ptr->setNodeQuantiser_Offset((int)args[0], (float)args[1]);
+		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
+
+				_engine_ptr->setNodeQuantiser_Offset((int)args[0], (float)args[1]);
 		}
 	return {};
 	}
@@ -373,7 +355,7 @@ public:
 
 	message<> quant_amount{ this, "quant_amount",
 		MIN_FUNCTION{
-		if (args.size() >= 1) {
+		if (args.size() >= 1 && _engine_ptr->nodeExists((int)args[0])) {
 			_engine_ptr->setQuantiseAmount((float)args[0]);
 		}
 	return {};
@@ -616,7 +598,6 @@ public:
 	bool fEqual(float f1, float f2) {
 		return f2 > f1 - FLOAT_EPSILON && f2 < f1 + FLOAT_EPSILON;
 	}
-
 
 };
 

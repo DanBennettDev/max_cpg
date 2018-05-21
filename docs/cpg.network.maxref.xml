@@ -85,11 +85,6 @@
 			<description></description>
 		</method>
 
-		<method name='scalingCurve'>
-			<digest></digest>
-			<description></description>
-		</method>
-
 		<method name='quant_amount'>
 			<digest></digest>
 			<description></description>
@@ -98,6 +93,11 @@
 		<method name='float'>
 			<digest>Set frequency</digest>
 			<description>Set frequency. </description>
+		</method>
+
+		<method name='noise'>
+			<digest></digest>
+			<description></description>
 		</method>
 
 		<method name='offset_out'>
