@@ -120,6 +120,11 @@
 			<description></description>
 		</method>
 
+		<method name='quant_amount_node'>
+			<digest></digest>
+			<description></description>
+		</method>
+
 	</methodlist>
 
 

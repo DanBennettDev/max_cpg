@@ -32,6 +32,8 @@ QuantisedEventQueue::QuantisedEventQueue(const QuantisedEventQueue &rhs)
 }
 
 
+
+
 void QuantisedEventQueue::addEvent(outputEvent e)
 {
     if (nodes[e.nodeID].grid!= gridType::unQuantised) {
@@ -44,8 +46,9 @@ void QuantisedEventQueue::addEvent(outputEvent e)
         switch (nodes[e.nodeID].grid) {
             case gridType::_32nd:
             {
-                qe.queueMarker = _grid32.getNoteCoordinate(mult, off);
                 std::lock_guard<std::mutex> lock(_queue_mutex);
+				_grid32.setQuantiseAmount(nodes[e.nodeID].amount * _quantiseAmount);
+                qe.queueMarker = _grid32.getNoteCoordinate(mult, off);
                 eventIt = _eventQueue32.begin();
                 if (_eventQueue32.size() > 0) {
                     while (eventIt != _eventQueue32.end() &&
@@ -59,6 +62,7 @@ void QuantisedEventQueue::addEvent(outputEvent e)
             case gridType::_24th:
             {
                 std::lock_guard<std::mutex> lock(_queue_mutex);
+				_grid24.setQuantiseAmount(nodes[e.nodeID].amount * _quantiseAmount);
                 qe.queueMarker = _grid24.getNoteCoordinate(mult, off);
                 eventIt = _eventQueue24.begin();
                 if (_eventQueue24.size() > 0) {
@@ -159,10 +163,29 @@ void QuantisedEventQueue::setQuantiseAmount(float amount)
 }
 
 
+void QuantisedEventQueue::setQuantiseAmount(unsigned node, float amount)
+{
+	if (amount < 0) {
+		amount = 0;
+	}
+	else if (amount > 1) {
+		amount = 1;
+	}
+	nodes[node].amount = amount;
+}
+
+
+
 float QuantisedEventQueue::getQuantiseAmount()
 {
     return _quantiseAmount;
 }
+
+float QuantisedEventQueue::getQuantiseAmount(unsigned node)
+{
+	return nodes[node].amount;
+}
+
 
 
 unsigned QuantisedEventQueue::getSampleRate() const

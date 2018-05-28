@@ -250,8 +250,11 @@ public:
 
     /// sets the strength of quantisation effect (0=no quantisation 1= strict quantisation)
     void     setQuantiseAmount(float amount);
+	void     setQuantiseAmount(unsigned node, float amount);
+
     /// gets the strength of quantisation effect (0=no quantisation 1= strict quantisation)
     float    getQuantiseAmount();
+	float    getQuantiseAmount(unsigned node);
 
     /// sets the number of calculation steps per second - used in internal calculations
     /// (this value must match the number of times per second you call step() )

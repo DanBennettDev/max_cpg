@@ -56,8 +56,14 @@ public:
 
     /// set the amount of quantisation (0=none, 1=strict)
     void setQuantiseAmount(float amount);
-    /// get the amount of quantisation (0=none, 1=strict)
+    
+
+	void setQuantiseAmount(unsigned node, float amount);
+
+
+	/// get the amount of quantisation (0=none, 1=strict)
     float getQuantiseAmount();
+	float getQuantiseAmount(unsigned node);
 
     /// set the quantise grid type for the node
     void setNodeGrid(unsigned nodeID, gridType grid);
@@ -119,12 +125,15 @@ private:
         gridType grid;
         unsigned multiple;
         unsigned offset;
+		float amount;
+
 
         nodeDetails()
         {
             grid = gridType::unQuantised;
             multiple = 1;
             offset = 0;
+			amount = 1;
         }
     };
 

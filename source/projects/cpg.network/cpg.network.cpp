@@ -355,14 +355,21 @@ public:
 
 	message<> quant_amount{ this, "quant_amount",
 		MIN_FUNCTION{
-		if (args.size() >= 1 && _engine_ptr->nodeExists((int)args[0])) {
+		if (args.size() >= 1) {
 			_engine_ptr->setQuantiseAmount((float)args[0]);
 		}
 	return {};
 	}
 	};
 
-
+	message<> quant_amount_node{ this, "quant_amount_node",
+		MIN_FUNCTION{
+		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
+			_engine_ptr->setQuantiseAmount((float)args[0], (float)args[1]);
+		}
+	return {};
+	}
+	};
 
 
 	queue calibrate{ this,

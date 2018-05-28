@@ -608,13 +608,21 @@ void     MatsuokaEngine::setQuantiseAmount(float amount)
     _quantiser.setQuantiseAmount(amount);
 }
 
+void     MatsuokaEngine::setQuantiseAmount(unsigned node, float amount)
+{
+	_quantiser.setQuantiseAmount(node, amount);
+}
+
 
 float    MatsuokaEngine::getQuantiseAmount()
 {
     return _quantiser.getQuantiseAmount();
 }
 
-
+float    MatsuokaEngine::getQuantiseAmount(unsigned node)
+{
+	return _quantiser.getQuantiseAmount(node);
+}
 
 void MatsuokaEngine::doQueuedActions()
 {
