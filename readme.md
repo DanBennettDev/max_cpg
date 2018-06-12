@@ -21,7 +21,7 @@ Three externals
 In all cases the MNO equation is solved using 4th order Runge Kutta methods, and a stepsize of 8
 
 
-Coming soon:
+# Coming soon
 
 - Max Help Patches
 - "neurythmic" drum machine / sequencer patch and control interface
