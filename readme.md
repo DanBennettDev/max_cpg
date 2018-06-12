@@ -29,7 +29,7 @@ In all cases the MNO equation is solved using 4th order Runge Kutta methods, and
 # Optimisation, Gradient Descent, etc.
 These are not the kind of neural networks used in machine learning. They are quite different both in behaviour and in usage. Gradient descent or other "training" techniques are less widely used and far less well documented with these networks than in e.g. Deep Learning networks. Of course, however, as a deterministic, network-based system  it is possible to tune these networks towards specific outcomes using gradient descent (or use genetic algorithms, etc. to explore the parameter space in a less teleological manner). 
 
-These externals are not geared to such usage with optimisation algorithms. Though it may be possible to use them in this way, MAX is arguably not the best environment for this. The sourcecode for the underlying network engine is located in ./source/MatsuokaEngine_src, and it may be easier to build optimisation processes around this. The top level class is MatsuokaEngine.h
+These externals are not geared to such usage with optimisation algorithms. MAX MSP is arguably not the best environment for this kind of approach, and as noted above, these externals focus on hands-on usage. The sourcecode for the underlying network engine is located in ./source/MatsuokaEngine_src, it works as a standalone library, and has a lot of features that the max externals don't exploit. If you are interested in using CPGs with optimisation methods, then this "library" is probably the best starting point. If you take this approach, all the methods you want should be in the MatsuokaEngine class (MatsuokaEngine.h) 
 
 
 # Coming soon
