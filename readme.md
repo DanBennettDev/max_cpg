@@ -1,7 +1,9 @@
-MAX objects for creative use of Central Pattern Generators (CPG) (specifically Matsuoka's Neural Oscillator (MNO)), as used in my "neurythmic" system. [(see paper here)](https://www.researchgate.net/publication/324360165_Neurythmic_A_Rhythm_Creation_Tool_Based_on_Central_Pattern_Generators)
+# Overview
+MAX MSP objects for creative use of Central Pattern Generators (CPG) (specifically Matsuoka's Neural Oscillator (MNO)), as used in my "neurythmic" system. [(see paper here)](https://www.researchgate.net/publication/324360165_Neurythmic_A_Rhythm_Creation_Tool_Based_on_Central_Pattern_Generators)
 
 If you do anything useful with this system please let me know - this is an ongoing piece of research. I'm interested in linking to your work as part of a showcase of creativity using CPGs. I'm also interested in collaboration if you have any ideas you'd like help realising, or would like to work together on a paper in this area. [db15237@bristol.ac.uk](db15237@bristol.ac.uk)
 
+# Description
 These are non-linear dynamic systems, which exhibit entrainment behaviour (a kind of neural synchronisation). I think they show potential in a great number of areas including:
 
 - Engine for a semi-generative drum machine/ sequencer (like Neurythmic)
