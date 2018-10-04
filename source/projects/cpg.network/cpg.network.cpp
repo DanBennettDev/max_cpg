@@ -106,7 +106,6 @@ private:
 	bool _send_noteTriggers{ true };
 	bool _use_syncInput{ false };
 	int _syncInputChannel{ -1 };
-	float _wavetable[WAVETABLE_LENGTH];
 
 	// holds raw output values for interpolation. Barebones ringbuffer approach.
 	DelayLine<float> _outRingBuff[MAX_NODES];
