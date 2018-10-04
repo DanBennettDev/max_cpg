@@ -122,7 +122,7 @@ public:
 
 
 	/// returns output signal value for the node   
-	double  getOutput() const;
+	double  getOutput(bool forceStateVal =false) const;
 
 
 	/// returns output signal value for the node at indicated delay   

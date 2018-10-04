@@ -511,7 +511,7 @@ void CPG::setDrivingInput(double input)
 {
 	if (input < 0) { input = 0; }
 	if (input > 1) { input = 1; }
-	_nodes[0].driveOutput(input);
+	_nodes[0].driveOutput(wavetableLookup(input));
 }
 
 void CPG::setDriven(bool driven) {
@@ -521,16 +521,18 @@ void CPG::setDriven(bool driven) {
 
 void CPG::createDrivingWavetable()
 {
-	// move to positive zero crossing
+	_wavetable.clear();
+
+	// move oscillator to positive zero crossing
 	while (_nodes[0].getOutput() > 0) {
 		_nodes[0].doCalcStep(true, false);
 	}
 	while (_nodes[0].getOutput() < 0) {
 		_nodes[0].doCalcStep(true, false);
 	}
-
-	for (int i = 0; i < WAVETABLE_LENGTH; i++) {
-		_wavetable[i] = (float)_nodes[0].getOutput();
+	// record wavetable
+	for (int i = 0; i < _sampleRate; i++) {
+		_wavetable.push_back((float)_nodes[0].getOutput(true));
 		_nodes[0].doCalcStep(true, false);
 	}
 }
@@ -724,6 +726,9 @@ void CPG::updateConnectionBasedOnFreq(unsigned nodeID, float oldFreq)
 
 
 float  CPG::wavetableLookup(float i) {
+
+	// scale up to wavetable size
+	i *= _sampleRate-1;
 	int iFloor = (int)i;
 	float delta = i - iFloor;
 	if (delta > 0) {

@@ -24,7 +24,8 @@ double matsuoka_calc_nextVal_RK(double in, double t1, double t2,
 		matsuoka_rkStep(in, t1recip, t2recip, c1, c2, b, g, internals);
 	}
 	matsuoka_fixNAN(internals);
-	return POSPART(internals->x1) - POSPART(internals->x2);
+	internals->out = POSPART(internals->x1) - POSPART(internals->x2);
+	return internals->out;
 }
 
 

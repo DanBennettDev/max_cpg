@@ -91,8 +91,11 @@ double MatsuNode::getInput() const
 }
 
 
-double MatsuNode::getOutput() const
+double MatsuNode::getOutput(bool forceStateVal) const
 {
+	if (forceStateVal) {
+		return matsuParams.state.out;
+	}
 	return matsuParams.out.getDelayed(_nodeOutputDelay);
 }
 

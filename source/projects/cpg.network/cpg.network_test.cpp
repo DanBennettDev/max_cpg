@@ -5,8 +5,39 @@
 #include "c74_min_unittest.h"		// required unit test header
 #include "cpg.network.cpp"	// need the source of our object so that we can access it
 
+
 // Unit tests are written using the Catch framework as described at
 // https://github.com/philsquared/Catch/blob/master/docs/tutorial.md
+
+//
+//
+//TEST_CASE("wavetable builds correctly") {
+//
+//	int sampleRate = 44100;
+//	CPG _cpg(sampleRate);
+//
+//	_cpg.setParam_t2Overt1(P_TRATIO);
+//	_cpg.setParam_c(P_C);
+//	_cpg.setParam_b(P_B);
+//	_cpg.setParam_b(P_G);
+//	_cpg.setFreqCompensation(P_COMPENSATION);
+//	_cpg.setNodeFrequency(0,1,false);
+//
+//	for (int i = 0; i < 88200; i++) {
+//		
+//	}
+//
+//	// calibrate
+//
+//	// generate wavetable
+//
+//	// 
+//}
+//
+//
+//
+
+
 
 TEST_CASE( "initialises and runs correctly with 1 node" ) {
 	ext_main(nullptr);	// every unit test must call ext_main() once to configure the class

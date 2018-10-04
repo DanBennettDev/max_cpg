@@ -205,7 +205,7 @@ private:
     unsigned _sampleRate;
     ScalingCurve scaler;
 	float _drivingInput;
-	float _wavetable[WAVETABLE_LENGTH];
+	std::vector<float> _wavetable;
 	bool _driven { false };
 
 
