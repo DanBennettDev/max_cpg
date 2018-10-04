@@ -698,7 +698,7 @@ void CPG::setNodeDelayLine(unsigned nodeID, double freq)
 
 void CPG::updateConnectionBasedOnFreq(unsigned nodeID, float oldFreq)
 {
-    //if we're using frequency based scaling of connection weight, update weights
+    //if we're using frequency-based scaling of connection weight, update weights
     if (scaler.isScalingOn()) {
         // handle all nodes which take input from this node
         for (auto destinationID : _activeNodes) {

@@ -47,20 +47,22 @@ void MatsuNode::doCalcStep(bool basicsOnly, bool withInput)
 #ifdef _DEBUG_LOG
 	prevState = matsuParams.state;
 #endif
+	double input = withInput ? getInput() : 0;
+	double calcVal = matsuoka_calc_nextVal_RK(input,
+		matsuParams.t1, matsuParams.t2,
+		matsuParams.c1, matsuParams.c2,
+		matsuParams.b, matsuParams.g,
+		&matsuParams.state);
+
 	if(_driven){
 		matsuParams.out.pushSample(_drivenValue);
 	} else {
-		double input = withInput ? getInput() : 0;
-		matsuParams.out.pushSample(matsuoka_calc_nextVal_RK(input,
-			matsuParams.t1, matsuParams.t2,
-			matsuParams.c1, matsuParams.c2,
-			matsuParams.b, matsuParams.g,
-			&matsuParams.state));
+		matsuParams.out.pushSample(calcVal);
+	}
 
-		if (!basicsOnly) {
-			updateSignalState();
-			doAuxiliaryStepActions();
-		}
+	if (!basicsOnly) {
+		updateSignalState();
+		doAuxiliaryStepActions();
 	}
 }
 
