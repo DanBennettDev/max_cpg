@@ -7,6 +7,8 @@
 */
 
 
+#define WAVETABLE_LENGTH 1024
+// no of samples in the wavetable when oscillator is driven by phasor
 
 #define TWOPI 6.2831853
 

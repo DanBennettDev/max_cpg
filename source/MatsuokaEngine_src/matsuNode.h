@@ -202,6 +202,8 @@ public:
 	*/
 	void    setFrequency(double freq, unsigned sampleRate);
 
+	void	setDrivenMode(bool driven);
+	void	driveOutput(float val);
 
 	/// Returns frequency of Matsuoka Oscillator. 
 	/*! This depends on correct setting of frequency compensation value.
@@ -343,6 +345,10 @@ private:
 
 	/// indicates whether or not the node is active
 	bool _active;
+
+	/// indicates whether or not the node is driven by external value rather than calculated
+	bool _driven;
+	float _drivenValue{ 0 };
 
 	/// Numeric identifier for this node. Should be unique within a network
 	unsigned _identifier;

@@ -43,7 +43,7 @@ void CPG::step()    // calculates all nodes in class
 
 void CPG::step(unsigned nodeID)    // calculates all nodes in class
 {
-    _nodes[nodeID].doCalcStep();
+	_nodes[nodeID].doCalcStep();
 }
 
 
@@ -507,6 +507,39 @@ void CPG::setExternalInput(unsigned nodeID, double input, double weight)
 }
 
 
+void CPG::setDrivingInput(double input)
+{
+	if (input < 0) { input = 0; }
+	if (input > 1) { input = 1; }
+	_nodes[0].driveOutput(input);
+}
+
+void CPG::setDriven(bool driven) {
+	_driven = driven;
+	_nodes[0].setDrivenMode(driven);
+}
+
+void CPG::createDrivingWavetable()
+{
+	// move to positive zero crossing
+	while (_nodes[0].getOutput() > 0) {
+		_nodes[0].doCalcStep(true, false);
+	}
+	while (_nodes[0].getOutput() < 0) {
+		_nodes[0].doCalcStep(true, false);
+	}
+
+	for (int i = 0; i < WAVETABLE_LENGTH; i++) {
+		_wavetable[i] = (float)_nodes[0].getOutput();
+		_nodes[0].doCalcStep(true, false);
+	}
+}
+
+
+
+
+
+
 // TODO - split into components.
 void CPG::setParam(unsigned nodeID, MatsuNode::matsuParam param, double val)
 {
@@ -687,4 +720,18 @@ void CPG::updateConnectionBasedOnFreq(unsigned nodeID, float oldFreq)
             setConnection(inputID, nodeID, scaler.getInputValue(oldFreqRatio, oldWeight));
         }
     }
+}
+
+
+float  CPG::wavetableLookup(float i) {
+	int iFloor = (int)i;
+	float delta = i - iFloor;
+	if (delta > 0) {
+		float a = _wavetable[iFloor];
+		float b = _wavetable[iFloor + 1];
+		return ((b - a) * delta) + a;
+	}
+	else {
+		return _wavetable[iFloor];
+	}
 }

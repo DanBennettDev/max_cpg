@@ -657,6 +657,25 @@ bool MatsuokaEngine::isIdle() { return _idle; }
 uint64_t MatsuokaEngine::getEngineStepCounter(){ return _stepCounter; }
 
 
+void MatsuokaEngine::setDriven(bool driven)
+{
+	if (driven) {
+		_cpg.createDrivingWavetable();
+	}
+	_cpg.setDriven(driven);
+
+}
+
+
+void MatsuokaEngine::setDrivingInput(float val)
+{
+	_cpg.setDrivingInput(val);
+}
+
+
+
+
+
 // PRIVATE ///////////////////////////////////////////////////////////////
 
 

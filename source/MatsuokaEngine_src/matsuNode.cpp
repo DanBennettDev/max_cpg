@@ -47,18 +47,21 @@ void MatsuNode::doCalcStep(bool basicsOnly, bool withInput)
 #ifdef _DEBUG_LOG
 	prevState = matsuParams.state;
 #endif
-	double input = withInput ? getInput() : 0;
-	matsuParams.out.pushSample(matsuoka_calc_nextVal_RK(input,
-		matsuParams.t1, matsuParams.t2,
-		matsuParams.c1, matsuParams.c2,
-		matsuParams.b, matsuParams.g,
-		&matsuParams.state));
+	if(_driven){
+		matsuParams.out.pushSample(_drivenValue);
+	} else {
+		double input = withInput ? getInput() : 0;
+		matsuParams.out.pushSample(matsuoka_calc_nextVal_RK(input,
+			matsuParams.t1, matsuParams.t2,
+			matsuParams.c1, matsuParams.c2,
+			matsuParams.b, matsuParams.g,
+			&matsuParams.state));
 
-	if (!basicsOnly) {
-		updateSignalState();
-		doAuxiliaryStepActions();
+		if (!basicsOnly) {
+			updateSignalState();
+			doAuxiliaryStepActions();
+		}
 	}
-
 }
 
 
@@ -216,6 +219,19 @@ void MatsuNode::setFrequency(double freq, unsigned sampleRate)
 		}
 	}
 }
+
+void MatsuNode::setDrivenMode(bool driven)
+{
+	_driven = driven;
+}
+
+
+
+void MatsuNode::driveOutput(float val)
+{
+	_drivenValue = val;
+}
+
 
 double MatsuNode::getFrequency(unsigned sampleRate) const
 {

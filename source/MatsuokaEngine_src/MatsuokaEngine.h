@@ -287,6 +287,11 @@ public:
     /// this reports the current value of the step counter
     uint64_t getEngineStepCounter();
 
+	/// Set system to be driven by external phasor (drives node0)
+	void setDriven(bool driven);
+
+	/// Set value of external driving phasor (drives node0)
+	void setDrivingInput(float val);
 
 
 private:
