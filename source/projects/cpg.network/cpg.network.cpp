@@ -43,7 +43,6 @@
 #define CALIBRATION_CYCLES 20
 #define TRIGGER_WIDTH 0.02
 
-#define FREQ_MIN 0.01f
 #define MAX_NODES 16
 #define INTERP_SAMPLES 4
 #define UNITY_CONN_WEIGHT 3
@@ -611,7 +610,7 @@ public:
 	void setFreq(int node, float freq) {
 
 		if (node == 0 && !fEqual(freq,_freqs[0]) ){
-			freq = freq < FREQ_MIN ? FREQ_MIN : freq;
+			freq = freq < MIN_NODE_FREQ ? MIN_NODE_FREQ : freq;
 			_freqs[0] = freq;
 			// root node - change freq for whole network 
 			_engine_ptr->setNodeFrequency(node, _freqs[0], true);
@@ -619,7 +618,7 @@ public:
 		else if(!fEqual(freq, _freqs[node])) {
 			// freq of non-root nodes is a multiple of node0
 			float thisF = freq * _freqs[0];
-			thisF = thisF < FREQ_MIN ? FREQ_MIN : thisF;
+			thisF = thisF < MIN_NODE_FREQ ? MIN_NODE_FREQ : thisF;
 			_freqs[node] = thisF;
 			_engine_ptr->setNodeFrequency(node, thisF, false);
 		}

@@ -202,8 +202,8 @@ bool MatsuNode::hasChanged_Inputs() const { return _haveInputsChanged; }
 // compensation must be recalculated if b,g change
 void MatsuNode::setFrequency(double freq, unsigned sampleRate)
 {
-	if (freq < 0.00001) {
-		freq = 0.00001;
+	if (freq < MIN_NODE_FREQ) {
+		freq = MIN_NODE_FREQ;
 	};
 
 	double mult = matsuParams.t2 / matsuParams.t1;
