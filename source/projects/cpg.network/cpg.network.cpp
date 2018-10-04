@@ -39,7 +39,7 @@
 #include "matsuNode.h"
 
 
-#define ARGS_BEFORE_PARAMS 3
+#define ARGS_BEFORE_PARAMS 4
 #define CALIBRATION_CYCLES 20
 #define TRIGGER_WIDTH 0.02
 

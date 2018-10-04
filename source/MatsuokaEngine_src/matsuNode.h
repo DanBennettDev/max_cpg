@@ -347,7 +347,7 @@ private:
 	bool _active;
 
 	/// indicates whether or not the node is driven by external value rather than calculated
-	bool _driven;
+	bool _driven{ false };
 	float _drivenValue{ 0 };
 
 	/// Numeric identifier for this node. Should be unique within a network
