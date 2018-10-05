@@ -36,42 +36,78 @@
 //
 //
 //
+//
+//
+//
+//TEST_CASE( "initialises and runs correctly with 1 node" ) {
+//	ext_main(nullptr);	// every unit test must call ext_main() once to configure the class
+//
+//	// create a single node instance of our object
+//	atoms testArgs = { 1 };
+//	test_wrapper<cpg_net> an_instance;
+//	cpg_net& my_object = an_instance;
+//
+//	//// create an impulse buffer to process
+//	const int		buffersize = 88100;
+//	sample_vector	impulse(buffersize);
+//
+//	sample_vector	output;
+//
+//	my_object.params({ 2,1,4.07,4.07}, 0);
+//
+//	my_object.quant_grid({ 1, "32"}, 0);
+//	my_object.quant_mult({ 1, 8 }, 0);
+//	my_object.number( 10, 0);
+//	my_object.number(9, 1);
+//
+//
+//	// run the calculations
+//	for (auto x : impulse) {
+//		auto y = my_object(x);
+//		////output.push_back(y);
+//	}
+//
+//
+//
+//	// check it
+////	REQUIRE( output == reference );
+//	REQUIRE ( true );
+//}
+//
 
 
-
-TEST_CASE( "initialises and runs correctly with 1 node" ) {
+TEST_CASE("speed test") {
 	ext_main(nullptr);	// every unit test must call ext_main() once to configure the class
 
-	// create a single node instance of our object
+						// create a single node instance of our object
 	atoms testArgs = { 1 };
 	test_wrapper<cpg_net> an_instance;
 	cpg_net& my_object = an_instance;
 
-	//// create an impulse buffer to process
-	const int		buffersize = 88100;
-	sample_vector	impulse(buffersize);
+
+	const int		sampleRate = 44100;
+
 
 	sample_vector	output;
 
-	my_object.params({ 2,1,4.07,4.07}, 0);
+	my_object.params({ 16 , sampleRate, 1, 1, 4, 1, 4.07,4.07 }, 0);
 
-	my_object.quant_grid({ 1, "32"}, 0);
-	my_object.quant_mult({ 1, 8 }, 0);
-	my_object.number( 10, 0);
-	my_object.number(9, 1);
+	//my_object.quant_grid({ 1, "32" }, 0);
+	//my_object.quant_mult({ 1, 8 }, 0);
+	//my_object.number(10, 0);
+	//my_object.number(9, 1);
 
 
 	// run the calculations
-	for (auto x : impulse) {
-		auto y = my_object(x);
+	for (int i = 0; i < sampleRate * 10; i++) {
+		auto y = my_object(1);
 		////output.push_back(y);
 	}
 
 
 
 	// check it
-//	REQUIRE( output == reference );
-	REQUIRE ( true );
+	//	REQUIRE( output == reference );
+	REQUIRE(true);
 }
-
 

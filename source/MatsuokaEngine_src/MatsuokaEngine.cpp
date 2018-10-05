@@ -657,12 +657,14 @@ bool MatsuokaEngine::isIdle() { return _idle; }
 uint64_t MatsuokaEngine::getEngineStepCounter(){ return _stepCounter; }
 
 
-void MatsuokaEngine::setDriven(bool driven)
+void MatsuokaEngine::setDriven(externalSync driven)
 {
-	if (driven) {
-		_cpg.createDrivingWavetable();
+	if (driven != externalSync::none) {
+		_cpg.createExternalSyncResources();
 	}
-	_cpg.setDriven(driven);
+	if (driven == externalSync::driving) {
+		_cpg.setDriven(driven);
+	}
 
 }
 
@@ -673,7 +675,10 @@ void MatsuokaEngine::setDrivingInput(float val)
 }
 
 
-
+void MatsuokaEngine::zeroSync(unsigned nodeID)
+{
+	_cpg.zeroSync(nodeID);
+}
 
 
 // PRIVATE ///////////////////////////////////////////////////////////////

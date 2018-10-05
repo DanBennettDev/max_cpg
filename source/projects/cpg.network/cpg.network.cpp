@@ -7,12 +7,14 @@
 /*
 
 	TODO:
-
+		efficiency! 
+			1) Turn off quantiser when trigger outputs are off.
+			2) Hadn't expected to use the engine for audio-rate use, so didn't think in terms of vectors
+				write an in-engine "step" function that will take a vector of inputs and spit out a vector
 
 	LONGER TERM:
 		Invertable connections
 		Smoothing control changes
-		Sync to max internal timings
 		External input(s)
 		Waveshaping between connections (raise to power and threshold)
 		Convert to Max8 multichannel
@@ -39,7 +41,7 @@
 #include "matsuNode.h"
 
 
-#define ARGS_BEFORE_PARAMS 4
+#define ARGS_BEFORE_PARAMS 5
 #define CALIBRATION_CYCLES 20
 #define TRIGGER_WIDTH 0.02
 
@@ -55,6 +57,8 @@
 #define DEFAULT_CURVE_Y 1.955492228f, 1.098290155f, 0.107150259f, 0.133937824f, 0.321450777f, 0.517f, 0.641026425f, 0.937029016f, 1.194725389f, 1.259015544f
 #define FLOAT_EPSILON 0.00001f
 #define SYNC_CHANNEL_OFFSET 1
+// more than adequate resolution for rhythm sequencing
+#define DEFAULT_SAMPLE_RATE 1000	
 
 
 using namespace c74::min;
@@ -97,15 +101,18 @@ private:
 		float _phaseStep;
 	};
 
+	using externalSync = MatsuokaEngine::externalSync;
 
 
 	std::shared_ptr<MatsuokaEngine> _engine_ptr;
 	MatsuNode _dummyNode;
 	double _freqComp{ P_COMPENSATION };
-	int _local_srate;
+	int _local_srate{ DEFAULT_SAMPLE_RATE };
 	bool _send_noteTriggers{ true };
-	bool _use_syncInput{ false };
+	bool _externalInputs{ false };
+	externalSync _syncInput{ externalSync::none };
 	int _syncInputChannel{ -1 };
+	float _prevDrivingInput{ 0 };
 
 	// holds raw output values for interpolation. Barebones ringbuffer approach.
 	DelayLine<float> _outRingBuff[MAX_NODES];
@@ -141,7 +148,8 @@ public:
 	argument<int> node_count_arg{ this, "node_count", "The number of nodes in the network." };
 	argument<int> sample_rate_arg{ this, "sample_rate", "The sample rate of network calculations." };
 	argument<int> trigger_outputs_arg{ this, "trigger_outputs", "1 (default) object has signal and note trigger outputs, 0: object has only signal outputs" };
-	argument<int> sync_inputs_arg{ this, "sync_inputs", "0 (default) object has sync input, 0: object has no sync input" };
+	argument<int> ext_inputs_arg{ this, "external_signal_inputs", "0 (default) object has external signal inputs, 0: object has none" };
+	argument<int> sync_input_arg{ this, "sync_input", "0 (default) object has sync input, 0: object has none" };
 	argument<int> tRatio_arg{ this, "tRatio_param", "The ratio of equation params t2:t1." };
 	argument<int> c_arg{ this, "c_param", "The equation parameter c." };
 	argument<int> b_arg{ this, "b_param", "The equation parameter b." };
@@ -186,7 +194,25 @@ public:
 		}
 
 		if (args.size() > 3) {
-			_use_syncInput = args[3] == 1 ? true : false;
+			_externalInputs = args[3] == 1 ? true : false;
+
+		}
+
+		if (args.size() > 4) {
+			switch ((int)args[4]) {
+				case 0:
+					_syncInput = externalSync::none;
+					break;
+				case 1: 
+					_syncInput = externalSync::driving;
+					break;
+				case 2:
+					_syncInput = externalSync::reseting;
+					break;
+				default:
+					_syncInput = externalSync::none;
+					break;
+			}
 		}
 
 
@@ -207,12 +233,18 @@ public:
 			}
 		}
 
+		if (_externalInputs) {
+			for (int nodeID = 0; nodeID < _nodeCount; ++nodeID)
+				_ins.push_back(std::make_unique<inlet<>>(this, "(signal) signal input " + nodeID, "signal"));
+		}
+
+
 		if (_send_noteTriggers) {
 			for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) 
 				_outs.push_back(std::make_unique<outlet<>>(this, "(signal) trigger output " + nodeID, "signal"));
 		}
 
-		if (_use_syncInput) {
+		if (_syncInput != externalSync::none) {
 			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) sync input "));
 		}
 
@@ -240,8 +272,8 @@ public:
 
 		_engine_ptr->doQueuedActions();
 		calibrate.set();
-		if (_use_syncInput) {
-			_engine_ptr->setDriven(true);
+		if (_syncInput != externalSync::none) {
+			_engine_ptr->setDriven(_syncInput);
 			_engine_ptr->setDrivingInput(0);
 		}
 
@@ -410,12 +442,31 @@ public:
 
 	void calcVector_nonInterp(audio_bundle input, audio_bundle output)
 	{
+		int syncInputNo = _nodeCount * _externalInputs ? 2 : 1;
+
 		// For each frame in the vector calc each channel
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
-			if (_use_syncInput) {
-				_engine_ptr->setDrivingInput((float)input.samples(_nodeCount)[frame]);
+
+			if (_syncInput == externalSync::driving) {
+				_engine_ptr->setDrivingInput((float)input.samples(syncInputNo)[frame]);
+			} else if (_syncInput == externalSync::reseting) {
+				float drivingInput = (float)input.samples(syncInputNo)[frame];
+				if (drivingInput < _prevDrivingInput) {
+					_engine_ptr->zeroSync(0);
+				}
+				_prevDrivingInput = (float)input.samples(syncInputNo)[frame];
 			}
+
+			if (_externalInputs) {
+				for (int channel = 0; channel < _nodeCount; ++channel) {
+					_engine_ptr->setNodeExternalInput(channel, 1, (float)input.samples(channel + _nodeCount)[frame]);
+				}
+			}
+
+
 			_engine_ptr->step();
+
+			
 			// signals
 			for (int channel = 0; channel < _nodeCount; ++channel) {
 				// send to max output
@@ -440,15 +491,30 @@ public:
 
 	void calcVector_interp(audio_bundle input, audio_bundle output)
 	{
+		int syncInputNo = _nodeCount * _externalInputs ? 2 : 1;
+
 		// For each frame in the vector calc each channel
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
-			if (_use_syncInput) {
-				_engine_ptr->setDrivingInput((float)input.samples(_nodeCount)[frame]);
+			if (_syncInput == externalSync::driving) {
+				_engine_ptr->setDrivingInput((float)input.samples(syncInputNo)[frame]);
+			}
+			else if (_syncInput == externalSync::reseting) {
+				float drivingInput = (float)input.samples(syncInputNo)[frame];
+				if (drivingInput < _prevDrivingInput) {
+					_engine_ptr->zeroSync(0);
+				}
+				_prevDrivingInput = (float)input.samples(syncInputNo)[frame];
 			}
 			// if _phase wraps, calc sample from network
 			_phase += _phaseStep;
 			if (_phase > 1.0) {
 				_phase -= 1.0;
+
+				if (_externalInputs) {
+					for (int channel = 0; channel < _nodeCount; ++channel) {
+						_engine_ptr->setNodeExternalInput(channel, 1, (float)input.samples(channel + _nodeCount)[frame]);
+					}
+				}
 				_engine_ptr->step();
 
 				if (_send_noteTriggers) {
@@ -491,8 +557,9 @@ public:
 							_outRingBuff[channel].getDelayed(0),
 							_phase);
 				}
-
-				output.samples(channel + _nodeCount)[frame] = _trigs[channel].phase() < 1 ? 1 : 0;
+				if (_send_noteTriggers) {
+					output.samples(channel + _nodeCount)[frame] = _trigs[channel].phase() < 1 ? 1 : 0;
+				}
 				
 			}
 		}

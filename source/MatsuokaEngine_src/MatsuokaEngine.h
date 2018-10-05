@@ -34,6 +34,10 @@ public:
     using outputEvent = QuantisedEventQueue::outputEvent;
     using gridType = QuantisedEventQueue::gridType;
 
+	enum externalSync {
+		none, driving, reseting
+	};
+
 
     MatsuokaEngine();
     MatsuokaEngine(unsigned sampleRate,
@@ -288,10 +292,15 @@ public:
     uint64_t getEngineStepCounter();
 
 	/// Set system to be driven by external phasor (drives node0)
-	void setDriven(bool driven);
+	void setDriven(externalSync driven);
 
 	/// Set value of external driving phasor (drives node0)
 	void setDrivingInput(float val);
+
+	/// if SetDriven has been run, with value other than "none", this 
+	// resets the node to its state prior to zero-crossing 
+	// otherwise behaviour is same as reset(nodeID)
+	void zeroSync(unsigned nodeID);
 
 
 private:
