@@ -163,6 +163,18 @@ void MatsuokaEngine::step()
     }
 }
 
+void MatsuokaEngine::stepBareBones()
+{
+	if (!_shutdown && !_paused) {
+		_idle = false;
+		// calculate next cpg step
+		_cpg.step();
+		_stepCounter++;
+		_idle = true;
+	}
+}
+
+
 
 void MatsuokaEngine::step(unsigned nodeID)
 {
@@ -540,7 +552,7 @@ bool MatsuokaEngine::loadConnectionWeightCurve(std::string source)
 {
     return _cpg.loadWeightScalingCurve(source);
 }
-
+ 
 bool MatsuokaEngine::loadConnectionWeightCurve(std::vector<float> x, std::vector<float> y)
 {
 	return _cpg.loadWeightScalingCurve(x,y);

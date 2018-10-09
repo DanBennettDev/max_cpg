@@ -53,6 +53,10 @@ public:
     /// calculate CPG and populate event queue,
     void step();
 
+	/// no syncing, no quantiser, no freq Compensation Calcs etc.,
+	void stepBareBones();
+
+
     /// calculate indicated node, 
     void step(unsigned nodeID);
 
