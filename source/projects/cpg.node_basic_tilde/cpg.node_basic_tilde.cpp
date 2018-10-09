@@ -45,6 +45,11 @@ public:
 	MIN_AUTHOR		{	"Cycling '74"			};
 	MIN_RELATED		{	"phasor~" };
 
+	// Because our object defines a constructor (below) these argument definitions are for
+	// documentation purposes only.
+	argument<int> sample_rate_arg{ this, "sample_rate", "The sample rate of node calculations" };
+
+
 	node_basic(const atoms& args = {})
 	{
 		m_initialized = 0;
@@ -191,7 +196,7 @@ public:
 		node.set_b(b);
 		node.set_g(g);
 		node.setExternalInput(in);
-		node.doCalcStep(true, false);
+		node.doCalcStep(true, true);
 		return node.getOutput();
 	}
 
