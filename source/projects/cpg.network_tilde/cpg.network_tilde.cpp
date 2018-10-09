@@ -6,22 +6,29 @@
 
 /*
 
-	TODO:
-		rename _tilde
-		build patch
+TODO:
+	IMMEDIATE:
+		- Build help patch
+		- Rebuild & test neurythmic patch
+		- Compile for mac
+		- Release repo & externals to Thomas
+		- Frontend compile for mac
+		- Release neurythmic & externals
+		- Document engine & release
 
 
 	LONGER TERM:
+		M4L patch
+		Audio version - stripped back
+			Handle signal diminishment
 		Invertable connections
+		Waveshaping between connections (raise to power, and threshold)
 		Smoothing control changes
-		External input(s)
-		Waveshaping between connections (raise to power and threshold)
 		Convert to Max8 multichannel
-
 		Per node quantiser amount setting
-		Tool for converting network params back into a a network graph for tweaking (ML?)
 
-		PERFORMANCE:
+
+	PERFORMANCE:
 		1) Turn off quantiser when trigger outputs are off.
 		2) Hadn't expected to use the engine for audio-rate use, so didn't think in terms of vectors
 			write an in-engine "step" function that will take a vector of inputs and spit out a vector
