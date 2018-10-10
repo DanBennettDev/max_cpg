@@ -21,10 +21,7 @@ private:
 	number inVal;
 	MatsuNode node;
 	MatsuNode dummyNode;
-	double freqComp;
 	int local_srate;
-
-	int testCounter{ 0 };
 
 	number phase{ 0 };
 	number phaseStep;
