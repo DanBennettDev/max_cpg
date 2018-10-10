@@ -94,7 +94,7 @@ void CPG::zeroSync(unsigned nodeID) {
 /*! If the connection specified exists, then its weight is set to that specified.
 *  Otherwise a new input is added to the node whose ID is specified by nodeTo,
 *  from the node whose ID is specified by nodeFrom, with weight specified.
-*  If either node specified does not exist, an exception is thrown.
+*  If either node specified does not exist, an runtime_error is thrown.
 */
 void CPG::setConnection(unsigned nodeFrom, unsigned nodeTo, double weight)
 {
@@ -120,7 +120,7 @@ void CPG::setConnectionPhaseOffset(unsigned nodeFrom, unsigned nodeTo,
 /*! If a connection specified exists, then its weight is set to that specified.
 *  Otherwise a new input is added: to the node specified by nodeTo,
 *  from the node specified by nodeFrom, with weight specified.
-*  If either node specified does not exist, an exception is thrown.
+*  If either node specified does not exist, an runtime_error is thrown.
 */
 void CPG::setConnection(unsigned NodeA, unsigned NodeB, double weightAtoB,
     double weightBtoA)
@@ -190,10 +190,10 @@ bool CPG::exists(unsigned nodeID) const
 void CPG::addChild(unsigned parentID, unsigned newID)
 {
     if (exists(newID)) {
-        throw std::exception("new node ID already exists");
+        throw std::runtime_error("new node ID already exists");
     }
     if (!exists(parentID)) {
-        throw std::exception("parent ID of node is invalid");
+        throw std::runtime_error("parent ID of node is invalid");
     }
     _activeNodes.push_back(newID);
     std::sort(_activeNodes.begin(), _activeNodes.end());
@@ -214,9 +214,9 @@ void CPG::addChild(unsigned parentID, unsigned newID)
 void CPG::moveNode(unsigned nodeID, unsigned newParentID,
     bool breakCurrParentChildConn, bool breakCurrChildParentConn)
 {
-    if (nodeID == 0) { throw std::exception("Cannot move the root node"); }
-    if (!exists(nodeID)) { throw std::exception("node to be moved does not exist"); }
-    if (!exists(newParentID)) { throw std::exception("new parent node does not exist"); }
+    if (nodeID == 0) { throw std::runtime_error("Cannot move the root node"); }
+    if (!exists(nodeID)) { throw std::runtime_error("node to be moved does not exist"); }
+    if (!exists(newParentID)) { throw std::runtime_error("new parent node does not exist"); }
    
     unsigned oldParentID = _nodes[nodeID].getParentID();
 
@@ -243,15 +243,15 @@ void CPG::moveNode(unsigned nodeID, unsigned newParentID,
 // moves children of deleted node up one in heirarchy. New connections from parent->child have weight 0.0
 void CPG::deleteNode(unsigned nodeID)
 {
-    if (nodeID == 0) { throw std::exception("Cannot delete the root node"); }
-    if (!exists(nodeID)) { throw std::exception("Node does not exist"); }
+    if (nodeID == 0) { throw std::runtime_error("Cannot delete the root node"); }
+    if (!exists(nodeID)) { throw std::runtime_error("Node does not exist"); }
 
     unsigned parentID = _nodes[nodeID].getParentID();
     if (parentID == -1) {
-        throw std::exception("non-root node without a parent");
+        throw std::runtime_error("non-root node without a parent");
     }
     if (!exists(parentID)) {
-        throw std::exception("parent ID is not an active node");
+        throw std::runtime_error("parent ID is not an active node");
     }
 
     if (_nodes[nodeID].getChildCount()>0) {
@@ -352,7 +352,7 @@ void CPG::setParam_g(double val)
 void CPG::setNodeFrequency(unsigned nodeID, double freq, bool inherit)
 {
     if (!exists(nodeID)) { 
-        throw std::exception("tried to set freq on inactive node");
+        throw std::runtime_error("tried to set freq on inactive node");
         return; 
     }
     float oldFreq = (float)_nodes[nodeID].getFrequency(_sampleRate);
@@ -382,7 +382,7 @@ void CPG::setNodeFrequencyMultiple(unsigned nodeID, double multipleOfParent,
 
     unsigned parentID = _nodes[nodeID].getParentID();
     if (parentID == -1) {
-        throw std::exception("no parent, cannot set frequency to multiple of parent frequency");
+        throw std::runtime_error("no parent, cannot set frequency to multiple of parent frequency");
     }
     double newFreq = _nodes[parentID].getFrequency(_sampleRate)
         * multipleOfParent;
@@ -436,7 +436,7 @@ unsigned CPG::getNextNodeID()
     for (auto id : _activeNodes) {
         if ((int)id != prev + 1) {
             if ((int)id < prev + 1 || prev == -1) {
-                throw std::exception("CPG's node vector is out of order or " \
+                throw std::runtime_error("CPG's node vector is out of order or " \
                     " missing root node");
             }
             return prev + 1;
@@ -604,7 +604,7 @@ void CPG::getRootParams(double &t1, double &t2, double &c1,
     double &c2, double &b, double &g)
 {
     if (_nodes[0].getIdentifier() != 0) {
-        throw std::exception("CPG's node vector is out of order");
+        throw std::runtime_error("CPG's node vector is out of order");
     }
     t1 = _nodes[0].getParam(MatsuNode::matsuParam::T1);
     t2 = _nodes[0].getParam(MatsuNode::matsuParam::T2);
@@ -669,7 +669,7 @@ void CPG::setNodeFrequencyMultipleInherit(unsigned nodeID,
 
     unsigned parentID = _nodes[nodeID].getParentID();
     if (parentID == -1) {
-        throw std::exception("no parent, cannot set frequency to multiple of parent frequency");
+        throw std::runtime_error("no parent, cannot set frequency to multiple of parent frequency");
     }
     double newFreq = _nodes[parentID].getFrequency(_sampleRate)
         * multipleOfParent;
