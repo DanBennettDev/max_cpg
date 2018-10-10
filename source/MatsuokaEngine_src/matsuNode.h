@@ -7,7 +7,7 @@
 #include <vector>
 #include "matsu_signal_calcs.h"
 #include "core.h"
-#include "delayline.h"
+#include "delayLine.h"
 #include "XORRand.h"
 
 #define MIN_MATSUOKA_FREQ 0.001
