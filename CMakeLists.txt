@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 
+if (POLICY CMP0025)
+  cmake_policy(SET CMP0025 NEW)
+endif ()
 
 
 if (${CMAKE_GENERATOR} MATCHES "Xcode")

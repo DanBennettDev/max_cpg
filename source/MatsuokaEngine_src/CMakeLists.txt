@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 
+if (POLICY CMP0025)
+  cmake_policy(SET CMP0025 NEW)
+endif ()
+
 project(MatsuokaEngine)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} MAT_SOURCES)
