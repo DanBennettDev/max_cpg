@@ -33,7 +33,7 @@ public:
         if (size == 0) { size = 1; }
         if(size == _size){return;}
 
-        std::vector<S>::size_type from;
+        typename std::vector<S>::size_type from;
         // handle size up or size down
         if (size > _size) {
             from = _write;
@@ -43,7 +43,7 @@ public:
             _write = 0;
         } 
 
-        vector<S> temp = _buffer;
+        std::vector<S> temp = _buffer;
         _buffer.resize(size, 0.0);
         unsigned i = 0;
         while (i < size && i < _size) {

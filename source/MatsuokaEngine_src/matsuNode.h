@@ -389,7 +389,7 @@ private:
 	static bool validateC(double c);
 	static bool validateB(double b);
 	static bool validateG(double g);
-	void MatsuNode::updateSignalState();
+	void updateSignalState();
 
 };
 
