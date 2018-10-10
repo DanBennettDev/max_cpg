@@ -484,8 +484,9 @@ public:
 			}
 			if (_send_noteTriggers) {
 				auto noteEvents = _engine_ptr->getEvents();
-				for each (auto note in noteEvents) {
-					_trigs[note.nodeID].setTrigger();
+				//for each (auto note in noteEvents) {
+				for(auto i=0; i< noteEvents.size(); i++){
+					_trigs[noteEvents[i].nodeID].setTrigger();
 				}
 				for (int channel = 0; channel < _nodeCount; channel++) {
 					output.samples(channel + _nodeCount)[frame] = _trigs[channel].tick();
@@ -525,8 +526,9 @@ public:
 
 				if (_send_noteTriggers) {
 					auto noteEvents = _engine_ptr->getEvents();
-					for each (auto note in noteEvents) {
-						_trigs[note.nodeID].setTrigger();
+					//for each (auto note in noteEvents) {
+					for (auto i = 0; i< noteEvents.size(); i++) {
+						_trigs[noteEvents[i].nodeID].setTrigger();
 					}
 					for (int channel = 0; channel < _nodeCount; channel++) {
 						_trigs[channel].tick();
