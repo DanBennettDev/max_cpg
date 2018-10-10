@@ -4,6 +4,9 @@ if (POLICY CMP0025)
   cmake_policy(SET CMP0025 NEW)
 endif ()
 
+set (CMAKE_CXX_STANDARD 11)
+
+
 project(MatsuokaEngine)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} MAT_SOURCES)
