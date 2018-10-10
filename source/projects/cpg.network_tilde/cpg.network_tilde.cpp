@@ -173,6 +173,12 @@ public:
 		// gather info for basic object init
 		if (args.size() > 0) {
 			_nodeCount = args[0];
+			if (_nodeCount > MAX_NODES) {
+				_nodeCount = MAX_NODES;
+			}
+			if (_nodeCount < 1) {
+				_nodeCount = 1;
+			}
 		}
 
 		if (args.size() > 1) {
