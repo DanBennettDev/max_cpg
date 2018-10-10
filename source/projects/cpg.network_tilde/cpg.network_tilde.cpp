@@ -117,12 +117,10 @@ private:
 	bool _send_noteTriggers{ true };
 	bool _externalInputs{ false };
 	externalSync _syncInput{ externalSync::none };
-	int _syncInputChannel{ -1 };
 	float _prevDrivingInput{ 0 };
 
 	// holds raw output values for interpolation. Barebones ringbuffer approach.
 	DelayLine<float> _outRingBuff[MAX_NODES];
-	int _ringIndex{ 0 };
 	float _freqs[MAX_NODES]{ 1 };
 	number _phase{ 0 };
 	number _phaseStep{ 0 };
@@ -484,7 +482,7 @@ public:
 			}
 			if (_send_noteTriggers) {
 				auto noteEvents = _engine_ptr->getEvents();
-				//for each (auto note in noteEvents) {
+				//for each (auto note in noteEvents) { // AppleClang doesn't like for each here. Can't understand why, switched to trad index loop
 				for(auto i=0; i< noteEvents.size(); i++){
 					_trigs[noteEvents[i].nodeID].setTrigger();
 				}
@@ -526,7 +524,7 @@ public:
 
 				if (_send_noteTriggers) {
 					auto noteEvents = _engine_ptr->getEvents();
-					//for each (auto note in noteEvents) {
+					//for each (auto note in noteEvents) {	// AppleClang doesn't like for each here. Can't understand why, switched to trad index loop
 					for (auto i = 0; i< noteEvents.size(); i++) {
 						_trigs[noteEvents[i].nodeID].setTrigger();
 					}
