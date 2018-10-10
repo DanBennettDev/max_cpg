@@ -207,7 +207,7 @@ public:
 	//	node.setFrequency(_freq, local_srate);
 	//}
 
-	queue calibrate{ this,
+	queue<> calibrate{ this,
 		MIN_FUNCTION{
 			doCalibration();
 			return {};

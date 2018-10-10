@@ -423,7 +423,7 @@ public:
 	};
 
 
-	queue calibrate{ this,
+	queue<> calibrate{ this,
 		MIN_FUNCTION{
 		doCalibration();
 	return {};
