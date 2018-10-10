@@ -5,7 +5,7 @@ if (POLICY CMP0025)
 endif ()
 
 set (CMAKE_CXX_STANDARD 11)
-
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 project(MatsuokaEngine)
 

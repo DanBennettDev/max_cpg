@@ -32,11 +32,11 @@ TEST_CASE( "not a real unit test - a debugging tool" ) {
 	my_object.number(9, 1);
 
 
-	// run the calculations
-	for (int i = 0; i < buffersize; i++) {
-		auto y = my_object(x);
-		////output.push_back(y);
-	}
+	//// run the calculations
+	//for (int i = 0; i < buffersize; i++) {
+	//	auto y = my_object(x);
+	//	////output.push_back(y);
+	//}
 
 
 
