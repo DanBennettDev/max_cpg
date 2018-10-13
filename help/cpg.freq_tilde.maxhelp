@@ -4,7 +4,7 @@
 		"appversion" : 		{
 			"major" : 7,
 			"minor" : 3,
-			"revision" : 5,
+			"revision" : 4,
 			"architecture" : "x64",
 			"modernui" : 1
 		}
@@ -60,18 +60,6 @@
 					"patching_rect" : [ 563.0, 177.0, 91.0, 22.0 ],
 					"style" : "",
 					"text" : "params 1 1 2 2"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"id" : "obj-6",
-					"maxclass" : "newobj",
-					"numinlets" : 2,
-					"numoutlets" : 0,
-					"patching_rect" : [ 193.0, 453.0, 37.0, 22.0 ],
-					"style" : "",
-					"text" : "dac~"
 				}
 
 			}
@@ -162,7 +150,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 14.0, 75.0, 257.0, 269.0 ],
+					"patching_rect" : [ 14.0, 75.0, 260.0, 269.0 ],
 					"style" : "",
 					"text" : "An easier to use version of cpg.node_basic~ \n\nAgain this is a single CPG node - a neural oscillator.\n\nUnlike cpg.node_basic~ the frequency of this node can be controlled directly. \n\nTo allow this the node must be re-calibrated after every parameter change - so signal-rate control of parameters is not possible\n\nThe parameters are reduced compared to cpg.node_basic~ for ease of use, but should be suitable for most uses\n\nFirst arg - sample rate. Set to c 1000 for control rate use, or 44100 for audio rate. Higher signal rate requires more CPU"
 				}
@@ -280,7 +268,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 305.0, 17.0, 123.0, 62.0 ],
+					"patching_rect" : [ 305.0, 17.0, 127.0, 62.0 ],
 					"style" : "",
 					"text" : "external signal input\n\n(e.g. from other nodes)"
 				}
@@ -339,15 +327,6 @@
 		"lines" : [ 			{
 				"patchline" : 				{
 					"destination" : [ "obj-4", 0 ],
-					"order" : 0,
-					"source" : [ "obj-1", 0 ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"destination" : [ "obj-6", 0 ],
-					"order" : 1,
 					"source" : [ "obj-1", 0 ]
 				}
 
