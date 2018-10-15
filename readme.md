@@ -1,7 +1,6 @@
 # Overview
 MAX MSP objects for creative use of Central Pattern Generator networks (CPGs) (specifically Matsuoka's Neural Oscillator (MNO)), as used in my "neurythmic" system. [(see paper here)](https://www.researchgate.net/publication/324360165_Neurythmic_A_Rhythm_Creation_Tool_Based_on_Central_Pattern_Generators)
 
-If you do anything useful with this system please let me know - this is an ongoing piece of research. I'm interested in linking to your work as part of a showcase of creativity using CPGs. I'm also interested in collaboration if you have any ideas you'd like help realising, or would like to work together on a paper in this area. [db15237@bristol.ac.uk](db15237@bristol.ac.uk)
 
 # Description
 CPGs are small networks of neurons which exhibit oscillation behaviour. They appear in animals controlling adaptive rhythmic systems like heartbeat, lung function, gait, and it is proposed many other complex motor control behaviours. It is also suggested that they may be central to human rhythm perception. For all these reasons and more I think they have huge potential for rhythmic creativity.
