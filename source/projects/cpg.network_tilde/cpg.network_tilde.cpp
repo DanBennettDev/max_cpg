@@ -25,7 +25,6 @@ TODO:
 		Waveshaping between connections (raise to power, and threshold)
 		Smoothing control changes
 		Convert to Max8 multichannel
-		Per node quantiser amount setting
 
 
 	PERFORMANCE:
@@ -53,14 +52,11 @@ TODO:
 
 #define MAX_NODES 16
 #define INTERP_SAMPLES 4
-#define UNITY_CONN_WEIGHT 3
 #define P_TRATIO 4
 #define P_C 1
 #define P_B 7
 #define P_G 7
 #define P_COMPENSATION 0.973200f
-#define DEFAULT_CURVE_X 0.25f, 0.333f, 0.5f, 1.111f, 1.333f, 2.f, 3.f, 4.f, 6.f, 8.f
-#define DEFAULT_CURVE_Y 1.955492228f, 1.098290155f, 0.107150259f, 0.133937824f, 0.321450777f, 0.517f, 0.641026425f, 0.937029016f, 1.194725389f, 1.259015544f
 #define FLOAT_EPSILON 0.00001f
 #define SYNC_CHANNEL_OFFSET 1
 // more than adequate resolution for rhythm sequencing

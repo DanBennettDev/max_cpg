@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
+set(CMAKE_OSX_ARCHITECTURES x86_64;i386)
 
 if (POLICY CMP0025)
   cmake_policy(SET CMP0025 NEW)
