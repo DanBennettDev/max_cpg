@@ -1,16 +1,15 @@
 # Overview
 MAX MSP objects for creative use of Central Pattern Generator networks (CPGs) (specifically Matsuoka's Neural Oscillator (MNO)), as used in my "neurythmic" system. [(see paper here)](https://www.researchgate.net/publication/324360165_Neurythmic_A_Rhythm_Creation_Tool_Based_on_Central_Pattern_Generators)
 
-If you do anything useful with this system please let me know - this is an ongoing piece of research. I'm interested in linking to your work as part of a showcase of creativity using CPGs. I'm also interested in collaboration if you have any ideas you'd like help realising, or would like to work together on a paper in this area. [db15237@bristol.ac.uk](db15237@bristol.ac.uk)
 
 # Description
-CPGs are small networks of neurons which exhibit oscillation behaviour. They appear in animals controlling adaptive rhythmic systems like heartbeat, lung function, gait, and it is proposed many other complex motor control behaviours. It is also suggested that they may be central to human rhythm perception. For all these reasons and more I think they have huge potential for rhythmic creativity.
+CPGs are small networks of neurons which exhibit oscillation behaviour. They are found in animals, where they control adaptive rhythmic systems like heartbeat, lung function, gait, and (it is suggested) underly more complex motor control behaviours. It is also suggested that they may be central to human rhythm perception. For all these reasons and more I think they have huge potential for use in creative rhythm generation and interaction.
 
 The goal of these externals is to support hands-on interaction, exploration and creativity with these networks. CPG networks tend to be much smaller than the kinds of networks used in machine learning, and these externals provide various interface helpers that make it possible (and I think we've shown rewarding) to interact with these networks more-or-less directly: e.g. to tune them by hand and use them to explore and control rhythms. [My Neurythmic drum sequencer took just this approach](https://www.researchgate.net/publication/324360165_Neurythmic_A_Rhythm_Creation_Tool_Based_on_Central_Pattern_Generators). 
 
 At a basic level, these are non-linear dynamic systems, which exhibit entrainment behaviour (a kind of neural synchronisation). This means that they will adapt to synchronise to incoming signals. Depending on the strength, shape and relative frequency of the incoming signal.
 
-They are currently used almost exclusively in robotic motor control. I think they show huge potential for music, in a great number of areas including e.g.:
+They are currently most commonly used in robotic motor control. I think they show huge potential for music, in a great number of areas including e.g.:
 
 - Engine for a semi-generative drum machine/ sequencer (like Neurythmic)
 - Pattern engine for audio granulation - using CPG network to generate control pulses offers a means of intuitively moving between microrhythmic patterns  
