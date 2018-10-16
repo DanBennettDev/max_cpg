@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.0)
 set(CMAKE_OSX_ARCHITECTURES x86_64;i386)
 
-set(C74_MIN_API_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../min-api)
-include(${C74_MIN_API_DIR}/script/min-pretarget.cmake)
-
 if (POLICY CMP0025)
   cmake_policy(SET CMP0025 NEW)
 endif ()
 
 set (CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+
+set(C74_MIN_API_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../min-api)
+include(${C74_MIN_API_DIR}/script/min-pretarget.cmake)
 
 #############################################################
 # MAX EXTERNAL
