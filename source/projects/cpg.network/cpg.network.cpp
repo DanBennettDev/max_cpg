@@ -104,7 +104,7 @@ private:
 	int _local_srate;
 	bool _send_noteTriggers{ true };
 
-	// holds raw output values for interpolation. Barebones ringbuffer approach.
+	// holds raw output values for interpolation. 
 	DelayLine<float> _outRingBuff[MAX_NODES];
 	int _ringIndex{ 0 };
 	float _freqs[MAX_NODES]{ 1 };
@@ -244,7 +244,7 @@ public:
 	//};
 
 
-	message<> bang{ this, "bang", "reset the node",
+	message<threadsafe::yes> bang{ this, "bang", "reset the node",
 		MIN_FUNCTION{
 		if (_initialized) {
 			_engine_ptr->reset();
@@ -263,7 +263,7 @@ public:
 	}
 	};
 
-	message<> params{ this, "params",
+	message<threadsafe::yes> params{ this, "params",
 		MIN_FUNCTION{
 		setParams(args, false);
 		calibrate.set();
@@ -272,7 +272,7 @@ public:
 	};
 
 
-	message<> weight{ this, "weight",
+	message<threadsafe::yes> weight{ this, "weight",
 		MIN_FUNCTION{
 		if (args.size() >= 3 && _engine_ptr->nodeExists((int)args[0]) && _engine_ptr->nodeExists((int)args[1])) {
 			_engine_ptr->setConnection((int)args[0], (int)args[1], (double)args[2]);
@@ -281,7 +281,7 @@ public:
 	}
 	};
 
-	message<> offset_conn{ this, "offset_conn",
+	message<threadsafe::yes> offset_conn{ this, "offset_conn",
 		MIN_FUNCTION{
 		if (args.size() >= 3 && _engine_ptr->nodeExists((int)args[0]) && _engine_ptr->nodeExists((int)args[1])) {
 			_engine_ptr->setConnectionPhaseOffset((int)args[0], (int)args[1], (double)args[2]);
@@ -290,7 +290,7 @@ public:
 	}
 	};
 
-	message<> offset_out{ this, "offset_out",
+	message<threadsafe::yes> offset_out{ this, "offset_out",
 		MIN_FUNCTION{
 		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 			_engine_ptr->setNodePhaseOffset((int)args[0],(double)args[1]);
@@ -299,7 +299,7 @@ public:
 	}
 	};
 
-	message<> noise{ this, "noise",
+	message<threadsafe::yes> noise{ this, "noise",
 		MIN_FUNCTION{
 		if (args.size() >= 3 && _engine_ptr->nodeExists((int)args[0])) {
 			_engine_ptr->setNodeSelfNoise((int)args[0], (double)args[1]);
@@ -309,7 +309,7 @@ public:
 	};
 
 
-	message<> quant_grid{ this, "quant_grid",
+	message<threadsafe::yes> quant_grid{ this, "quant_grid",
 		MIN_FUNCTION{
 		using gridType = QuantisedEventQueue::gridType;
 		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
@@ -334,7 +334,7 @@ public:
 	}
 	};
 
-	message<> quant_mult{ this, "quant_mult",
+	message<threadsafe::yes> quant_mult{ this, "quant_mult",
 		MIN_FUNCTION{
 			if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 				_engine_ptr->setNodeQuantiser_Multiple((int)args[0], (float)args[1]);
@@ -343,7 +343,7 @@ public:
 	}
 	};
 
-	message<> quant_offset{ this, "quant_offset",
+	message<threadsafe::yes> quant_offset{ this, "quant_offset",
 		MIN_FUNCTION{
 		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 
@@ -353,7 +353,7 @@ public:
 	}
 	};
 
-	message<> quant_amount{ this, "quant_amount",
+	message<threadsafe::yes> quant_amount{ this, "quant_amount",
 		MIN_FUNCTION{
 		if (args.size() >= 1) {
 			_engine_ptr->setQuantiseAmount((float)args[0]);
@@ -362,7 +362,7 @@ public:
 	}
 	};
 
-	message<> quant_amount_node{ this, "quant_amount_node",
+	message<threadsafe::yes> quant_amount_node{ this, "quant_amount_node",
 		MIN_FUNCTION{
 		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 			_engine_ptr->setQuantiseAmount((float)args[0], (float)args[1]);
@@ -372,7 +372,7 @@ public:
 	};
 
 
-	queue calibrate{ this,
+	queue<> calibrate{ this,
 		MIN_FUNCTION{
 		doCalibration();
 	return {};
