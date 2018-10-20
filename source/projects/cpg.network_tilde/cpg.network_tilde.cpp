@@ -132,8 +132,6 @@ private:
 
 	
 
-
-
 public:
 
 
@@ -261,8 +259,8 @@ public:
 		_engine_ptr->loadConnectionWeightCurve(curvX, curvY);
 		_engine_ptr->setUnityConnectionWeight(UNITY_CONN_WEIGHT);
 		_engine_ptr->setConnectionWeightScaling(true);
-		_engine_ptr->setFreqCompensation(P_COMPENSATION);
 		setParams(args, true);
+		_engine_ptr->setFreqCompensation(P_COMPENSATION);
 
 
 		// set frequencies and connect all nodes to all others, but with 0 signal weight
@@ -297,7 +295,7 @@ public:
 	//};
 
 
-	message<> bang{ this, "bang", "reset the node",
+	message<threadsafe::yes> bang{ this, "bang", "reset the node",
 		MIN_FUNCTION{
 		if (_initialized) {
 			_engine_ptr->reset();
@@ -316,7 +314,7 @@ public:
 	}
 	};
 
-	message<> params{ this, "params",
+	message<threadsafe::yes> params{ this, "params",
 		MIN_FUNCTION{
 		setParams(args, false);
 		calibrate.set();
@@ -325,7 +323,7 @@ public:
 	};
 
 
-	message<> weight{ this, "weight",
+	message<threadsafe::yes> weight{ this, "weight",
 		MIN_FUNCTION{
 		if (args.size() >= 3 && _engine_ptr->nodeExists((int)args[0]) && _engine_ptr->nodeExists((int)args[1])) {
 			_engine_ptr->setConnection((int)args[0], (int)args[1], (double)args[2]);
@@ -334,7 +332,7 @@ public:
 	}
 	};
 
-	message<> offset_conn{ this, "offset_conn",
+	message<threadsafe::yes> offset_conn{ this, "offset_conn",
 		MIN_FUNCTION{
 		if (args.size() >= 3 && _engine_ptr->nodeExists((int)args[0]) && _engine_ptr->nodeExists((int)args[1])) {
 			_engine_ptr->setConnectionPhaseOffset((int)args[0], (int)args[1], (double)args[2]);
@@ -343,7 +341,7 @@ public:
 	}
 	};
 
-	message<> offset_out{ this, "offset_out",
+	message<threadsafe::yes> offset_out{ this, "offset_out",
 		MIN_FUNCTION{
 		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 			_engine_ptr->setNodePhaseOffset((int)args[0],(double)args[1]);
@@ -352,7 +350,7 @@ public:
 	}
 	};
 
-	message<> noise{ this, "noise",
+	message<threadsafe::yes> noise{ this, "noise",
 		MIN_FUNCTION{
 		if (args.size() >= 3 && _engine_ptr->nodeExists((int)args[0])) {
 			_engine_ptr->setNodeSelfNoise((int)args[0], (double)args[1]);
@@ -362,7 +360,7 @@ public:
 	};
 
 
-	message<> quant_grid{ this, "quant_grid",
+	message<threadsafe::yes> quant_grid{ this, "quant_grid",
 		MIN_FUNCTION{
 		using gridType = QuantisedEventQueue::gridType;
 		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
@@ -387,7 +385,7 @@ public:
 	}
 	};
 
-	message<> quant_mult{ this, "quant_mult",
+	message<threadsafe::yes> quant_mult{ this, "quant_mult",
 		MIN_FUNCTION{
 			if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 				_engine_ptr->setNodeQuantiser_Multiple((int)args[0], (float)args[1]);
@@ -396,7 +394,7 @@ public:
 	}
 	};
 
-	message<> quant_offset{ this, "quant_offset",
+	message<threadsafe::yes> quant_offset{ this, "quant_offset",
 		MIN_FUNCTION{
 		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 
@@ -406,7 +404,7 @@ public:
 	}
 	};
 
-	message<> quant_amount{ this, "quant_amount",
+	message<threadsafe::yes> quant_amount{ this, "quant_amount",
 		MIN_FUNCTION{
 		if (args.size() >= 1) {
 			_engine_ptr->setQuantiseAmount((float)args[0]);
@@ -415,7 +413,7 @@ public:
 	}
 	};
 
-	message<> quant_amount_node{ this, "quant_amount_node",
+	message<threadsafe::yes> quant_amount_node{ this, "quant_amount_node",
 		MIN_FUNCTION{
 		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 			_engine_ptr->setQuantiseAmount((int)args[0], (float)args[1]);
@@ -701,6 +699,103 @@ public:
 	bool fEqual(float f1, float f2) {
 		return f2 > f1 - FLOAT_EPSILON && f2 < f1 + FLOAT_EPSILON;
 	}
+
+
+
+
+
+
+	void tester(int nodes, int samples) {
+
+		std::shared_ptr<MatsuokaEngine> _testPtr = std::shared_ptr<MatsuokaEngine>(
+			new  MatsuokaEngine(_local_srate, _send_noteTriggers, false, false));
+		_dummyNode = MatsuNode();
+
+
+		// set up nodes and ins/outs for them
+		for (int nodeID = 0; nodeID < nodes; ++nodeID) {
+			_testPtr->setNodeQuantiser_Grid(nodeID, MatsuokaEngine::gridType::unQuantised);
+			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) freq input " + std::to_string(nodeID)));
+			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) signal output " + std::to_string(nodeID), "signal"));
+			_trigs[nodeID].setLength((int)(TRIGGER_WIDTH * _local_srate));
+
+			if (nodeID != 0) {
+				_testPtr->addChild(0, nodeID);
+			}
+		}
+
+
+		vector<float> curvX = { DEFAULT_CURVE_X };
+		vector<float> curvY = { DEFAULT_CURVE_Y };
+
+		_testPtr->loadConnectionWeightCurve(curvX, curvY);
+		_testPtr->setUnityConnectionWeight(UNITY_CONN_WEIGHT);
+		_testPtr->setConnectionWeightScaling(true);
+
+		// set frequencies and connect all nodes to all others, with 0.1 signal weight
+		for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) {
+			//set all frequencies to 1
+			_testPtr->setNodeFrequency(nodeID, 1.0, false);
+			for (int connectToID = 0; connectToID < _nodeCount; ++connectToID) {
+				if (nodeID != connectToID) {
+					_testPtr->setConnection(nodeID, connectToID, 0.1);
+				}
+			}
+		}
+
+		_testPtr->doQueuedActions();
+		calibrate.set();
+
+		_initialized = true;
+
+		int syncInputNo = _nodeCount * (_externalInputs ? 2 : 1);
+
+		// For each frame in the vector calc each channel
+		for (auto frame = 0; frame< samples; ++frame) {
+
+			if (_syncInput == externalSync::driving) {
+				_testPtr->setDrivingInput(0.001f);
+			}
+			else if (_syncInput == externalSync::reseting) {
+				float drivingInput = 0.001f;
+				if (drivingInput < _prevDrivingInput) {
+					_testPtr->zeroSync(0);
+				}
+				_prevDrivingInput = 0.002f;
+			}
+
+			if (_externalInputs) {
+				for (int channel = 0; channel < _nodeCount; ++channel) {
+					_testPtr->setNodeExternalInput(channel, 1, 0.001f);
+				}
+			}
+
+
+			_testPtr->step();
+
+
+			// signals
+			for (int channel = 0; channel < _nodeCount; ++channel) {
+				// send to max output
+
+				_outRingBuff[channel].pushSample((float)_testPtr->getNodeOutput(channel, 0, _send_noteTriggers));
+				_outRingBuff[channel].getDelayed(0);
+			}
+			if (_send_noteTriggers) {
+				auto noteEvents = _testPtr->getEvents();
+				//for each (auto note in noteEvents) { // AppleClang doesn't like for each here. Can't understand why, switched to trad index loop
+				for (auto i = 0; i< noteEvents.size(); i++) {
+					_trigs[noteEvents[i].nodeID].setTrigger();
+				}
+				for (int channel = 0; channel < _nodeCount; channel++) {
+					_trigs[channel].tick();
+				}
+			}
+		}
+
+	}
+
+
 
 };
 
