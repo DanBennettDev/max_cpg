@@ -606,6 +606,79 @@ public:
 		return f2 > f1 - FLOAT_EPSILON && f2 < f1 + FLOAT_EPSILON;
 	}
 
+
+	void tester(int nodes, int samples) {
+
+		std::shared_ptr<MatsuokaEngine> _testPtr = std::shared_ptr<MatsuokaEngine>(
+			new  MatsuokaEngine(_local_srate, _send_noteTriggers, false, false));
+		_dummyNode = MatsuNode();
+
+
+		// set up nodes and ins/outs for them
+		for (int nodeID = 0; nodeID < nodes; ++nodeID) {
+			_testPtr->setNodeQuantiser_Grid(nodeID, MatsuokaEngine::gridType::unQuantised);
+			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) freq input " + std::to_string(nodeID)));
+			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) signal output " + std::to_string(nodeID), "signal"));
+			_trigs[nodeID].setLength((int)(TRIGGER_WIDTH * _local_srate));
+
+			if (nodeID != 0) {
+				_testPtr->addChild(0, nodeID);
+			}
+		}
+
+
+		vector<float> curvX = { DEFAULT_CURVE_X };
+		vector<float> curvY = { DEFAULT_CURVE_Y };
+
+		_testPtr->loadConnectionWeightCurve(curvX, curvY);
+		_testPtr->setUnityConnectionWeight(UNITY_CONN_WEIGHT);
+		_testPtr->setConnectionWeightScaling(true);
+
+		// set frequencies and connect all nodes to all others, with 0.1 signal weight
+		for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) {
+			//set all frequencies to 1
+			_testPtr->setNodeFrequency(nodeID, 1.0, false);
+			for (int connectToID = 0; connectToID < _nodeCount; ++connectToID) {
+				if (nodeID != connectToID) {
+					_testPtr->setConnection(nodeID, connectToID, 0.1);
+				}
+			}
+		}
+
+		_testPtr->doQueuedActions();
+		calibrate.set();
+
+		_initialized = true;
+
+		// For each frame in the vector calc each channel
+		for (auto frame = 0; frame< samples; ++frame) {
+
+
+
+			_testPtr->step();
+
+
+			// signals
+			for (int channel = 0; channel < _nodeCount; ++channel) {
+				// send to max output
+
+				_outRingBuff[channel].pushSample((float)_testPtr->getNodeOutput(channel, 0, _send_noteTriggers));
+				_outRingBuff[channel].getDelayed(0);
+			}
+			if (_send_noteTriggers) {
+				auto noteEvents = _testPtr->getEvents();
+				//for each (auto note in noteEvents) { // AppleClang doesn't like for each here. Can't understand why, switched to trad index loop
+				for (auto i = 0; i< noteEvents.size(); i++) {
+					_trigs[noteEvents[i].nodeID].setTrigger();
+				}
+				for (int channel = 0; channel < _nodeCount; channel++) {
+					_trigs[channel].tick();
+				}
+			}
+		}
+
+	}
+
 };
 
 MIN_EXTERNAL(cpg_net);
