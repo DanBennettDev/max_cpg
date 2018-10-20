@@ -607,18 +607,21 @@ public:
 
 	}
 
+
 	void setFreq(int node, float freq) {
-		freq = freq < MIN_NODE_FREQ ? MIN_NODE_FREQ : freq;
-		_freqs[node] = freq;
-		if (node == 0 && !fEqual(freq,_freqs[0]) ){
+		if (node == 0 && !fEqual(freq, _freqs[0])) {
+			_freqs[0] = freq;
+			_freqs[0] = _freqs[0] < MIN_NODE_FREQ ? MIN_NODE_FREQ : _freqs[0];
 			_engine_ptr->setNodeFrequency(node, _freqs[0], true);
 		}
-		else if(!fEqual(freq, _freqs[node])) {
+		else if (!fEqual(freq, _freqs[node])) {
+			_freqs[node] = freq;
 			float thisF = _freqs[node] * _freqs[0];
 			thisF = thisF < MIN_NODE_FREQ ? MIN_NODE_FREQ : thisF;
 			_engine_ptr->setNodeFrequency(node, thisF, false);
 		}
 	}
+
 
 	bool fEqual(float f1, float f2) {
 		return f2 > f1 - FLOAT_EPSILON && f2 < f1 + FLOAT_EPSILON;
