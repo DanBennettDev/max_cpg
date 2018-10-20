@@ -84,6 +84,7 @@ extern "C" {
 		double x2;
 		double v1;
 		double v2;
+		double out;
 	}   matsuoka_internals;
 
 

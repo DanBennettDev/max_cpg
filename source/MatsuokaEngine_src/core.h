@@ -70,7 +70,12 @@
 // file that defines the weight scaling curve
 #define SCALING_CURVE_SOURCE  CONFIG_ADDRESS "/scalingCurve.txt"
 
+// no of samples in the wavetable when oscillator is driven by phasor
+#define WAVETABLE_LENGTH 1024
 
+/// min stable freq currently seems to be c 0.2
+/// This is ok for present uses, but in future it might be worth investigating
+#define MIN_NODE_FREQ 0.2
 
 // DEBUGGING
 

@@ -48,11 +48,18 @@ void MatsuNode::doCalcStep(bool basicsOnly, bool withInput)
 	prevState = matsuParams.state;
 #endif
 	double input = withInput ? getInput() : 0;
-	matsuParams.out.pushSample(matsuoka_calc_nextVal_RK(input,
+	double calculatedValue = matsuoka_calc_nextVal_RK(input,
 		matsuParams.t1, matsuParams.t2,
 		matsuParams.c1, matsuParams.c2,
 		matsuParams.b, matsuParams.g,
-		&matsuParams.state));
+		&matsuParams.state);
+
+	if (!_driven) {
+		matsuParams.out.pushSample(calculatedValue);
+	}
+	else {
+		matsuParams.out.pushSample(_drivenValue);
+	}
 
 	if (!basicsOnly) {
 		updateSignalState();
@@ -85,10 +92,13 @@ double MatsuNode::getInput() const
 	return sum;
 }
 
-
-double MatsuNode::getOutput() const
+double MatsuNode::getOutput(bool forceStateVal) const
 {
-	return matsuParams.out.getDelayed(_nodeOutputDelay);
+	if (!forceStateVal) {
+		return matsuParams.out.getDelayed(_nodeOutputDelay);
+	}
+	return matsuParams.state.out;
+	
 }
 
 
@@ -197,8 +207,8 @@ bool MatsuNode::hasChanged_Inputs() const { return _haveInputsChanged; }
 // compensation must be recalculated if b,g change
 void MatsuNode::setFrequency(double freq, unsigned sampleRate)
 {
-	if (freq < 0.00001) {
-		freq = 0.00001;
+	if (freq < MIN_NODE_FREQ) {
+		freq = MIN_NODE_FREQ;
 	};
 
 	double mult = matsuParams.t2 / matsuParams.t1;
@@ -216,6 +226,16 @@ void MatsuNode::setFrequency(double freq, unsigned sampleRate)
 		}
 	}
 }
+
+void MatsuNode::setDrivenMode(bool driven)
+{
+	_driven = driven;
+}
+void MatsuNode::driveOutput(float val)
+{
+	_drivenValue = val;
+}
+
 
 double MatsuNode::getFrequency(unsigned sampleRate) const
 {

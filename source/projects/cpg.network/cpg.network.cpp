@@ -40,11 +40,10 @@
 #include "matsuNode.h"
 
 
-#define ARGS_BEFORE_PARAMS 3
+#define ARGS_BEFORE_PARAMS 4
 #define CALIBRATION_CYCLES 20
 #define TRIGGER_WIDTH 0.02
 
-#define FREQ_MIN 0.001f
 #define MAX_NODES 16
 #define INTERP_SAMPLES 4
 #define UNITY_CONN_WEIGHT 3
@@ -56,7 +55,7 @@
 #define DEFAULT_CURVE_X 0.25f, 0.333f, 0.5f, 1.111f, 1.333f, 2.f, 3.f, 4.f, 6.f, 8.f
 #define DEFAULT_CURVE_Y 1.955492228f, 1.098290155f, 0.107150259f, 0.133937824f, 0.321450777f, 0.517f, 0.641026425f, 0.937029016f, 1.194725389f, 1.259015544f
 #define FLOAT_EPSILON 0.00001f
-
+#define SYNC_CHANNEL_OFFSET 1
 
 using namespace c74::min;
 
@@ -66,7 +65,7 @@ private:
 	class _ramp {
 	public:
 		_ramp() {
-			setLength(TRIGGER_WIDTH * 44100);
+			setLength((int)(TRIGGER_WIDTH * 44100));
 		}
 
 		float tick() {
@@ -103,6 +102,9 @@ private:
 	double _freqComp{ P_COMPENSATION };
 	int _local_srate;
 	bool _send_noteTriggers{ true };
+	bool _use_syncInput{ false };
+	int _syncInputChannel{ -1 };
+
 
 	// holds raw output values for interpolation. 
 	DelayLine<float> _outRingBuff[MAX_NODES];
@@ -127,8 +129,8 @@ private:
 public:
 
 
-	MIN_DESCRIPTION{ "A basic, no frills Matsuoka Oscillator node" };
-	MIN_TAGS{ "audio, oscillator" };
+	MIN_DESCRIPTION{ "A network of neural oscillators designed for sequencing / control signal use" };
+	MIN_TAGS{ "audio, oscillator, LFO, control, sequencing" };
 	MIN_AUTHOR{ "Cycling '74" };
 	MIN_RELATED{ "phasor~" };
 
@@ -138,7 +140,7 @@ public:
 	argument<int> node_count_arg{ this, "node_count", "The number of nodes in the network." };
 	argument<int> sample_rate_arg{ this, "sample_rate", "The sample rate of network calculations." };
 	argument<int> trigger_outputs_arg{ this, "trigger_outputs", "1(default) object has signal and note trigger outputs, 0: object has only signal outputs" };
-
+	argument<int> sync_inputs_arg{ this, "sync_inputs", "0 (default) object has sync input, 0: object has no sync input" };
 	argument<int> tRatio_arg{ this, "tRatio_param", "The ratio of equation params t2:t1." };
 	argument<int> c_arg{ this, "c_param", "The equation parameter c." };
 	argument<int> b_arg{ this, "b_param", "The equation parameter b." };
@@ -183,6 +185,9 @@ public:
 		}
 
 
+		if (args.size() > 3) {
+			_use_syncInput = args[3] == 1 ? true : false;
+		}
 
 		_engine_ptr = std::shared_ptr<MatsuokaEngine>(
 			new  MatsuokaEngine(_local_srate, _send_noteTriggers, false, false));
@@ -193,7 +198,7 @@ public:
 			_engine_ptr->setNodeQuantiser_Grid(nodeID, MatsuokaEngine::gridType::unQuantised);
 			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) freq input " + nodeID));
 			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) signal output " + nodeID, "signal"));
-			_trigs[nodeID].setLength(TRIGGER_WIDTH * _local_srate);
+			_trigs[nodeID].setLength((int)(TRIGGER_WIDTH * _local_srate));
 
 			if (nodeID != 0) {
 				_engine_ptr->addChild(0, nodeID);
@@ -208,6 +213,11 @@ public:
 
 		vector<float> curvX = { DEFAULT_CURVE_X };
 		vector<float> curvY = { DEFAULT_CURVE_Y };
+
+
+		if (_use_syncInput) {
+			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) sync input "));
+		}
 
 		_engine_ptr->loadConnectionWeightCurve(curvX, curvY);
 		_engine_ptr->setUnityConnectionWeight(UNITY_CONN_WEIGHT);
@@ -229,6 +239,10 @@ public:
 
 		_engine_ptr->doQueuedActions();
 		calibrate.set();
+		if (_use_syncInput) {
+			_engine_ptr->setDriven(true);
+			_engine_ptr->setDrivingInput(0);
+		}
 
 		cout << "initialised network" << endl;
 
@@ -365,8 +379,9 @@ public:
 	message<threadsafe::yes> quant_amount_node{ this, "quant_amount_node",
 		MIN_FUNCTION{
 		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
-			_engine_ptr->setQuantiseAmount((float)args[0], (float)args[1]);
+			_engine_ptr->setQuantiseAmount((int)args[0], (float)args[1]);
 		}
+
 	return {};
 	}
 	};
@@ -397,6 +412,9 @@ public:
 	{
 		// For each frame in the vector calc each channel
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
+			if (_use_syncInput) {
+				_engine_ptr->setDrivingInput((float)input.samples(_nodeCount)[frame]);
+			}
 			_engine_ptr->step();
 			// signals
 			for (int channel = 0; channel < _nodeCount; ++channel) {
@@ -424,7 +442,9 @@ public:
 	{
 		// For each frame in the vector calc each channel
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
-
+			if (_use_syncInput) {
+				_engine_ptr->setDrivingInput((float)input.samples(_nodeCount)[frame]);
+			}
 			// if _phase wraps, calc sample from network
 			_phase += _phaseStep;
 			if (_phase > 1.0) {
@@ -587,17 +607,15 @@ public:
 
 	}
 
-
 	void setFreq(int node, float freq) {
+		freq = freq < MIN_NODE_FREQ ? MIN_NODE_FREQ : freq;
+		_freqs[node] = freq;
 		if (node == 0 && !fEqual(freq,_freqs[0]) ){
-			_freqs[0] = freq;
-			_freqs[0] = _freqs[0] < FREQ_MIN ? FREQ_MIN : _freqs[0];
 			_engine_ptr->setNodeFrequency(node, _freqs[0], true);
 		}
 		else if(!fEqual(freq, _freqs[node])) {
-			_freqs[node] = freq;
 			float thisF = _freqs[node] * _freqs[0];
-			thisF = thisF < FREQ_MIN ? FREQ_MIN : thisF;
+			thisF = thisF < MIN_NODE_FREQ ? MIN_NODE_FREQ : thisF;
 			_engine_ptr->setNodeFrequency(node, thisF, false);
 		}
 	}

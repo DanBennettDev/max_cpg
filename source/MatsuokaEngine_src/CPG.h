@@ -181,7 +181,12 @@ public:
     // protected - may be useful to limit which nodes can take external input 
     void setExternalInput(unsigned nodeID, double input, double weight = 1.0);
 
-
+	// Are we driving the root node from an external input? 
+	void setDriven(bool driven);
+	// if we are driving from an external input, set that value 
+	void setDrivingInput(double input);
+	// create the lookup wavetable in case we driving via an external phasor
+	void createDrivingWavetable();
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,6 +202,9 @@ private:
     std::vector<unsigned> _activeNodes;
     unsigned _sampleRate;
     ScalingCurve scaler;
+	float _drivingInput;
+	std::vector<float> _wavetable;
+	bool _driven{ false };
 
     /// Removes the specified node from the CPG.
     /*! All inputs from the removed node to other nodes in the network
@@ -252,6 +260,8 @@ private:
     void setNodeDelayLine(unsigned nodeID, double freq);
 
     void updateConnectionBasedOnFreq(unsigned nodeID, float oldFreq);
+
+	float wavetableLookup(float i);
 
 };
 
