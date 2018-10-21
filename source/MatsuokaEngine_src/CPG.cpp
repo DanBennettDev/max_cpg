@@ -85,6 +85,11 @@ void CPG::reset(double x1, double x2, double v1, double v2)
     }
 }
 
+
+void CPG::zeroSync(unsigned nodeID) {
+	_nodes[nodeID].reset(_zeroState.x1, _zeroState.x2, _zeroState.v1, _zeroState.v2);;
+}
+
 /// Adds, or changes weight of, a one-way connection between two nodes
 /*! If the connection specified exists, then its weight is set to that specified.
 *  Otherwise a new input is added to the node whose ID is specified by nodeTo,
@@ -517,7 +522,8 @@ void CPG::setDriven(bool driven) {
 	_driven = driven;
 	_nodes[0].setDrivenMode(driven);
 }
-void CPG::createDrivingWavetable()
+
+void CPG::createExternalSyncResources()
 {
 	_wavetable.clear();
 	// move to positive zero crossing
@@ -527,6 +533,13 @@ void CPG::createDrivingWavetable()
 	while (_nodes[0].getOutput() < 0) {
 		_nodes[0].doCalcStep(true, false);
 	}
+
+	// record state prior to zero crossing
+	_zeroState.x1 = _nodes[0].getInternal(MatsuNode::matsuInternal::X1);
+	_zeroState.x2 = _nodes[0].getInternal(MatsuNode::matsuInternal::X2);
+	_zeroState.v1 = _nodes[0].getInternal(MatsuNode::matsuInternal::V1);
+	_zeroState.v2 = _nodes[0].getInternal(MatsuNode::matsuInternal::V2);
+
 	// record wavetable
 	for (int i = 0; i < _sampleRate; i++) {
 		_wavetable.push_back((float)_nodes[0].getOutput(true));
@@ -572,6 +585,11 @@ void CPG::create(double t1, double t2, double c1, double c2, double b, double g)
     }
     _activeNodes.clear();
     _activeNodes.push_back(0);
+	_zeroState.x1 = X1_INIT;
+	_zeroState.x2 = X2_INIT;
+	_zeroState.v1 = V1_INIT;
+	_zeroState.v2 = V2_INIT;
+
 }
 
 

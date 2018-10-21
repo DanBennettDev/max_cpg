@@ -41,9 +41,14 @@
 			<description>1(default) object has signal and note trigger outputs, 0: object has only signal outputs </description>
 		</objarg>
 
-		<objarg name='sync_inputs' optional='1' type='int'>
-			<digest>0 (default) object has sync input, 0: object has no sync input </digest>
-			<description>0 (default) object has sync input, 0: object has no sync input </description>
+		<objarg name='external_signal_inputs' optional='1' type='int'>
+			<digest>0 (default) object has external signal inputs, 0: object has none </digest>
+			<description>0 (default) object has external signal inputs, 0: object has none </description>
+		</objarg>
+
+		<objarg name='sync_input' optional='1' type='int'>
+			<digest>0 (default) object has sync input, 0: object has none </digest>
+			<description>0 (default) object has sync input, 0: object has none </description>
 		</objarg>
 
 		<objarg name='tRatio_param' optional='1' type='int'>
