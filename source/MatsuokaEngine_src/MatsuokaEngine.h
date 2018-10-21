@@ -55,6 +55,10 @@ public:
     /// calculate indicated node, 
     void step(unsigned nodeID);
 
+	/// no syncing, no quantiser, no freq Compensation Calcs etc.,
+	void stepBareBones();
+
+
     /// list active nodes in the network 
     std::vector<unsigned> getNodeList() const;
     

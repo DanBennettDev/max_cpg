@@ -437,7 +437,7 @@ public:
 
 	void calcVector_nonInterp(audio_bundle input, audio_bundle output)
 	{
-		int syncInputNo = _nodeCount * _externalInputs ? 2 : 1;
+		int syncInputNo = _nodeCount * (_externalInputs ? 2 : 1);
 		// For each frame in the vector calc each channel
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
 			if (_syncInput == externalSync::driving) {
@@ -482,7 +482,7 @@ public:
 
 	void calcVector_interp(audio_bundle input, audio_bundle output)
 	{
-		int syncInputNo = _nodeCount * _externalInputs ? 2 : 1;
+		int syncInputNo = _nodeCount * (_externalInputs ? 2 : 1);
 		// For each frame in the vector calc each channel
 		for (auto frame = 0; frame<input.frame_count(); ++frame) {
 			if (_syncInput == externalSync::driving) {

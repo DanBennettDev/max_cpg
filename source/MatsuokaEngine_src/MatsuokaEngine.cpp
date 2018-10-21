@@ -163,7 +163,6 @@ void MatsuokaEngine::step()
     }
 }
 
-
 void MatsuokaEngine::step(unsigned nodeID)
 {
     if (!_shutdown && !_paused) {
@@ -180,6 +179,18 @@ void MatsuokaEngine::step(unsigned nodeID)
         updateFreqCompensationState();
         _idle = true;
     }
+}
+
+
+void MatsuokaEngine::stepBareBones()
+{
+	if (!_shutdown && !_paused) {
+		_idle = false;
+		// calculate next cpg step
+		_cpg.step();
+		_stepCounter++;
+		_idle = true;
+	}
 }
 
 
@@ -665,7 +676,6 @@ void MatsuokaEngine::setDriven(externalSync driven)
 	if (driven == externalSync::driving) {
 		_cpg.setDriven(driven);
 	}
-	_cpg.setDriven(driven);
 }
 void MatsuokaEngine::setDrivingInput(float val)
 {
