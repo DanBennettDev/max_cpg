@@ -6,29 +6,33 @@
 
 /*
 
-	TODO:
-		- OSC front end
-		- Handle DSP stop/start
+TODO:
+IMMEDIATE:
+- Build help patch
+- Rebuild & test neurythmic patch
+- Compile for mac
+- Release repo & externals to Thomas
+- Frontend compile for mac
+- Release neurythmic & externals
+- Document engine & release
 
+LONGER TERM:
+- M4L patch
+- Audio version - stripped back
+- Handle signal diminishment
+- Invertable connections
+- Waveshaping between connections (raise to power, and threshold)
+- Smoothing control changes
+- convert to max8 multichannel
 
-	LONGER TERM:
-		Invertable connections
-		Smoothing control changes
-		Sync to max internal timings
-		External input(s)
-		Waveshaping between connections (raise to power and threshold)
-
-		Per node quantiser amount setting
-		Tool for converting network params back into a a network graph for tweaking (ML?)
-
-		PERFORMANCE:
-			switchable triggering
-			Curve lookup every sample? (for freq check)
-			Look for other bottlenecks
-			setting root freq is SLOOW
-			why is higher freq more demanding on CPU?
-
-			audio version: no need to sync children
+PERFORMANCE:
+1) Turn off quantiser when trigger outputs are off.
+2) Hadn't expected to use the engine for audio-rate use, so didn't think in terms of vectors
+		write an in-engine "step" function that will take a vector of inputs and spit out a vector
+3) stop doing Curve lookup every sample? (for freq check)
+4) setting root freq is SLOOW - investigate and find a better option
+5) why is higher freq more demanding on CPU?
+6) make stripped down audio version: drop sync, quantiser, remove options (& therefore branches)
 
 
 */

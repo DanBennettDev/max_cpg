@@ -51,6 +51,8 @@ public:
 	MIN_AUTHOR{ "Cycling '74" };
 	MIN_RELATED{ "phasor~" };
 
+	argument<int> sample_rate_arg{ this, "sample_rate", "The sample rate of node calculations" };
+
 	node_freq(const atoms& args = {})
 	{
 		m_initialized = false;
@@ -104,8 +106,8 @@ public:
 		// object-specific tear-down code here
 	}
 
-	inlet<>			in{ this, "(signal) input" };
 	inlet<>			freq{ this, "(signal) node frequency" };
+	inlet<>			in{ this, "(signal) input" };
 
 	outlet<>		out{ this, "(signal) ramp wave", "signal" };
 
@@ -147,7 +149,7 @@ public:
 	//};
 
 
-	sample operator()(sample in, sample freq)
+	sample operator()(sample freq, sample in)
 	{
 		freq = freq < FREQ_MIN ? freq = FREQ_MIN : freq;
 		_freq = freq;
@@ -205,7 +207,7 @@ public:
 	//	node.setFrequency(_freq, local_srate);
 	//}
 
-	queue calibrate{ this,
+	queue<> calibrate{ this,
 		MIN_FUNCTION{
 			doCalibration();
 			return {};
