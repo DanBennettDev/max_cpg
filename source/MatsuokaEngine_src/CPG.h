@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include "MatsuNode.h"
+#include "matsuNode.h"
 #include "ScalingCurve.h"
 
 class CPG

@@ -28,8 +28,6 @@ private:
 	double freqComp{ DEFAULTFREQCOMPENSAITON };
 	int local_srate;
 
-	int testCounter{ 0 };
-
 	number phase{ 0 };
 	number phaseStep;
 	number _freq{ 50 };

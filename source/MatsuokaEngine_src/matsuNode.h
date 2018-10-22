@@ -7,7 +7,7 @@
 #include <vector>
 #include "matsu_signal_calcs.h"
 #include "core.h"
-#include "delayline.h"
+#include "delayLine.h"
 #include "XORRand.h"
 
 #define MIN_MATSUOKA_FREQ 0.001
@@ -389,7 +389,7 @@ private:
 	static bool validateC(double c);
 	static bool validateB(double b);
 	static bool validateG(double g);
-	void MatsuNode::updateSignalState();
+	void updateSignalState();
 
 };
 

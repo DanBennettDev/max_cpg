@@ -40,7 +40,7 @@ PERFORMANCE:
 
 
 #include "c74_min.h"
-#include "matsuokaEngine.h"
+#include "MatsuokaEngine.h"
 #include "matsuNode.h"
 
 
@@ -114,12 +114,10 @@ private:
 	bool _send_noteTriggers{ true };
 	bool _externalInputs{ false };
 	externalSync _syncInput{ externalSync::none };
-	int _syncInputChannel{ -1 };
 	float _prevDrivingInput{ 0 };
 
 	// holds raw output values for interpolation. 
 	DelayLine<float> _outRingBuff[MAX_NODES];
-	int _ringIndex{ 0 };
 	float _freqs[MAX_NODES]{ 1 };
 	number _phase{ 0 };
 	number _phaseStep{ 0 };
@@ -172,6 +170,12 @@ public:
 		// gather info for basic object init
 		if (args.size() > 0) {
 			_nodeCount = args[0];
+			if (_nodeCount > MAX_NODES) {
+				_nodeCount = MAX_NODES;
+			}
+			if (_nodeCount < 1) {
+				_nodeCount = 1;
+			}
 		}
 
 		if (args.size() > 1) {
@@ -223,8 +227,8 @@ public:
 		// set up nodes and ins/outs for them
 		for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) {
 			_engine_ptr->setNodeQuantiser_Grid(nodeID, MatsuokaEngine::gridType::unQuantised);
-			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) freq input " + nodeID));
-			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) signal output " + nodeID, "signal"));
+			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) freq input " + std::to_string(nodeID)));
+			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) signal output " + std::to_string(nodeID), "signal"));
 			_trigs[nodeID].setLength((int)(TRIGGER_WIDTH * _local_srate));
 
 			if (nodeID != 0) {
@@ -234,11 +238,11 @@ public:
 
 		if (_send_noteTriggers) {
 			for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) 
-				_outs.push_back(std::make_unique<outlet<>>(this, "(signal) trigger output " + nodeID, "signal"));
+				_outs.push_back(std::make_unique<outlet<>>(this, "(signal) trigger output " + std::to_string(nodeID), "signal"));
 		}
 		if (_externalInputs) {
 			for (int nodeID = 0; nodeID < _nodeCount; ++nodeID)
-				_ins.push_back(std::make_unique<inlet<>>(this, "(signal) signal input " + nodeID, "signal"));
+				_ins.push_back(std::make_unique<inlet<>>(this, "(signal) signal input " + std::to_string(nodeID), "signal"));
 		}
 
 
@@ -473,8 +477,9 @@ public:
 			}
 			if (_send_noteTriggers) {
 				auto noteEvents = _engine_ptr->getEvents();
-				for each (auto note in noteEvents) {
-					_trigs[note.nodeID].setTrigger();
+				//for each (auto note in noteEvents) {
+				for (auto i = 0; i< noteEvents.size(); i++) {
+					_trigs[noteEvents[i].nodeID].setTrigger();
 				}
 				for (int channel = 0; channel < _nodeCount; channel++) {
 					output.samples(channel + _nodeCount)[frame] = _trigs[channel].tick();
@@ -512,8 +517,9 @@ public:
 
 				if (_send_noteTriggers) {
 					auto noteEvents = _engine_ptr->getEvents();
-					for each (auto note in noteEvents) {
-						_trigs[note.nodeID].setTrigger();
+					//for each (auto note in noteEvents) {
+					for (auto i = 0; i< noteEvents.size(); i++) {
+						_trigs[noteEvents[i].nodeID].setTrigger();
 					}
 					for (int channel = 0; channel < _nodeCount; channel++) {
 						_trigs[channel].tick();
