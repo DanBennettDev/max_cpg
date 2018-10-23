@@ -703,7 +703,9 @@ public:
 
 		// set up nodes and ins/outs for them
 		for (int nodeID = 0; nodeID < nodes; ++nodeID) {
-			_testPtr->setNodeQuantiser_Grid(nodeID, MatsuokaEngine::gridType::unQuantised);
+			_testPtr->setNodeQuantiser_Grid(nodeID, MatsuokaEngine::gridType::_32nd);
+			_testPtr->setNodeQuantiser_Multiple(nodeID, 2.0);
+			_testPtr->setQuantiseAmount(0.4);
 			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) freq input " + std::to_string(nodeID)));
 			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) signal output " + std::to_string(nodeID), "signal"));
 			_trigs[nodeID].setLength((int)(TRIGGER_WIDTH * _local_srate));
