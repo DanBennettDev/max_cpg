@@ -4,3 +4,6 @@
 [submodule "source/min-lib"]
 	path = source/min-lib
 	url = https://github.com/Cycling74/min-lib.git
+[submodule "source/MatsuokaEngine_src"]
+	path = source/MatsuokaEngine_src
+	url = git@github.com:DanBennettDev/CPGLib.git
