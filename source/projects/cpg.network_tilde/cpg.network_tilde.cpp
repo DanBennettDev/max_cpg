@@ -726,7 +726,7 @@ public:
 		// set frequencies and connect all nodes to all others, with 0.1 signal weight
 		for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) {
 			//set all frequencies to 1
-			_testPtr->setNodeFrequency(nodeID, 1.0, false);
+			_testPtr->setNodeFrequency(nodeID, 1.0f + (float)nodeID / 0.5f, false);
 			for (int connectToID = 0; connectToID < _nodeCount; ++connectToID) {
 				if (nodeID != connectToID) {
 					_testPtr->setConnection(nodeID, connectToID, 0.1);
