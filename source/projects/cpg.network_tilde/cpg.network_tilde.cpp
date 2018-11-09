@@ -704,11 +704,6 @@ public:
 		// set up nodes and ins/outs for them
 		for (int nodeID = 0; nodeID < nodes; ++nodeID) {
 			_testPtr->setNodeQuantiser_Grid(nodeID, MatsuokaEngine::gridType::unQuantised);
-			//_testPtr->setNodeQuantiser_Multiple(nodeID, 2.0);
-			//_testPtr->setQuantiseAmount(0.4);
-			_ins.push_back(std::make_unique<inlet<>>(this, "(signal) freq input " + std::to_string(nodeID)));
-			_outs.push_back(std::make_unique<outlet<>>(this, "(signal) signal output " + std::to_string(nodeID), "signal"));
-			_trigs[nodeID].setLength((int)(TRIGGER_WIDTH * _local_srate));
 
 			if (nodeID != 0) {
 				_testPtr->addChild(0, nodeID);
@@ -722,21 +717,25 @@ public:
 		_testPtr->loadConnectionWeightCurve(curvX, curvY);
 		_testPtr->setUnityConnectionWeight(UNITY_CONN_WEIGHT);
 		_testPtr->setConnectionWeightScaling(true);
+		_testPtr->setFreqCompensation(P_COMPENSATION);
 
-		// set frequencies and connect all nodes to all others, with 0.1 signal weight
+		// set frequencies and connect all nodes to all others, but with 0 signal weight
 		for (int nodeID = 0; nodeID < _nodeCount; ++nodeID) {
 			//set all frequencies to 1
-			_testPtr->setNodeFrequency(nodeID, 1.0f + (float)nodeID / 0.5f, false);
+			_testPtr->setNodeFrequency(nodeID, 1.0, false);
 			for (int connectToID = 0; connectToID < _nodeCount; ++connectToID) {
 				if (nodeID != connectToID) {
-					_testPtr->setConnection(nodeID, connectToID, 0.1);
+					_testPtr->setConnection(nodeID, connectToID, 0.0);
 				}
 			}
 		}
 
 		_testPtr->doQueuedActions();
 		calibrate.set();
-
+		if (_syncInput != externalSync::none) {
+			_testPtr->setDriven(_syncInput);
+			_testPtr->setDrivingInput(0);
+		}
 		_initialized = true;
 
 		// For each frame in the vector calc each channel
