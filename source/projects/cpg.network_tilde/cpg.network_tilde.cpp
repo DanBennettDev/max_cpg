@@ -11,7 +11,6 @@ IMMEDIATE:
 - Build help patch
 - Rebuild & test neurythmic patch
 - Compile for mac
-- Release repo & externals to Thomas
 - Frontend compile for mac
 - Release neurythmic & externals
 - Document engine & release
@@ -21,7 +20,7 @@ LONGER TERM:
 - Audio version - stripped back
 - Handle signal diminishment
 - Invertable connections
-- Waveshaping between connections (raise to power, and threshold)
+- Waveshaping between connections (sigmoid?)
 - Smoothing control changes
 - convert to max8 multichannel
 
