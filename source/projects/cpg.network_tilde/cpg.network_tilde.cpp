@@ -292,7 +292,7 @@ public:
 	//};
 
 
-	message<threadsafe::yes> bang{ this, "bang", "reset the node",
+	message<threadsafe::yes> bang{ this, "bang", "reset the network",
 		MIN_FUNCTION{
 		if (_initialized) {
 			_engine_ptr->reset();
@@ -539,23 +539,12 @@ public:
 				}
 				_outRingBuff[channel].pushSample((float)_engine_ptr->getNodeOutput(channel, 0, _send_noteTriggers));
 
-				if (_local_srate > 11024) {
-					output.samples(channel)[frame] =
-						_interp_herm(	_outRingBuff[channel].getDelayed(3),
-										_outRingBuff[channel].getDelayed(2),
-										_outRingBuff[channel].getDelayed(1),
-										_outRingBuff[channel].getDelayed(0),
-										_phase);
-				}
-				else {
-					output.samples(channel)[frame] =
-						_interp_lin(_outRingBuff[channel].getDelayed(3),
-							_outRingBuff[channel].getDelayed(2),
-							_outRingBuff[channel].getDelayed(1),
-							_outRingBuff[channel].getDelayed(0),
-							_phase);
-				}
-
+				output.samples(channel)[frame] =
+					_interp_herm(	_outRingBuff[channel].getDelayed(3),
+									_outRingBuff[channel].getDelayed(2),
+									_outRingBuff[channel].getDelayed(1),
+									_outRingBuff[channel].getDelayed(0),
+									_phase);
 				if (_send_noteTriggers) {
 					output.samples(channel + _nodeCount)[frame] = _trigs[channel].phase() < 1 ? 1 : 0;
 				}
