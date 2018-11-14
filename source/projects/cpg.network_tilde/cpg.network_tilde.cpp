@@ -349,7 +349,7 @@ public:
 
 	message<threadsafe::yes> noise{ this, "noise",
 		MIN_FUNCTION{
-		if (args.size() >= 3 && _engine_ptr->nodeExists((int)args[0])) {
+		if (args.size() >= 2 && _engine_ptr->nodeExists((int)args[0])) {
 			_engine_ptr->setNodeSelfNoise((int)args[0], (double)args[1]);
 		}
 	return {};
@@ -608,7 +608,7 @@ public:
 		_engine_ptr->setFreqCompensation(_freqComp);
 
 		for (int i = 0; i < _nodeCount; i++) {
-			_engine_ptr->setNodeFrequency(i, _freqs[i], false);
+			setFreq(i, _freqs[i]);
 		}
 		_engine_ptr->reset();
 	
