@@ -1,0 +1,40 @@
+<presets>
+    <preset id="-1">
+        <nodeCount>1</nodeCount>
+        <BPM>60</BPM>
+        <t2overt1>4.0</t2overt1>
+        <c>1.0</c>
+        <b>4.07</b>
+        <g>4.07</g>
+        <freqComp>0.077451</freqComp>
+        <nodes>
+            <node id="0">
+                <parent>-1</parent>
+                <freq>0.5</freq>
+                <selfNoise>0.05</selfNoise>
+                <phaseOffset>0.0</phaseOffset>
+                <synchMode>"off"</synchMode>
+                <positionX>0.5</positionX>
+                <positionY>0.5</positionY>
+                <inputs>
+                    <input>
+                        <id></id>
+                        <weight></weight>
+                        <offset></offset>
+                    </input>
+                </inputs>
+                <synth>
+                    <note>30</note>
+                    <attack>0.020</attack>
+                    <decay>0.6</decay>
+                    <vol>0.7</vol>
+                    <muted>0</muted>
+                    <carrier>1</carrier>
+                    <modulator>3</modulator>
+                    <index>0.6</index>
+                    <noise>0.01</noise>
+                </synth>
+            </node>
+        </nodes>
+    </preset>
+</presets>

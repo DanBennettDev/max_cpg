@@ -1,0 +1,201 @@
+<settings>
+    <defaultPresetFile>./matsuPresets.pre</defaultPresetFile>
+    <defaultSynthPresetFile>./synthPresets.xml</defaultSynthPresetFile>
+    <nodeFrequencies>
+        <name>1/4</name><value>0.25</value>
+        <name>1/3</name><value>0.33333333333333</value>
+        <name>1/2</name><value>0.5</value>
+        <name>1</name><value>1</value>
+        <name>2</name><value>2</value>
+        <name>3</name><value>3</value>
+        <name>4</name><value>4</value>
+        <name>6</name><value>6</value>
+        <name>8</name><value>8</value>
+        <name>16</name><value>16</value>
+    </nodeFrequencies>
+    <nodePitches>
+        <!--         <set>
+                    <pitch>220</pitch>
+                    <pitch>329.63</pitch>
+                    <pitch>440</pitch>
+                    <pitch>369.99</pitch>
+                    <pitch>311.13</pitch>
+                    <pitch>220.26</pitch>
+                </set> -->
+        <set>
+            <pitch>220</pitch>
+            <pitch>329.63</pitch>
+            <pitch>440</pitch>
+            <pitch>370</pitch>
+            <pitch>493.9</pitch>
+            <pitch>523.251</pitch>
+            <pitch>659.3</pitch>
+            <pitch>587.33</pitch>
+            <pitch>261</pitch>  
+            <pitch>783.991</pitch>      
+        </set>
+        <set>
+            <pitch>440</pitch>
+            <pitch>329.628</pitch>
+            <pitch>440</pitch>
+            <pitch>523.251</pitch>
+            <pitch>783.991</pitch>
+            <pitch>659</pitch>
+            <pitch>880</pitch>
+            <pitch>493.883</pitch>
+            <pitch>172.614</pitch>
+            <pitch>1046.5</pitch>
+        </set>
+        <set>
+            <pitch>220</pitch>
+            <pitch>329.628</pitch>
+            <pitch>440</pitch>
+            <pitch>523.251</pitch>
+            <pitch>659.255</pitch>
+            <pitch>659</pitch>
+            <pitch>880</pitch>
+            <pitch>493.883</pitch>
+            <pitch>164.814</pitch>
+            <pitch>1046.5</pitch> 
+        </set>
+        <set>
+            <pitch>440</pitch>
+            <pitch>329.628</pitch>
+            <pitch>523</pitch>
+            <pitch>370</pitch>
+            <pitch>740</pitch>
+            <pitch>659</pitch>
+            <pitch>880</pitch>
+            <pitch>440</pitch>
+            <pitch>220</pitch>
+            <pitch>987.767</pitch> 
+        </set>
+    </nodePitches>
+
+    <audioOn>1</audioOn>
+    <midiOn>0</midiOn>
+    <nodeMenu>
+        <showSynthAdvanced>0</showSynthAdvanced>
+        <showSynthPresets>1</showSynthPresets>
+        <showPhaseOffset>0</showPhaseOffset>
+        <showSelfNoise>0</showSelfNoise>
+        <showSynchMode>0</showSynchMode>
+        <showNodeMenu>1</showNodeMenu>
+    </nodeMenu>
+    <mainMenu>
+        <showReloadSettings>1</showReloadSettings>
+        <mainMenuOpacity>0.2</mainMenuOpacity>
+    </mainMenu>  
+
+    <CPG_behaviour>
+        <nodeIntensityFloor>0.7</nodeIntensityFloor>
+        <newNodeFreqMultiple>2</newNodeFreqMultiple>
+        <newNodeVolumeInit>0.6</newNodeVolumeInit>
+        <newConnWeightScale>0.0</newConnWeightScale>
+        <newParentChildConnWeightScale>1.0</newParentChildConnWeightScale>
+
+        <nodeDistWeightScalingLimit>0.85</nodeDistWeightScalingLimit>
+        <nodeDistWeightScalingStart>0.01</nodeDistWeightScalingStart>
+        <nodeDistWeightScalingExp>2</nodeDistWeightScalingExp>
+
+        <positionMapsToPan>0</positionMapsToPan>
+        <connectionWeightMax>10</connectionWeightMax>
+        <connectionWeightScalingOn>1</connectionWeightScalingOn>
+        <connectionWeightScalingUnity>3</connectionWeightScalingUnity>
+        <connectionWeightScalingCurveSource>./scalingCurve.txt</connectionWeightScalingCurveSource>
+        <t1Overt2>4.0</t1Overt2>
+        <c>1.0</c>
+        <b>7</b>
+        <g>7</g>
+        <!-- just a starter value - will be calibrated on load -->
+        <freqCompensation>0.973200</freqCompensation>
+    </CPG_behaviour>
+
+
+    <CPG_layout>
+        <!-- messy - measurements for these are as proportion of screen... -->
+        <nodeClickableRadius>0.035</nodeClickableRadius>
+        <nodeCollideDistance>0.07</nodeCollideDistance>
+        <defaultNodeSpawnDistance>0.12</defaultNodeSpawnDistance>
+
+        <!-- ... these are in pixels -->
+        <!-- ... because currently Presenter, which uses 0-1 coordinates is 
+             handling click-location of nodes, whereas view/drawing classes are
+             (correctly) handling location of connections.
+         -->
+        <connectionClickableWidth>15</connectionClickableWidth>
+        <defaultNodeRadius>34</defaultNodeRadius>
+        <node0HaloSize>1.35</node0HaloSize>
+        <nodeFreqIndicatorSize>40</nodeFreqIndicatorSize>
+
+        <pointsInCircle>30</pointsInCircle>
+        <pointsInArc>30</pointsInArc>
+        <arrowHeadSize>12</arrowHeadSize>
+        <arrowHeadWidthMultiplier>2</arrowHeadWidthMultiplier>
+        <arrowHeadWidthMin>5</arrowHeadWidthMin>
+        <arrowHeadWidthMax>13</arrowHeadWidthMax>
+
+        <!--
+        parameters to adjust size of arced connection lines 
+        compared to base length, so they line up neatly with arrowhead    
+         -->
+        <arcAdjust>1</arcAdjust>
+        <minArcAdjustRad>0</minArcAdjustRad>
+        <maxArcAdjustRad>50</maxArcAdjustRad>
+        <defaultCurveAmount>0.01</defaultCurveAmount>
+
+        <minLineThickness>1.0</minLineThickness>
+        <maxLineThickness>8</maxLineThickness>
+        <nodeLineThickness>2.4</nodeLineThickness>
+        <nodeFlashSpread>40</nodeFlashSpread>
+        <nodeFlashExponent>8</nodeFlashExponent>
+
+
+        <nodeInfoTriWidth>3</nodeInfoTriWidth>
+        <nodeInfoTriHeight>6</nodeInfoTriHeight>
+        <nodeInfoTriXOffset>0</nodeInfoTriXOffset>
+        <nodeInfoTriYOffset>0</nodeInfoTriYOffset>
+        <fontSizeNodeInfo>16</fontSizeNodeInfo>
+        <fontNodeInfoAboveOffset>1.9</fontNodeInfoAboveOffset>
+        <fontNodeInfoBelowOffset>0.9</fontNodeInfoBelowOffset>
+        <fontNodeInfoColour><r>170</r><g>170</g><b>170</b>
+        </fontNodeInfoColour>
+
+
+
+        <fontNodeInfoPath>assets/FantasqueSansMono-Regular.ttf</fontNodeInfoPath>
+
+        <minLineWeight>0.1</minLineWeight>
+        <maxLineWeight>7</maxLineWeight>
+
+        <ConnBrightnessParentChild>1</ConnBrightnessParentChild>
+        <ConnBrightnessOther>1</ConnBrightnessOther>
+        <inactiveBrightnessMult>0.4</inactiveBrightnessMult>
+        <lineBrightnessScalingBegins>0.9</lineBrightnessScalingBegins>
+
+
+        <ConnColour_R>255</ConnColour_R>
+        <ConnColour_G>150</ConnColour_G>
+        <ConnColour_B>20</ConnColour_B>
+        <SelectedColour_R>0</SelectedColour_R>
+        <SelectedColour_G>255</SelectedColour_G>
+        <SelectedColour_B>29</SelectedColour_B>
+        <NodeColours>
+            <nColour><r>255</r><g>255</g><b>255</b></nColour>
+            <nColour><r>9</r><g>164</g><b>255</b></nColour>
+            <!-- <nColour><r>255</r><g>140</g><b>0</b></nColour> -->
+            <nColour><r>255</r><g>233</g><b>14</b></nColour>
+            <nColour><r>89</r><g>0</g><b>208</b></nColour>
+            <nColour><r>255</r><g>189</g><b>108</b></nColour>
+            <nColour><r>0</r><g>255</g><b>245</b></nColour>
+            <nColour><r>158</r><g>144</g><b>0</b></nColour>
+            <nColour><r>143</r><g>61</g><b>251</b></nColour>
+            <nColour><r>255</r><g>0</g><b>172</b></nColour>
+            <nColour><r>248</r><g>105</g><b>202</b></nColour>
+            <nColour><r>172</r><g>116</g><b>246</b></nColour>
+        </NodeColours>
+
+
+    </CPG_layout>
+
+</settings>

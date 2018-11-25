@@ -84,8 +84,8 @@
 		</method>
 
 		<method name='bang'>
-			<digest>reset the node </digest>
-			<description>reset the node </description>
+			<digest>reset the network </digest>
+			<description>reset the network </description>
 		</method>
 
 		<method name='params'>

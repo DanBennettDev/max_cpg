@@ -1,0 +1,9 @@
+
+
+--------------------------------------- 2018-11-25-22-02-52-123
+[notice ] done
+[notice ] done
+[ error ] ofShader: setupShaderFromFile(): couldn't load GL_VERTEX_SHADER shader  from "shaders/shaderMonteCarloBlur_vert.glsl"
+[ error ] ofShader: setupShaderFromFile(): couldn't load GL_FRAGMENT_SHADER shader  from "shaders/shaderMonteCarloBlur_frag.glsl"
+[ error ] ofShader: bindDefaults(): trying to link GLSL program, but no shaders created yet
+[ error ] ofShader: linkProgram(): trying to link GLSL program, but no shaders created yet
