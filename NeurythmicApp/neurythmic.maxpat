@@ -4,7 +4,7 @@
 		"appversion" : 		{
 			"major" : 7,
 			"minor" : 3,
-			"revision" : 4,
+			"revision" : 5,
 			"architecture" : "x64",
 			"modernui" : 1
 		}
@@ -152,14 +152,14 @@
 , 			{
 				"box" : 				{
 					"id" : "obj-23",
-					"linecount" : 3,
+					"linecount" : 4,
 					"maxclass" : "message",
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 47.0, 263.0, 52.0, 50.0 ],
+					"patching_rect" : [ 47.0, 263.0, 52.0, 64.0 ],
 					"style" : "",
-					"text" : "offset_out 5 0.3125"
+					"text" : "weight 0 5 1.716426"
 				}
 
 			}
@@ -226,7 +226,7 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 4,
+							"revision" : 5,
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -1216,7 +1216,7 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 4,
+							"revision" : 5,
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -1258,7 +1258,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 444.0, 546.0, 50.0, 36.0 ],
 									"style" : "",
-									"text" : "preset 4."
+									"text" : "preset 3."
 								}
 
 							}
@@ -1272,7 +1272,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 377.0, 546.0, 50.0, 36.0 ],
 									"style" : "",
-									"text" : "preset 4."
+									"text" : "preset 6."
 								}
 
 							}
@@ -1300,7 +1300,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 239.0, 546.0, 50.0, 36.0 ],
 									"style" : "",
-									"text" : "preset 2."
+									"text" : "preset 8."
 								}
 
 							}
@@ -1551,7 +1551,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -2643,7 +2643,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -3735,7 +3735,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -4827,7 +4827,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -5919,7 +5919,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -7024,7 +7024,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -8918,7 +8918,7 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 4,
+							"revision" : 5,
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -9003,7 +9003,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -9230,7 +9230,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -9604,7 +9604,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 417.0, 319.0, 50.0, 36.0 ],
 									"style" : "",
-									"text" : "/noteEvent/4 1."
+									"text" : "/noteEvent/6 1."
 								}
 
 							}
@@ -9646,7 +9646,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -9873,7 +9873,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -10100,7 +10100,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -10327,7 +10327,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -10554,7 +10554,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -10781,7 +10781,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -11008,7 +11008,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -11209,7 +11209,7 @@
 										"appversion" : 										{
 											"major" : 7,
 											"minor" : 3,
-											"revision" : 4,
+											"revision" : 5,
 											"architecture" : "x64",
 											"modernui" : 1
 										}
@@ -11749,7 +11749,7 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 4,
+							"revision" : 5,
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -11980,14 +11980,14 @@
 , 			{
 				"box" : 				{
 					"id" : "obj-5",
-					"linecount" : 3,
+					"linecount" : 5,
 					"maxclass" : "message",
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 425.0, 82.0, 50.0, 50.0 ],
+					"patching_rect" : [ 425.0, 82.0, 50.0, 77.0 ],
 					"style" : "",
-					"text" : "/phase/node/5 0.3125"
+					"text" : "/weight/conn/0/5 1.716426"
 				}
 
 			}
@@ -12003,7 +12003,7 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 4,
+							"revision" : 5,
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -12045,7 +12045,7 @@
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 672.0, 368.0, 50.0, 64.0 ],
 									"style" : "",
-									"text" : "quant_amount_node 5 0."
+									"text" : "quant_amount_node 1 1."
 								}
 
 							}
@@ -12525,7 +12525,7 @@
 						"appversion" : 						{
 							"major" : 7,
 							"minor" : 3,
-							"revision" : 4,
+							"revision" : 5,
 							"architecture" : "x64",
 							"modernui" : 1
 						}
@@ -13823,7 +13823,7 @@
 , 			{
 				"patchline" : 				{
 					"destination" : [ "obj-11", 2 ],
-					"midpoints" : [ 808.0, 291.0, 1161.0, 293.0, 1133.0, 629.0, 280.0, 644.0 ],
+					"midpoints" : [ 808.0, 291.0, 1161.0, 291.0, 1133.0, 629.0, 280.0, 644.0 ],
 					"source" : [ "obj-12", 16 ]
 				}
 
@@ -14186,31 +14186,36 @@
  ],
 		"dependency_cache" : [ 			{
 				"name" : "audioUnit_simple.maxpat",
-				"bootpath" : "D:/edu/msc/matsuokaMax",
+				"bootpath" : "O:/Documents/Max 7/Packages/max_cpg/NeurythmicApp",
+				"patcherrelativepath" : ".",
 				"type" : "JSON",
 				"implicit" : 1
 			}
 , 			{
 				"name" : "crappyAR.gendsp",
-				"bootpath" : "D:/edu/msc/matsuokaMax",
+				"bootpath" : "O:/Documents/Max 7/Packages/max_cpg/NeurythmicApp",
+				"patcherrelativepath" : ".",
 				"type" : "gDSP",
 				"implicit" : 1
 			}
 , 			{
 				"name" : "ZeroxTrig.gendsp",
-				"bootpath" : "D:/edu/msc/matsuokaMax",
+				"bootpath" : "O:/Documents/Max 7/Packages/max_cpg/NeurythmicApp",
+				"patcherrelativepath" : ".",
 				"type" : "gDSP",
 				"implicit" : 1
 			}
 , 			{
 				"name" : "nth.gendsp",
-				"bootpath" : "D:/edu/msc/matsuokaMax",
+				"bootpath" : "O:/Documents/Max 7/Packages/max_cpg/NeurythmicApp",
+				"patcherrelativepath" : ".",
 				"type" : "gDSP",
 				"implicit" : 1
 			}
 , 			{
 				"name" : "grooveDriver.gendsp",
-				"bootpath" : "D:/edu/msc/matsuokaMax",
+				"bootpath" : "O:/Documents/Max 7/Packages/max_cpg/NeurythmicApp",
+				"patcherrelativepath" : ".",
 				"type" : "gDSP",
 				"implicit" : 1
 			}
