@@ -1,11 +1,11 @@
 # Central Pattern Generator Objects for MAX/MSP
 MAX MSP objects for creative use of Central Pattern Generator networks (CPGs) (specifically Matsuoka's Neural Oscillator (MNO)), as used in my "neurythmic" system. [(see paper here)](https://www.researchgate.net/publication/324360165_Neurythmic_A_Rhythm_Creation_Tool_Based_on_Central_Pattern_Generators). This repository contains all the externals, helpfiles etc., and an implementation of my Neurythmic software for MAX/MSP. The externals should work on macOS or Windows, but the GUI for neurythmic will only run on Windows at present.
 
-Download or clone this repo, to your max packages folder. If you download it, unzip it.
+Download or clone this repo, to your max packages folder. 
 
-See [this page](https://danbennettdev.github.io/projects/cpg_max.html) for a guide to the neurythmic GUI. and [this page](https://danbennettdev.github.io/projects/cpg_creativity.html) for a description of why you might be interested).
+See [this page](https://danbennettdev.github.io/projects/cpg_max.html) for a guide to the neurythmic GUI. and [this page](https://danbennettdev.github.io/projects/cpg_creativity.html) for a description of why you might be interested.
 
-# Description
+## What are CPGs
 CPGs are small networks of neurons which exhibit oscillation behaviour. They are found in animals, where they control adaptive rhythmic systems like heartbeat, lung function, gait, and (it is suggested) underly more complex motor control behaviours. It is also suggested that they may be central to human rhythm perception. For all these reasons and more I think they have huge potential for use in creative rhythm generation and interaction.
 
 The goal of these externals is to support hands-on interaction, exploration and creativity with these networks. CPG networks tend to be much smaller than the kinds of networks used in machine learning, and these externals provide various interface helpers that make it possible (and I think we've shown rewarding) to interact with these networks more-or-less directly: e.g. to tune them by hand and use them to explore and control rhythms. [My Neurythmic drum sequencer took just this approach](https://www.researchgate.net/publication/324360165_Neurythmic_A_Rhythm_Creation_Tool_Based_on_Central_Pattern_Generators). 
@@ -22,9 +22,9 @@ They are currently most commonly used in robotic motor control. I think they sho
 # The externals
 Three externals are provided
 
-1. A friendly full-network object, with quantiser, allowing easy creation and manipulation of CPG networks built up from individual MNO nodes 
-2. A single MNO-node object with a direct-frequency control interface, and message-based control of equation parameters - the frequency control system is recalibrated when you change system parameters
-3. A single barebones MNO-node with signal control over equation parameters
+1. cpg.network~ A full featured, full-network object, with quantiser, allowing easy creation and manipulation of CPG networks built up from individual MNO nodes 
+2. cpg.node_freq~ A single MNO-node object with a direct-frequency control interface, and message-based control of equation parameters - the frequency control system is recalibrated when you change system parameters
+3. cpg.node_basic~ A single barebones MNO-node with signal control over equation parameters
 
 In all cases the MNO equation is solved using 4th order Runge Kutta methods, and a stepsize of 8
 
