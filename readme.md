@@ -1,6 +1,9 @@
-# Overview
-MAX MSP objects for creative use of Central Pattern Generator networks (CPGs) (specifically Matsuoka's Neural Oscillator (MNO)), as used in my "neurythmic" system. [(see paper here)](https://www.researchgate.net/publication/324360165_Neurythmic_A_Rhythm_Creation_Tool_Based_on_Central_Pattern_Generators)
+# Central Pattern Generator Objects for MAX/MSP
+MAX MSP objects for creative use of Central Pattern Generator networks (CPGs) (specifically Matsuoka's Neural Oscillator (MNO)), as used in my "neurythmic" system. [(see paper here)](https://www.researchgate.net/publication/324360165_Neurythmic_A_Rhythm_Creation_Tool_Based_on_Central_Pattern_Generators). This repository contains all the externals, helpfiles etc., and an implementation of my Neurythmic software for MAX/MSP. The externals should work on macOS or Windows, but the GUI for neurythmic will only run on Windows at present.
 
+Download or clone this repo, to your max packages folder. If you download it, unzip it.
+
+See [this page](https://danbennettdev.github.io/projects/cpg_max.html) for a guide to the neurythmic GUI. and [this page](https://danbennettdev.github.io/projects/cpg_creativity.html) for a description of why you might be interested).
 
 # Description
 CPGs are small networks of neurons which exhibit oscillation behaviour. They are found in animals, where they control adaptive rhythmic systems like heartbeat, lung function, gait, and (it is suggested) underly more complex motor control behaviours. It is also suggested that they may be central to human rhythm perception. For all these reasons and more I think they have huge potential for use in creative rhythm generation and interaction.
