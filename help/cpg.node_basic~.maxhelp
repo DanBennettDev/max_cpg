@@ -53,13 +53,13 @@
 , 			{
 				"box" : 				{
 					"id" : "obj-16",
-					"linecount" : 26,
+					"linecount" : 31,
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 15.0, 72.0, 296.0, 365.0 ],
+					"patching_rect" : [ 15.0, 72.0, 321.0, 434.0 ],
 					"style" : "",
-					"text" : "- a simulation of a single neural oscillator unit, comprising two coupled neurons\n\nThis is the most basic element in the CPG toolkit - a no-frills implementation of a single node, controllable via its equation parameters.\n\n1st arg: sample rate of simulation - set to c 1000 for control, c 44100 for audio\n\n\nt1 & t2 - time constants - control rate and shape\n\nc1 & c2 - tonic inputs - can accept slow singal inputs, or else control the amplitude\n\nb constant of adaptation to signal\n\ng constant of adaptation of the coupled neurons to one-another.\n\nDirect frequency control is not straightforward. Use cpg.freq~ or else see this paper\n\nhttp://www.nime.org/proceedings/2018/nime2018_paper0047.pdf \n"
+					"text" : "- a simulation of a single neural oscillator unit, comprising two coupled neurons\n\nThis is the most basic element in the CPG toolkit - a no-frills implementation of a single node, controllable via its equation parameters.\n\n1st arg: sample rate of simulation - set to c 1000 for control, c 44100 for audio\n\n\nt1 & t2 - time constants - control rate and shape\n\nc1 & c2 - tonic inputs - can accept slow singal inputs, or else control the amplitude\n\nb constant of adaptation to signal\n\ng constant of adaptation of the coupled neurons to one-another.\n\nDirect frequency control is not straightforward. Use cpg.freq~ or else see this paper\n\nThese objects develop on this project\nhttp://www.nime.org/proceedings/2018/nime2018_paper0047.pdf\nPlease cite that paper if you use these objects in your own work\n\nmy email: db15237@bristol.ac.uk"
 				}
 
 			}
@@ -123,7 +123,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 525.916687, 32.0, 183.333313, 48.0 ],
+					"patching_rect" : [ 525.916687, 32.0, 188.0, 48.0 ],
 					"style" : "",
 					"text" : "Input Weight (node will entrain to periodic signal inputs of sufficient strength)"
 				}
@@ -540,7 +540,7 @@
 					"mode" : 0,
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 11.5, 20.5, 334.0, 440.0 ],
+					"patching_rect" : [ 11.5, 20.5, 334.0, 497.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 661.5, 367.5, 309.0, 217.0 ],
 					"proportion" : 0.39,

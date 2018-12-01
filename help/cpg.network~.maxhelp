@@ -9,7 +9,7 @@
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 43.0, 88.0, 1286.0, 626.0 ],
+		"rect" : [ 100.0, 100.0, 1286.0, 626.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -263,7 +263,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr",
-									"varname" : "u703000455"
+									"varname" : "u838007623"
 								}
 
 							}
@@ -561,10 +561,10 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 13.0, 65.0, 339.0, 227.0 ],
+									"patching_rect" : [ 13.0, 65.0, 351.0, 227.0 ],
 									"presentation" : 1,
 									"presentation_linecount" : 16,
-									"presentation_rect" : [ 22.0, 106.0, 359.0, 227.0 ],
+									"presentation_rect" : [ 22.0, 106.0, 363.0, 227.0 ],
 									"style" : "",
 									"text" : "External signal inlets are enabled y setting argument 4 to 1 this creates a set of signal inlets - simply send your signal into the relevant inlet\n\nExternal sync allows synchronisation to other sequencers, etc.\nIt is enabled by setting argument 5  to '1' or '2'  - this creates another inlet, which will always be the last inlet. \n1 drives node 0 (and the quantiser) directly from a phasor - in this mode, feedback signals to node 0 have no effect\n2 resets node0 to the beginning of its cycle when the incoming phasor wraps. Feedback signals still have some effect on node 0, within this externally imposed cycle. \nIf you use external sync, you should still send a frequency value into the frequency inlet for node 0 as this is used to tell the object the expected root frequency - used for setting frequencies of other nodes and other purposes."
 								}
@@ -879,7 +879,7 @@
 ,
 									"style" : "",
 									"text" : "autopattr",
-									"varname" : "u011000453"
+									"varname" : "u123007621"
 								}
 
 							}
@@ -2376,7 +2376,7 @@
 ,
 					"style" : "",
 					"text" : "autopattr",
-					"varname" : "u740000457"
+					"varname" : "u886007625"
 				}
 
 			}
@@ -2848,16 +2848,16 @@
 , 			{
 				"box" : 				{
 					"id" : "obj-16",
-					"linecount" : 27,
+					"linecount" : 36,
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 13.0, 65.0, 337.0, 379.0 ],
+					"patching_rect" : [ 13.0, 65.0, 337.0, 503.0 ],
 					"presentation" : 1,
-					"presentation_linecount" : 27,
-					"presentation_rect" : [ 22.0, 106.0, 337.0, 379.0 ],
+					"presentation_linecount" : 36,
+					"presentation_rect" : [ 22.0, 106.0, 337.0, 503.0 ],
 					"style" : "",
-					"text" : "This is another step on from cpg.node_freq - a network of CPG nodes in a single object. Like cpg.node_freq, both the equation parameters, and the frequencies of nodes can be set. All connections in the network begin with their weight set to 0\n\nThis object also adds a number of other features to allow you to manipulate network behaviour\n- Adjust signal connections between nodes\n- Generate note-triggers from node behaviour (with or without quantisation)\n- Apply delays to node outputs, and to signal connections between nodes\n- Set \"internal noise\" level for each node\n- Apply delay to individual node outputs\n\n\nThese features mean the object requires more CPU power than the other cpg. objects. For CPU efficiency, the sample rate of the object can be set to a lower rate than the overall max environment. We have found 1000 hz is a good trade-off for control-signal applications. Of course the sample rate can be set to (e.g.) 44100 if you wish to listen to the audio output of the network. Below a signal rates of 44100 interpolation is used we have found this completely adequate for control signal use, but less so for audio (though you may like the digital crunchiness)."
+					"text" : "This is another step on from cpg.node_freq - a network of CPG nodes in a single object. Like cpg.node_freq, both the equation parameters, and the frequencies of nodes can be set. All connections in the network begin with their weight set to 0\n\nThis object also adds a number of other features to allow you to manipulate network behaviour\n- Adjust signal connections between nodes\n- Generate note-triggers from node behaviour (with or without quantisation)\n- Apply delays to node outputs, and to signal connections between nodes\n- Set \"internal noise\" level for each node\n- Apply delay to individual node outputs\n\n\nThese features mean the object requires more CPU power than the other cpg. objects. For CPU efficiency, the sample rate of the object can be set to a lower rate than the overall max environment. We have found 1000 hz is a good trade-off for control-signal applications. Of course the sample rate can be set to (e.g.) 44100 if you wish to listen to the audio output of the network. Below a signal rates of 44100 interpolation is used we have found this completely adequate for control signal use, but less so for audio (though you may like the digital crunchiness).\n\n\nThese objects develop on this project\nhttp://www.nime.org/proceedings/2018/nime2018_paper0047.pdf\nPlease cite that paper if you use these objects in your own work\n\nmy email: db15237@bristol.ac.uk"
 				}
 
 			}
@@ -3083,7 +3083,7 @@
 					"mode" : 0,
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 11.0, 8.5, 350.0, 529.0 ],
+					"patching_rect" : [ 11.0, 8.5, 352.0, 564.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 16.5, 43.5, 359.0, 517.0 ],
 					"proportion" : 0.39,

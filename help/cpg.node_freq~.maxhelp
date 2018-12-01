@@ -146,13 +146,13 @@
 , 			{
 				"box" : 				{
 					"id" : "obj-16",
-					"linecount" : 19,
+					"linecount" : 27,
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 14.0, 75.0, 263.0, 269.0 ],
+					"patching_rect" : [ 14.0, 75.0, 264.0, 379.0 ],
 					"style" : "",
-					"text" : "An easier to use version of cpg.node_basic~ \n\nAgain this is a single CPG node - a neural oscillator.\n\nUnlike cpg.node_basic~ the frequency of this node can be controlled directly. \n\nTo allow this the node must be re-calibrated after every parameter change - so signal-rate control of parameters is not possible\n\nThe parameters are reduced compared to cpg.node_basic~ for ease of use, but should be suitable for most uses\n\nFirst arg - sample rate. Set to c 1000 for control rate use, or 44100 for audio rate. Higher signal rate requires more CPU"
+					"text" : "An easier to use version of cpg.node_basic~ \n\nAgain this is a single CPG node - a neural oscillator.\n\nUnlike cpg.node_basic~ the frequency of this node can be controlled directly. \n\nTo allow this the node must be re-calibrated after every parameter change - so signal-rate control of parameters is not possible\n\nThe parameters are reduced compared to cpg.node_basic~ for ease of use, but should be suitable for most uses\n\nFirst arg - sample rate. Set to c 1000 for control rate use, or 44100 for audio rate. Higher signal rate requires more CPU \n\nThese objects develop on this project\nhttp://www.nime.org/proceedings/2018/nime2018_paper0047.pdf\nPlease cite that paper if you use these objects in your own work\n\nmy email: db15237@bristol.ac.uk"
 				}
 
 			}

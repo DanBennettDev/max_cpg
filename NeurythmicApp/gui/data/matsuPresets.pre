@@ -2131,7 +2131,7 @@
                     <offset>11</offset>
                     <amount>1.000000000</amount>
                 </quantiser>
-                <inputs></inputs>
+                <inputs />
             </node>
             <node>
                 <nodeID>1</nodeID>
@@ -2434,7 +2434,7 @@
                     <offset>11</offset>
                     <amount>1.000000000</amount>
                 </quantiser>
-                <inputs></inputs>
+                <inputs />
             </node>
             <node>
                 <nodeID>1</nodeID>
