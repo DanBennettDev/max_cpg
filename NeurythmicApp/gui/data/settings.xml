@@ -2,6 +2,9 @@
     <defaultPresetFile>./matsuPresets.pre</defaultPresetFile>
     <defaultSynthPresetFile>./synthPresets.xml</defaultSynthPresetFile>
     <nodeFrequencies>
+        <freqMin>20</freqMin>
+        <freqMax>200</freqMax>
+        <freqLabel>bpm</freqLabel>
         <name>1/4</name><value>0.25</value>
         <name>1/3</name><value>0.33333333333333</value>
         <name>1/2</name><value>0.5</value>
