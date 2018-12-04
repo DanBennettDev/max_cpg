@@ -1,10 +1,12 @@
 # Central Pattern Generator Objects for MAX/MSP
 
+*No need to build: just download or clone this repo, to your max packages folder. *
+
+
 **note: version 0.x. Fairly stable, but still subject to change**
 
 MAX MSP objects for creative use of Central Pattern Generator networks (CPGs) (specifically Matsuoka's Neural Oscillator (MNO)), as used in my "neurythmic" system. [(see paper here)](https://www.researchgate.net/publication/324360165_Neurythmic_A_Rhythm_Creation_Tool_Based_on_Central_Pattern_Generators). This repository contains all the externals, helpfiles etc., and an implementation of my Neurythmic software for MAX/MSP. The externals should work on macOS or Windows, but the GUI for neurythmic will only run on Windows at present.
 
-Download or clone this repo, to your max packages folder. 
 
 See [this page](https://danbennettdev.github.io/projects/cpg_max.html) for a guide to the neurythmic GUI. and [this page](https://danbennettdev.github.io/projects/cpg_creativity.html) for a description of why you might be interested.
 
