@@ -1,6 +1,6 @@
 # Central Pattern Generator Objects for MAX/MSP
 
-*No need to build: just download or clone this repo, to your max packages folder. *
+**No need to build: just download or clone this repo, to your max packages folder.**
 
 
 **note: version 0.x. Fairly stable, but still subject to change**
